@@ -1,0 +1,25 @@
+{
+	"name": "plot",
+	"version": "1.0.0",
+	"author": "dayblox",
+	"description": "WebSocket chatrooms server",
+	"engines": {
+		"node": ">=18.11",
+		"pnpm": ">=7.27"
+	},
+	"scripts": {
+		"dev": "pnpm /dev:.*/",
+		"dev:build": "esbuild dev.ts ./src --bundle --outdir=dist --packages=external --platform=node --sourcemap --watch",
+		"dev:run": "node --inspect --no-warnings --loader ./dist/dev.js --watch dist/src",
+		"build": "esbuild index=./src --bundle --minify --outdir=dist --packages=external --platform=node",
+		"start": "node dist"
+	},
+	"dependencies": {
+		"esbuild": "^0.17.16",
+		"ws": "^8.13.0"
+	},
+	"devDependencies": {
+		"@types/node": "^18.15.11",
+		"@types/ws": "^8.5.4"
+	}
+}
