@@ -1,8 +1,8 @@
 import { Socket, rooms } from "./state.js"
 
-export const blue = "\x1b[94m"
-export const green = "\x1b[92m"
-export const reset = "\x1b[0m"
+export const blue  = ">"
+export const green = ">>"
+export const reset = ""
 
 export function ask(socket: Socket, item: string, error?: boolean) {
 	if (error)
