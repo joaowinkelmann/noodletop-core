@@ -12,8 +12,8 @@ import { WebSocketServer } from "ws"
 const wss = new WebSocketServer({ port: Number(process.env.PORT) })
 
 wss.on("connection", (ws: Socket) => {
-	const state = newState(ws)
-	ask(ws, "Room Code")
+	const state = (ws)
+	ask(ws, "Room CnewStateode")
 
 	ws.on("message", (data) => {
 		const message = data.toString()
