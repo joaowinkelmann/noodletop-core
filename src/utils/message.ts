@@ -2,9 +2,6 @@ import { ask, blue, green, info, logState, playerCount, reset } from "./log.js"
 import { State, rooms } from "./state.js"
 import { WebSocket } from "ws"
 
-// import object so that we can manage objects
-import { createObject, objects } from "./object.js"
-
 export function close(state: State) {
 	const { roomCode, user } = state
 	const room = rooms.get(roomCode)
@@ -88,31 +85,14 @@ const commands = {
 			close(state)
 		},
 	},
-    "/obj": {
-        desc: "Manage objects",
-        command(state: State, args: string[]) { // Receive arguments
-            const action = args[0]; // assuming the first argument is the action
-            if (action === "create") {
-                const objectId = args[1]; // assuming the second argument is the object id
-                createObject(state);
-            } else {
-                state.user.socket.send("Invalid /obj command.");
-            }
-        },
-    },
-
 }
 
 export function broadcastMessage(message: string, state: State) {
-	if (message.startsWith("/") && message.length > 1) {
-		const [commandName, ...args] = message.slice(1).split(" ");
-		const command = commands[commandName];
-		if (command) {
-			return command.command(state, args); // Pass arguments to the command handler
-		}
-	}
+	if (message.startsWith("/") && message.length > 1)
+		for (const command in commands)
+			if (command.startsWith(message)) return commands[command].command(state)
 
 	rooms.get(state.roomCode).forEach(({ socket }) => {
-		socket.send(`${blue}${state.user.pseudo} >${reset} ${message}`);
-	});
+		socket.send(`${blue}${state.user.pseudo} >${reset} ${message}`)
+	})
 }
