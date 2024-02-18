@@ -104,15 +104,24 @@ const commands = {
 }
 
 export function broadcastMessage(message: string, state: State) {
-	if (message.startsWith("/") && message.length > 1) {
-		const [commandName, ...args] = message.slice(1).split(" ");
-		const command = commands[commandName];
-		if (command) {
-			return command.command(state, args); // Pass arguments to the command handler
-		}
-	}
+    if (state.roomCode) { // Check if room code is set
+        if (message.startsWith("/") && message.length > 1) {
+            const [commandName, ...args] = message.slice(1).split(" ");
+            const command = commands[commandName];
+            if (command) {
+                return command.command(state, args); // Pass arguments to the command handler
+            }
+        }
 
-	rooms.get(state.roomCode).forEach(({ socket }) => {
-		socket.send(`${blue}${state.user.pseudo} >${reset} ${message}`);
-	});
+        const room = rooms.get(state.roomCode);
+        if (room) {
+            room.forEach(({ socket }) => {
+                socket.send(`${blue}${state.user.pseudo} >${reset} ${message}`);
+            });
+        }
+    } else {
+        // Handle the case when room code is not set
+        // For example, send a message to the user indicating they need to join a room
+        state.user.socket.send("You need to join a room first.");
+    }
 }
