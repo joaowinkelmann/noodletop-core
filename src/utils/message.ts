@@ -93,7 +93,6 @@ export function broadcastMessage(message: string, state: State) {
 			if (command.startsWith(message)) return commands[command].command(state)
 
 	rooms.get(state.roomCode).forEach(({ socket }) => {
-		socket !== state.user.socket &&
-			socket.send(`${blue}${state.user.pseudo} >${reset} ${message}`)
+		socket.send(`${blue}${state.user.pseudo} >${reset} ${message}`)
 	})
 }
