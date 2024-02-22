@@ -64,13 +64,15 @@ const commands = {
 	},
 	"/info": {
 		desc: "Room information",
-		command({ roomCode, user }: State) {
+		command({ user, parameters }: { user: any, parameters: string[] }) {
+			const roomCode = parameters[0]; // Assuming the first parameter is the room code
 			user.socket.send(info(roomCode, rooms.get(roomCode)))
 		},
 	},
 	"/list": {
 		desc: "Room user list",
-		command({ roomCode, user }: State) {
+		command({ user, parameters }: { user: any, parameters: string[] }) {
+			const roomCode = parameters[0]; // Assuming the first parameter is the room code
 			const room = rooms.get(roomCode)
 			user.socket.send(
 				`${playerCount(room.size)}: ${blue}${[...room.values()]
@@ -85,12 +87,26 @@ const commands = {
 			close(state)
 		},
 	},
+	"/echo": {
+		desc: "Echo message to all users",
+		command({ parameters, state }: { parameters: string[], state: State }) {
+			const message = parameters.slice(1).join(" "); // Join all parameters after the first one
+			const roomCode = state.roomCode;
+			rooms.get(roomCode).forEach(({ socket }) => {
+				socket.send(`${blue}Echo: ${reset}${message}`);
+			});
+		},
+	},
 }
 
 export function broadcastMessage(message: string, state: State) {
-	if (message.startsWith("/") && message.length > 1)
-		for (const command in commands)
-			if (command.startsWith(message)) return commands[command].command(state)
+	if (message.startsWith("/")) {
+		const [command, ...parameters] = message.slice(1).split(" "); // Split command and parameters
+		if (command in commands) {
+			commands[command].command({ user: state.user, parameters });
+			return;
+		}
+	}
 
 	rooms.get(state.roomCode).forEach(({ socket }) => {
 		socket.send(`${blue}${state.user.pseudo} >${reset} ${message}`)
