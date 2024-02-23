@@ -102,7 +102,7 @@ const commands = {
 export function broadcastMessage(message: string, state: State) {
 	if (message.startsWith("/") && message.length > 1) {
 		const [command, ...parameters] = message.slice(1).split(" "); // Split command and parameters
-		for (const cmd in commands) {
+		for (const cmd of Object.keys(commands)) {
 			if (command === cmd) {
 				return commands[cmd].command({ user: state.user, parameters });
 			}
@@ -110,6 +110,6 @@ export function broadcastMessage(message: string, state: State) {
 	}
 
 	rooms.get(state.roomCode).forEach(({ socket }) => {
-		socket.send(`${blue}${state.user.pseudo} >${reset} ${message}`)
-	})
+		socket.send(`${blue}${state.user.pseudo} >${reset} ${message}`);
+	});
 }
