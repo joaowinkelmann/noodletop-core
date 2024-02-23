@@ -98,13 +98,16 @@ const commands = {
 }
 
 export function broadcastMessage(message: string, state: State) {
-	if (message.startsWith("/") && message.length > 1)
-		for (const command in commands)
-			if (command.startsWith(message)) return commands[command].command(state, message.slice(command.length + 1))
+	if (message.startsWith("/") && message.length > 1) {
+		const command = message.split(" ")[0]
+		const commandArgs = message.slice(command.length + 1)
+		if (commands.hasOwnProperty(command)) {
+			commands[command].command(state, commandArgs)
+			return
+		}
+	}
 
 	rooms.get(state.roomCode).forEach(({ socket }) => {
-		// socket !== state.user.socket 
-		// &&
-			socket.send(`${blue}${state.user.pseudo} >${reset} ${message}`)
+		socket.send(`${blue}${state.user.pseudo} >${reset} ${message}`)
 	})
 }
