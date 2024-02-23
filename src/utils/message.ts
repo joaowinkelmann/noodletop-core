@@ -2,6 +2,8 @@ import { ask, blue, green, info, logState, playerCount, reset } from "./log.js"
 import { State, rooms } from "./state.js"
 import { WebSocket } from "ws"
 
+import { RoomObject, RoomObjects } from "./object.js"
+
 export function close(state: State) {
 	const { roomCode, user } = state
 	const room = rooms.get(roomCode)
@@ -93,6 +95,25 @@ const commands = {
 					socket.send(`${blue}${state.user.pseudo} >${reset} ${message}`)
 				})
 			})
+		},
+	},
+	"/obj": {
+		desc: "Perform operations on RoomObject",
+		command(state: State, operation: string) {
+			const room = rooms.get(state.roomCode);
+			if (!room) return;
+
+			// Create an instance of the RoomObjects class
+			const roomObjects = new RoomObjects();
+
+			// get the operation
+			const [op, ...args] = operation.split(" ");
+			switch (op) {
+				case "create":
+				default:
+					// Call the createObject method on the instance
+					roomObjects.createObject(state, {});
+			}
 		},
 	},
 }
