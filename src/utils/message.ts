@@ -100,11 +100,12 @@ const commands = {
 }
 
 export function broadcastMessage(message: string, state: State) {
-	if (message.startsWith("/")) {
+	if (message.startsWith("/") && message.length > 1) {
 		const [command, ...parameters] = message.slice(1).split(" "); // Split command and parameters
-		if (command in commands) {
-			commands[command].command({ user: state.user, parameters });
-			return;
+		for (const cmd in commands) {
+			if (command === cmd) {
+				return commands[cmd].command({ user: state.user, parameters });
+			}
 		}
 	}
 
