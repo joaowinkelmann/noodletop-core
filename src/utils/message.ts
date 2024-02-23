@@ -85,12 +85,22 @@ const commands = {
 			close(state)
 		},
 	},
+	"/globalecho": {
+		desc: "Send a message to all connected sockets",
+		command(state: State, message: string) {
+			rooms.forEach((room) => {
+				room.forEach(({ socket }) => {
+					socket.send(`${blue}${state.user.pseudo} >${reset} ${message}`)
+				})
+			})
+		},
+	},
 }
 
 export function broadcastMessage(message: string, state: State) {
 	if (message.startsWith("/") && message.length > 1)
 		for (const command in commands)
-			if (command.startsWith(message)) return commands[command].command(state)
+			if (command.startsWith(message)) return commands[command].command(state, message.slice(command.length + 1))
 
 	rooms.get(state.roomCode).forEach(({ socket }) => {
 		// socket !== state.user.socket 
