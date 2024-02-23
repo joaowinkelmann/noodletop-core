@@ -102,17 +102,18 @@ const commands = {
 		command(state: State, operation: string) {
 			const room = rooms.get(state.roomCode);
 			if (!room) return;
-
-			// Create an instance of the RoomObjects class
 			const roomObjects = new RoomObjects();
-
 			// get the operation
 			const [op, ...args] = operation.split(" ");
 			switch (op) {
+				case "read":
+					roomObjects.getObject(state, args[0]);
+					break;
 				case "create":
 				default:
 					// Call the createObject method on the instance
 					roomObjects.createObject(state, {});
+					break;
 			}
 		},
 	},

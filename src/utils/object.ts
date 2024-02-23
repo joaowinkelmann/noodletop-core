@@ -25,6 +25,15 @@ export class RoomObjects {
     return newObject
   }
 
+  getObject(state: State, objectId: string): RoomObject {
+    const roomObjects = this.objects.get(state.roomCode) || []
+    const object = roomObjects.find(obj => obj.id === objectId)
+    if (!object) {
+      throw new Error('Object not found');
+    }
+    return object;
+  }
+
   updateObject(state: State, objectId: string, updatedFields: Partial<RoomObject>): RoomObject {
     const roomObjects = this.objects.get(state.roomCode) || []
     const objectIndex = roomObjects.findIndex(obj => obj.id === objectId)
