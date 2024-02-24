@@ -47,9 +47,8 @@ export class ObjectManager {
 	/**
 	 * Returns all objects from the manager.
 	 */
-	getAll(): string | undefined {
-		// return this.objects;
-		return JSON.stringify(this.objects);
+	getAll(): string {
+		return JSON.stringify(Array.from(this.objects.values()));
 	}
 
 	/**
@@ -98,14 +97,5 @@ export class ObjectManager {
 		} while (this.objects.has(result));
 
 		return result;
-	}
-
-	private isJSON(str: string): boolean {
-		try {
-			JSON.parse(str);
-		} catch (e) {
-			return false;
-		}
-		return true;
 	}
 }
