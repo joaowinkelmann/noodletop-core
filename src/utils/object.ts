@@ -25,11 +25,11 @@ export class RoomObjects {
     return newObject
   }
 
-  getObject(state: State, objectId: string): RoomObject {
+  getObject(state: State, objectId: string): RoomObject | string {
     const roomObjects = this.objects.get(state.roomCode) || []
     const object = roomObjects.find(obj => obj.id === objectId)
     if (!object) {
-      throw new Error('Object not found');
+      return "Object not found";
     }
     return object;
   }
