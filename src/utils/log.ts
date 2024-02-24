@@ -15,7 +15,7 @@ export function ask(socket: Socket, item: string, error?: boolean) {
 export const info = (roomCode: string, room: Room) =>
 	`${green}Connected to room ${blue}${roomCode}${green} with ${playerCount(
 		// room.size - 1
-		room.getUsers().size - 1
+		room.getUsers().size
 	)} ${blue}>${reset}`;
 
 export const logState = () =>

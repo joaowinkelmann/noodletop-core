@@ -45,19 +45,19 @@ export class Room {
 	}
 
 	// CRUD operations for objects
-	createObj(properties?: string | undefined): rObject {
+	createObj(properties?: string | undefined): string {
 		return this.objects.create(properties);
 	}
 
-	getObj(id: string): rObject | undefined {
+	getObj(id: string): string | undefined {
 		return this.objects.get(id);
 	}
 
-	getAllObj(): Map<string, rObject> {
+	getAllObj(): string | undefined{
 		return this.objects.getAll();
 	}
 
-	updateObj(id: string, properties?: string): rObject {
+	updateObj(id: string, properties?: string): string {
 		return this.objects.update(id, properties);
 	}
 
