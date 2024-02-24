@@ -1,14 +1,11 @@
 import { WebSocket } from "ws"
-
-type User = {
-	socket: Socket
-	pseudo: string
-}
+import { User } from "./user"
+import { Room } from "./room"
 
 export type State = {
-	status: "ROOM" | "NICKNAME" | "CONNECTED"
-	roomCode: string
-	user: User
+	status: "ROOM" | "NICKNAME" | "CONNECTED";
+	roomCode: string;
+	user: User;
 }
 
 export type Socket = WebSocket & { isAlive: boolean }
@@ -22,4 +19,4 @@ export const newState = (socket: Socket): State => ({
 	},
 })
 
-export const rooms = new Map<string, Set<User>>()
+export const rooms = new Map<string, Room>();
