@@ -67,6 +67,10 @@ export class ObjectManager {
 		if (object) {
 			// update the object's properties, merging them with the new properties provided, while keeping the old ones
 			object.props = { ...object.props, ...JSON.parse(properties) };
+
+			// update the object in the manager
+			this.objects.set(id, object);
+
 			// return object;
 			return JSON.stringify(object);
 		} else {
