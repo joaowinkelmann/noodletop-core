@@ -136,8 +136,8 @@ const commands = {
 					response = room.getObj(args[0]);
 					break;
 				case "update":
-					// update example "/obj update NAGswjYK '{"radius": 10, "color": "blue"}'"
-					// the id is the first argument, the properties are the rest of the arguments
+					// update example '/obj update NAGswjYK {"radius": 10, "color": "blue"}'
+					// the id is the first argument, the properties are the second argument (as JSON string)
 					let id = args.shift();
 					let properties = JSON.parse(args.join(" "));
 					response = room.updateObj(id, properties);
