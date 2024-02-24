@@ -3,7 +3,7 @@ import { State, rooms } from "./state.js";
 import { WebSocket } from "ws";
 
 // import { ObjectManager, rObject } from "./objects/object.js";
-import { Room } from "./objects/room.js";
+import { Room } from "../objects/room.js";
 
 export function close(state: State) {
 	const { roomCode, user } = state;
@@ -126,7 +126,6 @@ const commands = {
 			const room = rooms.get(state.roomCode);
 			if (!room) return;
 
-			
 			var response = null;
 
 			// get the operation
@@ -135,6 +134,9 @@ const commands = {
 				case "read":
 					response = room.getObj(args[0]);
 					break;
+				case "readall":
+					response = room.getAllObj();
+					break;
 				case "update":
 					// update example '/obj update NAGswjYK {"radius": 10, "color": "blue"}'
 					// the id is the first argument, the properties are the second argument (as JSON string)
@@ -142,7 +144,7 @@ const commands = {
 					let properties = JSON.parse(args.join(" "));
 					console.log(args.join(" "));
 					console.log("properties", properties);
-						response = room.updateObj(id, properties);
+					response = room.updateObj(id, properties);
 					break;
 				case "delete":
 					response = room.deleteObj(args[0]);

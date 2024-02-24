@@ -1,4 +1,4 @@
-import { Socket } from "../state";
+import { Socket } from "../utils/state";
 
 export type User = {
 	socket: Socket;

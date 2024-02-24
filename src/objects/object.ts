@@ -1,8 +1,7 @@
 export type rObject = {
-    id: string;
-    props: { [key: string]: any } | null;
+	id: string;
+	props: { [key: string]: any } | null;
 };
-
 
 /**
  * Class instanced by a Room to manage objects within that room.
@@ -17,21 +16,21 @@ export class ObjectManager {
 	//create
 	/**
 	 * Creates an object and adds it to the manager's list of objects.
-	 * @param properties - If provided, a JSON string containing the properties of the object to be created. Ex: "{type: 'circle', radius: 5, color: 'red'}"
+	 * @param properties - If provided, a JSON object containing the properties of the object to be created. Ex: "{type: 'circle', radius: 5, color: 'red'}"
 	 * @returns The created object as a JSON string
 	 */
-	create(properties: string | undefined): string {
+	create(properties: Object | undefined): string {
 		const id = this.uniqId();
 		const object: rObject = {
 			id: id,
-			props: null
+			props: null,
 		};
 
 		// if properties are provided, add them to the object
 		if (properties) {
-			object.props = JSON.parse(properties);
+			object.props = properties;
 		}
-		
+
 		this.objects.set(id, object);
 
 		return JSON.stringify(object);
@@ -48,7 +47,7 @@ export class ObjectManager {
 	/**
 	 * Returns all objects from the manager.
 	 */
-	getAll(): string | undefined{
+	getAll(): string | undefined {
 		// return this.objects;
 		return JSON.stringify(this.objects);
 	}
@@ -56,7 +55,7 @@ export class ObjectManager {
 	/**
 	 * Updates the properties of an object in the manager.
 	 * @param id - The id of the object to be updated
-	 * @param properties - A JSON string containing the properties to be updated. Ex: "{radius: 10, color: 'blue'}"
+	 * @param properties - A JSON object containing the properties to be updated. Ex: "{radius: 10, color: 'blue'}"
 	 * @returns The object, with the updated properties.
 	 */
 	update(id: string, properties: Object): string {
@@ -99,5 +98,14 @@ export class ObjectManager {
 		} while (this.objects.has(result));
 
 		return result;
+	}
+
+	private isJSON(str: string): boolean {
+		try {
+			JSON.parse(str);
+		} catch (e) {
+			return false;
+		}
+		return true;
 	}
 }

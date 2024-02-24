@@ -1,6 +1,6 @@
 import { WebSocket } from "ws";
-import { User } from "./objects/user";
-import { Room } from "./objects/room";
+import { User } from "../objects/user";
+import { Room } from "../objects/room";
 
 export type State = {
 	status: "ROOM" | "NICKNAME" | "CONNECTED";
