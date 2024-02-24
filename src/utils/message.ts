@@ -140,7 +140,9 @@ const commands = {
 					// the id is the first argument, the properties are the second argument (as JSON string)
 					let id = args.shift();
 					let properties = JSON.parse(args.join(" "));
-					response = room.updateObj(id, properties);
+					console.log(args.join(" "));
+					console.log("properties", properties);
+						response = room.updateObj(id, properties);
 					break;
 				case "delete":
 					response = room.deleteObj(args[0]);
