@@ -1,88 +1,96 @@
-import { State, rooms } from "../state.js";
-import { broadcastMessage } from "../message.js";
-
-export type RoomObject = {
-	id: string;
-	// Add other properties as needed
+export type rObject = {
+    id: string;
+    props: { [key: string]: any } | null;
 };
 
-export class RoomObjects {
-	private objects: Map<string, RoomObject[]>;
+
+/**
+ * Class instanced by a Room to manage objects within that room.
+ */
+export class ObjectManager {
+	private objects: Map<string, rObject>;
 
 	constructor() {
-		this.objects = new Map<string, RoomObject[]>();
+		this.objects = new Map<string, rObject>();
 	}
 
-	createObject(state: State, object: Partial<RoomObject>): RoomObject {
-		const roomObjects = this.objects.get(state.roomCode) || [];
-		const newObject: RoomObject = {
-			id: this.uniqId(),
-			...object,
+	//create
+	/**
+	 * Creates an object and adds it to the manager's list of objects.
+	 * @param properties - If provided, a JSON string containing the properties of the object to be created. Ex: "{type: 'circle', radius: 5, color: 'red'}"
+	 * @returns The created object
+	 */
+	create(properties: string | undefined): rObject {
+		const id = this.uniqId();
+		const object: rObject = {
+			id: id,
+			props: null
 		};
-		roomObjects.push(newObject);
-		this.objects.set(state.roomCode, roomObjects);
-		broadcastMessage(`Object created: ${newObject.id}`, state);
-		return newObject;
+
+		// if properties are provided, add them to the object
+		if (properties) {
+			object.props = JSON.parse(properties);
+		}
+
+		// add the new list of objects to the manager
+		this.objects.set(id, object);
+
+		return object;
 	}
 
-	getObject(state: State, objectId: string): RoomObject | string {
-		// const roomObjects = this.objects.get(state.roomCode) || [];
-		// const object = roomObjects.find((obj) => obj.id === objectId);
-		// if (!object) {
-		// 	return "Object not found";
-		// }
-		// return object;
-		try {
-			const roomObjects = this.objects.get(state.roomCode) || [];
-			const object = roomObjects.find((obj) => obj.id === objectId);
-			if (!object) {
-				return "Object not found";
-			}
+	/**
+	 * Retrieves an object from the manager. If the object is not found, returns undefined.
+	 * @param id - The id of the object to be retrieved
+	 */
+	get(id: string): rObject | undefined {
+		return this.objects.get(id);
+	}
+	/**
+	 * Returns all objects from the manager.
+	 */
+	getAll(): Map<string, rObject> {
+		return this.objects;
+	}
+
+	/**
+	 * Updates the properties of an object in the manager.
+	 * @param id - The id of the object to be updated
+	 * @param properties - A JSON string containing the properties to be updated. Ex: "{radius: 10, color: 'blue'}"
+	 * @returns The object, with the updated properties.
+	 */
+	update(id: string, properties: string): rObject {
+		// try to get the object
+		const object = this.get(id);
+
+		if (object) {
+			// update the object's properties, merging them with the new properties provided, while keeping the old ones
+			object.props = { ...object.props, ...JSON.parse(properties) };
 			return object;
-		} catch (error) {
-			console.error(error);
-			return error.message;
-		}
-	}
-
-	updateObject(
-		state: State,
-		objectId: string,
-		updatedFields: Partial<RoomObject>
-	): RoomObject {
-		const roomObjects = this.objects.get(state.roomCode) || [];
-		const objectIndex = roomObjects.findIndex((obj) => obj.id === objectId);
-		if (objectIndex === -1) {
+		} else {
 			throw new Error("Object not found");
 		}
-		const updatedObject = { ...roomObjects[objectIndex], ...updatedFields };
-		roomObjects[objectIndex] = updatedObject;
-		this.objects.set(state.roomCode, roomObjects);
-		broadcastMessage(`Object updated: ${updatedObject.id}`, state);
-		return updatedObject;
 	}
 
-	deleteObject(state: State, objectId: string): void {
-		const roomObjects = this.objects.get(state.roomCode) || [];
-		const objectIndex = roomObjects.findIndex((obj) => obj.id === objectId);
-		if (objectIndex === -1) {
-			throw new Error("Object not found");
-		}
-		roomObjects.splice(objectIndex, 1);
-		this.objects.set(state.roomCode, roomObjects);
-		broadcastMessage(`Object deleted: ${objectId}`, state);
+	/**
+	 * Deletes an object from the manager.
+	 * @param id - The id of the object to be deleted
+	 * @returns True if the object was deleted, false if it was not found
+	 */
+	delete(id: string): boolean {
+		return this.objects.delete(id);
 	}
 
-	// returns a random 8 character alphanumeric string
+	// generates a random 8 char alphanumeric unique id, checking if it already exists in the manager
 	private uniqId(): string {
 		const chars =
 			"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 		let result = "";
 
 		do {
-			for (let i = 8; i > 0; --i)
+			for (let i = 8; i > 0; i--) {
 				result += chars[Math.floor(Math.random() * chars.length)];
-		} while (this.objects.get(result));
+			}
+		} while (this.objects.has(result));
 
 		return result;
 	}

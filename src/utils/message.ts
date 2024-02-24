@@ -2,7 +2,7 @@ import { ask, blue, green, info, logState, playerCount, reset } from "./log.js";
 import { State, rooms } from "./state.js";
 import { WebSocket } from "ws";
 
-import { RoomObject, RoomObjects } from "./objects/object.js";
+// import { ObjectManager, rObject } from "./objects/object.js";
 import { Room } from "./objects/room.js";
 
 export function close(state: State) {
@@ -121,23 +121,36 @@ const commands = {
 		},
 	},
 	"/obj": {
-		desc: "Perform operations on RoomObject. Usage: /obj [read|create] [id]",
+		desc: "Perform operations with objects. Usage: /obj [read|create] [id]",
 		command(state: State, operation: string) {
 			const room = rooms.get(state.roomCode);
 			if (!room) return;
-			const roomObjects = new RoomObjects();
+			// // get the operation
+			// const [op, ...args] = operation.split(" ");
+			// switch (op) {
+			// 	case "read":
+			// 		roomObjects.getObject(state, args[0]);
+			// 		break;
+			// 	case "create":
+			// 	default:
+			// 		// Call the createObject method on the instance
+			// 		roomObjects.createObject(state, {});
+			// 		break;
+			// }
+
 			// get the operation
 			const [op, ...args] = operation.split(" ");
 			switch (op) {
 				case "read":
-					roomObjects.getObject(state, args[0]);
+					room.getObj(args[0]);
 					break;
 				case "create":
 				default:
 					// Call the createObject method on the instance
-					roomObjects.createObject(state, {});
+					room.createObj();
 					break;
 			}
+
 		},
 	},
 };

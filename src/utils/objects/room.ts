@@ -1,4 +1,5 @@
 import { User } from "./user";
+import { rObject, ObjectManager } from "./object";
 
 /**
  * Class representing a room, containing a set of users.
@@ -8,6 +9,7 @@ export class Room {
 	private roomCode: string;
 	private capacity: number | undefined;
 	private isPublic: boolean;
+	private objects: ObjectManager = new ObjectManager();
 
 	/**
 	 * @param roomCode - The unique code for the room
@@ -25,6 +27,7 @@ export class Room {
 		this.capacity = capacity;
 	}
 
+	// CRUD operations for users
 	addUser(user: User) {
 		this.users.add(user);
 	}
@@ -40,4 +43,22 @@ export class Room {
 	getRoomCode(): string {
 		return this.roomCode;
 	}
+
+	// CRUD operations for objects
+	createObj(properties?: string | undefined): rObject {
+		return this.objects.create(properties);
+	}
+
+	getObj(id: string): rObject | undefined {
+		return this.objects.get(id);
+	}
+
+	getAllObj(): Map<string, rObject> {
+		return this.objects.getAll();
+	}
+
+	updateObj(id: string, properties?: string): rObject {
+		return this.objects.update(id, properties);
+	}
+
 }
