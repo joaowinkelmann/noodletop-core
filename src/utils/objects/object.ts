@@ -59,13 +59,13 @@ export class ObjectManager {
 	 * @param properties - A JSON string containing the properties to be updated. Ex: "{radius: 10, color: 'blue'}"
 	 * @returns The object, with the updated properties.
 	 */
-	update(id: string, properties: string): string {
+	update(id: string, properties: Object): string {
 		// try to get the object
 		const object = this.objects.get(id);
 
 		if (object) {
 			// update the object's properties, merging them with the new properties provided, while keeping the old ones
-			object.props = { ...object.props, ...JSON.parse(properties) };
+			object.props = { ...object.props, ...properties };
 
 			// update the object in the manager
 			this.objects.set(id, object);
