@@ -147,6 +147,12 @@ const commands = {
 				case "read":
 					response = room.getObj(args[0]);
 					break;
+				case "update":
+					response = room.updateObj(args[0], args[1]);
+					break;
+				case "delete":
+					response = room.deleteObj(args[0]);
+					break;
 				case "create":
 				default:
 					// Call the createObject method on the instance
@@ -158,9 +164,7 @@ const commands = {
 				socket.send(
 					`${blue}${state.user.pseudo} >${reset} ${response}`
 				);
-			}
-			);
-
+			});
 		},
 	},
 };

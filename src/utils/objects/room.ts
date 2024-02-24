@@ -53,7 +53,7 @@ export class Room {
 		return this.objects.get(id);
 	}
 
-	getAllObj(): string | undefined{
+	getAllObj(): string | undefined {
 		return this.objects.getAll();
 	}
 
@@ -61,4 +61,7 @@ export class Room {
 		return this.objects.update(id, properties);
 	}
 
+	deleteObj(id: string): boolean {
+		return this.objects.delete(id);
+	}
 }
