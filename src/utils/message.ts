@@ -148,7 +148,13 @@ const commands = {
 					response = room.getObj(args[0]);
 					break;
 				case "update":
-					response = room.updateObj(args[0], args[1]);
+					// update example '/obj update abcd1234 "{radius: 10, color: 'blue'}"'
+					// the id is the first argument, the properties are the rest of the arguments
+					let id = args.shift();
+					let properties = args.splice(0).join(" ");
+
+					// response = room.updateObj(args[0], args[1]);
+					response = room.updateObj(id, properties);
 					break;
 				case "delete":
 					response = room.deleteObj(args[0]);

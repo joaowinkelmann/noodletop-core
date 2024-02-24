@@ -31,8 +31,7 @@ export class ObjectManager {
 		if (properties) {
 			object.props = JSON.parse(properties);
 		}
-
-		// add the new list of objects to the manager
+		
 		this.objects.set(id, object);
 
 		return JSON.stringify(object);
