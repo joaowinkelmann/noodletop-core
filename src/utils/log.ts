@@ -1,5 +1,5 @@
 import { Socket, rooms } from "./state.js";
-import { Room } from "./room";
+import { Room } from "./objects/room.js";
 
 export const blue = ">";
 export const green = ">>";

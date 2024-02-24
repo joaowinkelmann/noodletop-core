@@ -2,8 +2,8 @@ import { ask, blue, green, info, logState, playerCount, reset } from "./log.js";
 import { State, rooms } from "./state.js";
 import { WebSocket } from "ws";
 
-import { RoomObject, RoomObjects } from "./object";
-import { Room } from "./room";
+import { RoomObject, RoomObjects } from "./objects/object.js";
+import { Room } from "./objects/room.js";
 
 export function close(state: State) {
 	const { roomCode, user } = state;
@@ -17,8 +17,8 @@ export function close(state: State) {
 	room.removeUser(user);
 	// if (room.size === 0) rooms.delete(roomCode);
 	if (room.getUsers().size === 0) rooms.delete(roomCode);
+	// room.forEach(({ socket }) =>
 	else
-		// room.forEach(({ socket }) =>
 		room.getUsers().forEach(({ socket }) =>
 			socket.send(
 				`${blue}${user.pseudo} ${green}left the room${
@@ -48,7 +48,7 @@ export function chooseNickname(message: string, state: State) {
 		// the room does not exist, create it
 		rooms.set(roomCode, new Room(roomCode));
 	}
-	
+
 	const room = rooms.get(roomCode);
 	room.addUser(user);
 	// room.forEach(({ socket }) => {
@@ -63,7 +63,6 @@ export function chooseNickname(message: string, state: State) {
 			socket.send(info(roomCode, room));
 		}
 		// else socket.send(info(roomCode, room));
-
 	});
 	state.status = "CONNECTED";
 	logState();
@@ -122,7 +121,7 @@ const commands = {
 		},
 	},
 	"/obj": {
-		desc: "Perform operations on RoomObject",
+		desc: "Perform operations on RoomObject. Usage: /obj [read|create] [id]",
 		command(state: State, operation: string) {
 			const room = rooms.get(state.roomCode);
 			if (!room) return;
@@ -145,7 +144,7 @@ const commands = {
 
 export function broadcastMessage(message: string, state: State) {
 	if (message.startsWith("/") && message.length > 1) {
-		const command     = message.split(" ")[0];
+		const command = message.split(" ")[0];
 		const commandArgs = message.slice(command.length + 1);
 		if (commands.hasOwnProperty(command)) {
 			commands[command].command(state, commandArgs);
@@ -154,7 +153,10 @@ export function broadcastMessage(message: string, state: State) {
 	}
 
 	// rooms.get(state.roomCode).forEach(({ socket }) => {
-	rooms.get(state.roomCode).getUsers().forEach(({ socket }) => {
-		socket.send(`${blue}${state.user.pseudo} >${reset} ${message}`);
-	});
+	rooms
+		.get(state.roomCode)
+		.getUsers()
+		.forEach(({ socket }) => {
+			socket.send(`${blue}${state.user.pseudo} >${reset} ${message}`);
+		});
 }
