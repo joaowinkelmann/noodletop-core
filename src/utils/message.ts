@@ -151,7 +151,7 @@ const commands = {
 					// update example '/obj update abcd1234 "{radius: 10, color: 'blue'}"'
 					// the id is the first argument, the properties are the rest of the arguments
 					let id = args.shift();
-					let properties = args.splice(0).join(" ");
+					let properties = JSON.stringify(args.join(" "));
 
 					// response = room.updateObj(args[0], args[1]);
 					response = room.updateObj(id, properties);
