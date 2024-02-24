@@ -121,24 +121,12 @@ const commands = {
 		},
 	},
 	"/obj": {
-		desc: "Perform operations with objects. Usage: /obj [read|create] [id]",
+		desc: "Perform operations with objects. Usage: /obj [read|create|update|delete] [id] [properties]",
 		command(state: State, operation: string) {
 			const room = rooms.get(state.roomCode);
 			if (!room) return;
-			// // get the operation
-			// const [op, ...args] = operation.split(" ");
-			// switch (op) {
-			// 	case "read":
-			// 		roomObjects.getObject(state, args[0]);
-			// 		break;
-			// 	case "create":
-			// 	default:
-			// 		// Call the createObject method on the instance
-			// 		roomObjects.createObject(state, {});
-			// 		break;
-			// }
 
-			// response
+			
 			var response = null;
 
 			// get the operation
@@ -148,12 +136,10 @@ const commands = {
 					response = room.getObj(args[0]);
 					break;
 				case "update":
-					// update example '/obj update abcd1234 "{radius: 10, color: 'blue'}"'
+					// update example "/obj update NAGswjYK '{"radius": 10, "color": "blue"}'"
 					// the id is the first argument, the properties are the rest of the arguments
 					let id = args.shift();
-					let properties = JSON.stringify(args.join(" "));
-
-					// response = room.updateObj(args[0], args[1]);
+					let properties = JSON.parse(args.join(" "));
 					response = room.updateObj(id, properties);
 					break;
 				case "delete":
