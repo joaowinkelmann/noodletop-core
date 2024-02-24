@@ -35,7 +35,7 @@ export class ObjectManager {
 		// add the new list of objects to the manager
 		this.objects.set(id, object);
 
-		return object;
+		return JSON.parse(JSON.stringify(object));
 	}
 
 	/**
@@ -43,13 +43,15 @@ export class ObjectManager {
 	 * @param id - The id of the object to be retrieved
 	 */
 	get(id: string): rObject | undefined {
-		return this.objects.get(id);
+		// return this.objects.get(id);
+		return JSON.parse(JSON.stringify(this.objects.get(id)));
 	}
 	/**
 	 * Returns all objects from the manager.
 	 */
 	getAll(): Map<string, rObject> {
-		return this.objects;
+		// return this.objects;
+		return JSON.parse(JSON.stringify(this.objects));
 	}
 
 	/**
@@ -65,7 +67,8 @@ export class ObjectManager {
 		if (object) {
 			// update the object's properties, merging them with the new properties provided, while keeping the old ones
 			object.props = { ...object.props, ...JSON.parse(properties) };
-			return object;
+			// return object;
+			return JSON.parse(JSON.stringify(object));
 		} else {
 			throw new Error("Object not found");
 		}

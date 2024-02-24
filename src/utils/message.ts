@@ -138,18 +138,28 @@ const commands = {
 			// 		break;
 			// }
 
+			// response
+			var response = null;
+
 			// get the operation
 			const [op, ...args] = operation.split(" ");
 			switch (op) {
 				case "read":
-					room.getObj(args[0]);
+					response = room.getObj(args[0]);
 					break;
 				case "create":
 				default:
 					// Call the createObject method on the instance
-					room.createObj();
+					response = room.createObj();
 					break;
 			}
+
+			room.getUsers().forEach(({ socket }) => {
+				socket.send(
+					`${blue}${state.user.pseudo} >${reset} ${response}`
+				);
+			}
+			);
 
 		},
 	},
