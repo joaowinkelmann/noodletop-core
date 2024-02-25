@@ -7,17 +7,18 @@ export class Rand {
 	}
 
 	// Function to generate a random dice roll from a string of dice notation (e.g. "2d6+3")
-	static roll(diceNotation: string): number {
+	static roll(diceNotation: string): number | string {
 		// check if the dice notation is valid
-		if (!/^\d+d\d+(\+|-)?\d+$/.test(diceNotation)) {
-			throw new Error("Invalid dice notation");
+		if (!/^\d*d\d+(\+|-)?\d*$/.test(diceNotation)) {
+			// return new Error("Invalid dice notation");
+			return "Invalid dice notation";
 		}
 
 		const [numDice, diceSides, modifier] = diceNotation
 			.split(/[d+]/)
 			.map(Number);
 		let total = 0;
-		for (let i = 0; i < numDice; i++) {
+		for (let i = 0; i < (isNaN(numDice) ? 1 : numDice); i++) {
 			total += this.int(1, diceSides);
 		}
 
