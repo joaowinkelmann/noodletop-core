@@ -1,3 +1,5 @@
+import { Rand } from "../utils/randomizer";
+
 export type rObject = {
 	id: string;
 	props: { [key: string]: any } | null;
@@ -86,16 +88,10 @@ export class ObjectManager {
 
 	// generates a random 8 char alphanumeric unique id, checking if it already exists in the manager
 	private uniqId(): string {
-		const chars =
-			"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-		let result = "";
-
-		do {
-			for (let i = 8; i > 0; i--) {
-				result += chars[Math.floor(Math.random() * chars.length)];
-			}
-		} while (this.objects.has(result));
-
-		return result;
+		let id = Rand.id(8);
+		while (this.objects.has(id)) {
+			id = Rand.id(8);
+		}
+		return id;
 	}
 }

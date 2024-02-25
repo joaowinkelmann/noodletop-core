@@ -1,6 +1,7 @@
 import { ask, blue, green, info, logState, playerCount, reset } from "./log.js";
 import { State, rooms } from "./state.js";
 import { WebSocket } from "ws";
+import { Rand } from "./randomizer";
 
 // import { ObjectManager, rObject } from "./objects/object.js";
 import { Room } from "../objects/room.js";
@@ -163,6 +164,17 @@ const commands = {
 			});
 		},
 	},
+	"/roll": {
+		desc: "Roll dice. Usage: /roll [dice notation (2d6+3)]",
+		command(state: State, diceNotation: string) {
+			
+			let result = Rand.roll(diceNotation);
+			// send the result to the user
+			state.user.socket.send(
+				`${blue}${state.user.pseudo} >${reset} ${result}`
+			);
+		},
+	},
 };
 
 export function broadcastMessage(message: string, state: State) {
@@ -175,7 +187,6 @@ export function broadcastMessage(message: string, state: State) {
 		}
 	}
 
-	// rooms.get(state.roomCode).forEach(({ socket }) => {
 	rooms
 		.get(state.roomCode)
 		.getUsers()
