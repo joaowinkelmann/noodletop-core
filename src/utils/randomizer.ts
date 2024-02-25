@@ -7,19 +7,23 @@ export class Rand {
 		);
 	}
 
-	// Function to generate a random dice roll from a string of dice notation (e.g. "2d6+3")
-	static roll(diceNotation: string): number | string {
-		// check if the dice notation is valid
+	// Function to generate a random dice roll from a string of dice notation (e.g. "2d6+3" or "d8")
+	static roll(diceNotation: string, showRolls: boolean): number | string {
+		// Check if the dice notation is valid
 		if (!/^\d*d\d+(\+|-)?\d*$/.test(diceNotation)) {
 			return "Invalid dice notation";
 		}
 		const [numDice, diceSides, modifier] = diceNotation
 			.split(/[d+]/)
 			.map(Number);
+		const rolls: number[] = [];
+
 		let total = 0;
-		const actualNumDice = isNaN(numDice) ? 1 : numDice; // treating 'd6' as '1d6'
+		const actualNumDice = isNaN(numDice) ? 1 : numDice; // Treat 'd6' as '1d6'
 		for (let i = 0; i < actualNumDice; i++) {
-			total += this.int(1, diceSides);
+			const roll = this.int(1, diceSides);
+			rolls.push(roll);
+			total += roll;
 		}
 
 		// Adjust the total based on the modifier
@@ -30,7 +34,11 @@ export class Rand {
 				total -= Math.abs(modifier);
 			}
 		}
-		return total;
+		if (showRolls) {
+			return `${total} (${rolls.join(", ")})`;
+		} else {
+			return total;
+		}
 	}
 
 	// Function to generate a random alphanumeric ID of a given length

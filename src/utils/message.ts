@@ -165,10 +165,13 @@ const commands = {
 		},
 	},
 	"/roll": {
-		desc: "Roll dice. Usage: /roll [dice notation (2d6+3)]",
-		command(state: State, diceNotation: string) {
+		desc: "Roll dice. Usage: /roll [dice notation (2d6+3)] [show rolls (true|false)]",
+		command(state: State, operation: string) {
+
+			let diceNotation = operation.split(" ")[0];
+			let showRolls = operation.split(" ")[1] === "true" ? true : false;
 			
-			let result = Rand.roll(diceNotation);
+			let result = Rand.roll(diceNotation, showRolls);
 			// send the result to the user
 			state.user.socket.send(
 				`${blue}${state.user.pseudo} >${reset} ${result}`
