@@ -1,3 +1,4 @@
+import crypto from "crypto";
 export class Rand {
 	// Function to generate a random number between a minimum and maximum value using crypto.getRandomValues
 	static int(min: number = 0, max: number): number {
