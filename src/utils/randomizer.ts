@@ -13,6 +13,12 @@ export class Rand {
 		if (!/^\d*d\d+(\+|-)?\d*$/.test(diceNotation)) {
 			return "Invalid dice notation";
 		}
+
+		// if a string like 'd6' is passed, change it to '1d6'
+		if (diceNotation.startsWith("d")) {
+			diceNotation = "1" + diceNotation;
+		}
+
 		const [numDice, diceSides, modifier] = diceNotation
 			.split(/[d+]/)
 			.map(Number);
