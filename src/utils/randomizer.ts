@@ -11,15 +11,14 @@ export class Rand {
 	static roll(diceNotation: string): number | string {
 		// check if the dice notation is valid
 		if (!/^\d*d\d+(\+|-)?\d*$/.test(diceNotation)) {
-			// return new Error("Invalid dice notation");
 			return "Invalid dice notation";
 		}
-
 		const [numDice, diceSides, modifier] = diceNotation
 			.split(/[d+]/)
 			.map(Number);
 		let total = 0;
-		for (let i = 0; i < (isNaN(numDice) ? 1 : numDice); i++) {
+		const actualNumDice = isNaN(numDice) ? 1 : numDice; // tratando 'd6' como '1d6'
+		for (let i = 0; i < actualNumDice; i++) {
 			total += this.int(1, diceSides);
 		}
 
