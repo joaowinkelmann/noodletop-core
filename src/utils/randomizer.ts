@@ -27,7 +27,7 @@ export class Rand {
 		let total = 0;
 		const actualNumDice = isNaN(numDice) ? 1 : numDice; // Treat 'd6' as '1d6'
 		for (let i = 0; i < actualNumDice; i++) {
-			const roll = this.int(1, diceSides);
+			const roll = this.int(1, diceSides + 1);
 			rolls.push(roll);
 			total += roll;
 		}
