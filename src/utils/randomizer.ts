@@ -17,18 +17,19 @@ export class Rand {
 			.split(/[d+]/)
 			.map(Number);
 		let total = 0;
-		const actualNumDice = isNaN(numDice) ? 1 : numDice; // tratando 'd6' como '1d6'
+		const actualNumDice = isNaN(numDice) ? 1 : numDice; // treating 'd6' as '1d6'
 		for (let i = 0; i < actualNumDice; i++) {
 			total += this.int(1, diceSides);
 		}
 
 		// Adjust the total based on the modifier
-		if (diceNotation.includes("+")) {
-			total += modifier;
-		} else if (diceNotation.includes("-")) {
-			total -= Math.abs(modifier);
+		if (modifier !== undefined) {
+			if (diceNotation.includes("+")) {
+				total += modifier;
+			} else if (diceNotation.includes("-")) {
+				total -= Math.abs(modifier);
+			}
 		}
-
 		return total;
 	}
 
