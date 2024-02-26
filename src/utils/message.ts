@@ -22,9 +22,10 @@ export function close(state: State) {
 	else
 		room.getUsers().forEach(({ socket }) =>
 			socket.send(
-				`${blue}${user.pseudo} ${green}left the room${
-					user.socket.isAlive ? "" : " (inactivity)"
-				} ${blue}>${reset}`
+				// `${blue}${user.pseudo} ${green}left the room${
+				// 	user.socket.isAlive ? "" : " (inactivity)"
+				// } ${blue}>${reset}`
+				`${blue}${user.pseudo} ${green}left the room${blue}>${reset}`
 			)
 		);
 	logState();
@@ -127,7 +128,7 @@ const commands = {
 			const room = rooms.get(state.roomCode);
 			if (!room) return;
 
-			var response = null;
+			let response = null;
 
 			// get the operation
 			const [op, ...args] = operation.split(" ");
@@ -167,10 +168,9 @@ const commands = {
 	"/roll": {
 		desc: "Roll dice. Usage: /roll [dice notation (2d6+3)] [show rolls (true|false)]",
 		command(state: State, operation: string) {
-
 			let diceNotation = operation.split(" ")[0];
 			let showRolls = operation.split(" ")[1] === "true" ? true : false;
-			
+
 			let result = Rand.roll(diceNotation, showRolls);
 			// send the result to the user
 			state.user.socket.send(
