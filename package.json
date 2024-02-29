@@ -14,7 +14,8 @@
   },
   "dependencies": {
     "esbuild": "^0.17.16",
-    "ws": "^8.13.0"
+    "ws": "^8.13.0",
+    "bun": "^1.0.0"
   },
   "devDependencies": {
     "@types/bun": "^1.0.7",
