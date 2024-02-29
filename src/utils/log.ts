@@ -1,11 +1,13 @@
 import { Socket, rooms } from "./state.js";
 import { Room } from "../objects/room.js";
+import { WebSocketServer } from "ws";
+import { ServerWebSocket } from "bun";
 
 export const blue = ">";
 export const green = ">>";
 export const reset = "";
 
-export function ask(socket: Socket, item: string, error?: boolean) {
+export function ask(socket: ServerWebSocket<unknown>, item: string, error?: boolean) {
 	if (error) {
 		socket.send(`${green}Minimum length is 3 characters ${blue}>${reset}`);
 	}
