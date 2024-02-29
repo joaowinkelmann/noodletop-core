@@ -5,9 +5,16 @@ import { Rand } from "./randomizer";
 
 // import { ObjectManager, rObject } from "./objects/object.js";
 import { Room } from "../objects/room.js";
+import { send } from "process";
 
-export function close(state: State) {
-	const { roomCode, user } = state;
+export function leaveRoom(state: State) {
+		if (!state) {
+		  throw new Error('State is undefined');
+		}
+	  
+		const { roomCode, user } = state;
+		// rest of your code
+
 	const room = rooms.get(roomCode);
 	if (!room) return;
 	if (user.socket.readyState === WebSocket.OPEN) {
@@ -106,7 +113,8 @@ const commands = {
 	"/quit": {
 		desc: "Leave the room",
 		command(state: State) {
-			close(state);
+			send(state.user.socket, "You left the room");
+			leaveRoom(state);
 		},
 	},
 	"/globalecho": {
@@ -123,7 +131,7 @@ const commands = {
 		},
 	},
 	"/obj": {
-		desc: "Perform operations with objects. Usage: /obj [read|create|update|delete] [id] [properties]",
+		desc: 'Perform operations with objects. Usage: /obj [read|create|update|delete] [id] [{"property": "value"}]',
 		command(state: State, operation: string) {
 			const room = rooms.get(state.roomCode);
 			if (!room) return;
@@ -143,7 +151,16 @@ const commands = {
 					// update example '/obj update NAGswjYK {"radius": 10, "color": "blue"}'
 					// the id is the first argument, the properties are the second argument (as JSON string)
 					let id = args.shift();
-					let properties = JSON.parse(args.join(" "));
+
+					let properties = null;
+
+					if (isJSON(args.join(" ")) === false) {
+						response = "Invalid JSON properties";
+						break;
+					} else {
+						properties = JSON.parse(args.join(" "));
+					}
+
 					console.log(args.join(" "));
 					console.log("properties", properties);
 					response = room.updateObj(id, properties);
@@ -196,4 +213,14 @@ export function broadcastMessage(message: string, state: State) {
 		.forEach(({ socket }) => {
 			socket.send(`${blue}${state.user.pseudo} >${reset} ${message}`);
 		});
+}
+
+
+function isJSON(str: string) {
+	try {
+		JSON.parse(str);
+	} catch (e) {
+		return false;
+	}
+	return true;
 }

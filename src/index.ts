@@ -5,7 +5,7 @@ import {
 	broadcastMessage,
 	chooseNickname,
 	chooseRoom,
-	close,
+	leaveRoom,
 } from "./utils/message.js";
 import { Socket, newState } from "./utils/state.js";
 import { WebSocketServer } from "ws";
@@ -56,7 +56,7 @@ Bun.serve({
 		open(ws) {
 			const state = newState(ws);
 			stateMap.set(ws, state); // Store the state in the Map, associated with the ws object
-			ws.send("Hello world");
+			ws.send(""
 
 			// Set the initial ping time when the connection is opened
 			lastPingMap.set(ws, Date.now());
@@ -79,10 +79,10 @@ Bun.serve({
 			lastPingMap.set(ws, Date.now());
 		},
 		close(ws, code, message) {
+			let state = stateMap.get(ws);
+			leaveRoom(state);
 			stateMap.delete(ws); // Remove the state from the Map when the WebSocket connection is closed
 			lastPingMap.delete(ws); // Also remove the last ping time
-			let state = stateMap.get(ws);
-			close(state);
 		},
 		drain(ws) {
 			// Handle drain events
@@ -91,25 +91,24 @@ Bun.serve({
 	port: Number(process.env.PORT || 3000),
 });
 
-// Refactored keepAliveBun function
-function keepAliveBun() {
-	const now = Date.now();
-	for (const [ws, lastPing] of lastPingMap) {
-		if (now - lastPing > 30000) {
-			ws.close();
-		} else {
-			ws.ping();
-		}
-	}
-}
+// function keepAliveBun() {
+// 	const now = Date.now();
+// 	for (const [ws, lastPing] of lastPingMap) {
+// 		if (now - lastPing > 30000) {
+// 			ws.close();
+// 		} else {
+// 			ws.ping();
+// 		}
+// 	}
+// }
 
 // Set an interval to check for WebSocket connections that haven't sent a ping recently
-setInterval(() => {
-	const now = Date.now();
-	for (const [ws, lastPing] of lastPingMap.entries()) {
-		// If the last ping was more than 30 seconds ago, close the connection
-		if (now - lastPing > 30000) {
-			ws.close(1000, "No heartbeat");
-		}
-	}
-}, 10000); // Check every 10 seconds
+// setInterval(() => {
+// 	const now = Date.now();
+// 	for (const [ws, lastPing] of lastPingMap.entries()) {
+// 		// If the last ping was more than 30 seconds ago, close the connection
+// 		if (now - lastPing > 30000) {
+// 			ws.close(1000, "No heartbeat");
+// 		}
+// 	}
+// }, 10000); // Check every 10 seconds
