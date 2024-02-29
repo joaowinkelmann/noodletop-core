@@ -186,7 +186,7 @@ const commands = {
 		desc: "Roll dice. Usage: /roll [dice notation (2d6+3)] [show rolls (true|false)]",
 		command(state: State, operation: string) {
 			let diceNotation = operation.split(" ")[0];
-			let showRolls = operation.split(" ")[1] === "true" ? true : false;
+			let showRolls = operation.split(" ")[1] === "false" ? false : true;
 
 			let result = Rand.roll(diceNotation, showRolls);
 			// send the result to the user

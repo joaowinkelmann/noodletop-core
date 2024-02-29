@@ -7,55 +7,46 @@ export class Rand {
 		);
 	}
 
-	// Function to generate a random dice roll from a string of dice notation (e.g. "2d6+3" or "d8")
+	// Function to generate a random dice roll from a string of dice notation (e.g. "2d6+3", "d8-3" or "d8")
 	static roll(diceNotation: string, showRolls: boolean): number | string {
 		// Check if the dice notation is valid
-		if (!/^\d*d\d+(\+|-)?\d*$/.test(diceNotation)) {
+		if (!/^(\d*d\d+)([-+]\d+)*$/.test(diceNotation)) {
 			return "Invalid dice notation";
 		}
 
-		// if a string like 'd6' is passed, change it to '1d6'
-		if (diceNotation.startsWith("d")) {
-			diceNotation = "1" + diceNotation;
-		}
+		const matches = diceNotation.match(/(\d*)d(\d+)([-+]\d+)*/);
 
-		const [numDice, diceSides, modifier] = diceNotation
-			.split(/[d+]/)
-			.map(Number);
+		const numDice = parseInt(matches[1]) || 1;
+		const diceSides = parseInt(matches[2]);
+		const modifiers = matches[0].match(/[-+]\d+/g) || [];
+	  
 		const rolls: number[] = [];
 
 		let total = 0;
-		const actualNumDice = isNaN(numDice) ? 1 : numDice; // Treat 'd6' as '1d6'
-		for (let i = 0; i < actualNumDice; i++) {
+		for (let i = 0; i < numDice; i++) {
 			const roll = this.int(1, diceSides + 1);
 			rolls.push(roll);
 			total += roll;
 		}
 
-		// Adjust the total based on the modifier
-		if (modifier !== undefined) {
-			if (diceNotation.includes("+")) {
-				total += modifier;
-			} else if (diceNotation.includes("-")) {
-				total -= Math.abs(modifier);
+		// Adjust the total based on the modifiers
+		modifiers.forEach((modifier) => {
+			const modifierSign = modifier[0];
+			const modifierValue = parseInt(modifier.slice(1));
+
+			if (modifierSign === "+") {
+				total += modifierValue;
+			} else if (modifierSign === "-") {
+				total -= Math.abs(modifierValue);
 			}
-		}
+		});
+
 		if (showRolls) {
-			return `${total} (${rolls.join(", ")})`;
+			return `${total} (${rolls.join(", ")})${modifiers.join("")}`;
 		} else {
 			return total;
 		}
 	}
-
-	// Function to generate a random alphanumeric ID of a given length
-	static id(len: number = 8): string {
-		let result = "";
-		const characters =
-			"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-		const charactersLength = characters.length;
-		for (let i = 0; i < len; i++) {
-			result += characters.charAt(this.int(0, charactersLength));
-		}
-		return result;
-	}
+	
+	
 }
