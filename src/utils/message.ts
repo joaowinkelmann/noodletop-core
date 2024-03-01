@@ -5,7 +5,7 @@ import { Rand } from "./randomizer";
 
 // import { ObjectManager, rObject } from "./objects/object.js";
 import { Room } from "../objects/room.js";
-import { send } from "process";
+// import { send } from "process";
 
 export function leaveRoom(state: State) {
 		if (!state) {
@@ -113,7 +113,7 @@ const commands = {
 	"/quit": {
 		desc: "Leave the room",
 		command(state: State) {
-			send(state.user.socket, "You left the room");
+			// send(state.user.socket, "You left the room"); // Bun não suporta send
 			leaveRoom(state);
 		},
 	},

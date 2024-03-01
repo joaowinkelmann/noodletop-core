@@ -8,7 +8,7 @@
   },
   "scripts": {
     "dev": "bun dev",
-    "build": "bun build",
+    "build": "bun build ./src/index.ts --target=bun --outfile=server.js",
     "start": "bun ./src/index.ts"
   },
   "dependencies": {
