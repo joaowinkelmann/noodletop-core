@@ -18,4 +18,4 @@ RUN bun build ./src/index.ts --target=bun --outfile=server.ts
 USER bun
 EXPOSE 34567/tcp
 EXPOSE 34567/udp
-ENTRYPOINT [ "bun", "run", "index.ts" ]
+ENTRYPOINT [ "bun", "run", "server.ts" ]
