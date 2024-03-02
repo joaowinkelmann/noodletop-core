@@ -16,6 +16,5 @@ RUN bun build ./src/index.ts --target=bun --outfile=server.ts
 
 # run the app
 USER bun
-EXPOSE 34567/tcp
-EXPOSE 34567/udp
-ENTRYPOINT [ "bun", "run", "server.ts" ]
+EXPOSE 3000/tcp
+ENTRYPOINT [ "bun", "run", "./server.ts" ]
