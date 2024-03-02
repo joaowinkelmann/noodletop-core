@@ -48,5 +48,16 @@ export class Rand {
 		}
 	}
 	
+	// Function to generate a random alphanumeric ID of a given length
+	static id(len: number = 8): string {
+		let result = "";
+		const characters =
+			"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+		const charactersLength = characters.length;
+		for (let i = 0; i < len; i++) {
+			result += characters.charAt(this.int(0, charactersLength));
+		}
+		return result;
+	}
 	
 }

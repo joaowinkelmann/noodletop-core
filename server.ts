@@ -319,7 +319,7 @@ var commands = {
 
 // src/index.ts
 import {WebSocketServer} from "ws";
-var wss = new WebSocketServer({ port: Number(process.env.PORT) });
+var wss = new WebSocketServer({ port: Number(process.env.PORT || 34567) });
 var stateMap = new Map;
 var lastPingMap = new Map;
 Bun.serve({
