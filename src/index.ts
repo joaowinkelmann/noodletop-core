@@ -10,7 +10,7 @@ import {
 import { Socket, newState } from "./utils/state.js";
 import { WebSocketServer } from "ws";
 
-const wss = new WebSocketServer({ port: Number(process.env.PORT) });
+const wss = new WebSocketServer({ port: Number(process.env.PORT || 34567) });
 
 // wss.on("connection", (ws: Socket) => {
 // 	const state = newState(ws)
