@@ -1,35 +1,4 @@
 // @bun
-// src/utils/state.ts
-var newState = (socket) => ({
-  status: "ROOM",
-  roomCode: null,
-  user: {
-    socket,
-    pseudo: null
-  }
-});
-var rooms = new Map;
-
-// src/utils/log.ts
-function ask(socket, item, error) {
-  if (error) {
-    socket.send(`${green}Minimum length is 3 characters ${blue}>${reset}`);
-  }
-  socket.send(`${green}Enter ${item} ${blue}>${reset}`);
-}
-var blue = ">";
-var green = ">>";
-var reset = "";
-var info = (roomCode, room) => `${green}Connected to room ${blue}${roomCode}${green} with ${playerCount(room.getUsers().size)} ${blue}>${reset}`;
-var logState = () => console.table(Object.fromEntries([...rooms.entries()].map(([code, room]) => [
-  code,
-  room.getUsers().size
-])));
-var playerCount = (count) => `${blue}${count > 0 ? count : "no"}${green} user${count !== 1 ? "s" : ""}`;
-
-// src/utils/message.ts
-import {WebSocket} from "ws";
-
 // src/utils/randomizer.ts
 import crypto from "crypto";
 
@@ -67,7 +36,57 @@ class Rand {
       return total;
     }
   }
+  static id(len = 8) {
+    let result = "";
+    const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    const charactersLength = characters.length;
+    for (let i = 0;i < len; i++) {
+      result += characters.charAt(this.int(0, charactersLength));
+    }
+    return result;
+  }
 }
+
+// src/objects/user.ts
+class User {
+  socket;
+  username;
+  id = Rand.id();
+  constructor(socket, username) {
+    this.socket = socket;
+    this.username = username;
+  }
+  changeUsername(newUsername) {
+    let currentUsername = this.username;
+    this.username = newUsername;
+    return `Username changed from ${currentUsername} to ${newUsername}`;
+  }
+}
+
+// src/utils/state.ts
+var newState = (socket) => ({
+  status: "ROOM",
+  roomCode: null,
+  user: new User(socket, "")
+});
+var rooms = new Map;
+
+// src/utils/log.ts
+function ask(socket, item, error) {
+  if (error) {
+    socket.send(`${green}Minimum length is 3 characters ${blue}>${reset}`);
+  }
+  socket.send(`${green}Enter ${item} ${blue}>${reset}`);
+}
+var blue = ">";
+var green = ">>";
+var reset = "";
+var info = (roomCode, room) => `${green}Connected to room ${blue}${roomCode}${green} with ${playerCount(room.getUsers().size)} ${blue}>${reset}`;
+var logState = () => console.table(Object.fromEntries([...rooms.entries()].map(([code, room]) => [
+  code,
+  room.getUsers().size
+])));
+var playerCount = (count) => `${blue}${count > 0 ? count : "no"}${green} user${count !== 1 ? "s" : ""}`;
 
 // src/objects/object.ts
 class ObjectManager {
@@ -128,11 +147,11 @@ class Room {
     this.isPublic = isPublic;
     this.capacity = capacity;
   }
-  addUser(user) {
-    this.users.add(user);
+  addUser(user2) {
+    this.users.add(user2);
   }
-  removeUser(user) {
-    this.users.delete(user);
+  removeUser(user2) {
+    this.users.delete(user2);
   }
   getUsers() {
     return this.users;
@@ -162,20 +181,20 @@ function leaveRoom(state3) {
   if (!state3) {
     throw new Error("State is undefined");
   }
-  const { roomCode, user } = state3;
+  const { roomCode, user: user2 } = state3;
   const room2 = rooms.get(roomCode);
   if (!room2)
     return;
-  if (user.socket.readyState === WebSocket.OPEN) {
+  if (user2.socket.readyState === WebSocket.OPEN) {
     state3.roomCode = null;
     state3.status = "ROOM";
-    ask(user.socket, "Room Code");
+    ask(user2.socket, "Room Code");
   }
-  room2.removeUser(user);
+  room2.removeUser(user2);
   if (room2.getUsers().size === 0)
     rooms.delete(roomCode);
   else
-    room2.getUsers().forEach(({ socket }) => socket.send(`${blue}${user.pseudo} ${green}left the room${blue}>${reset}`));
+    room2.getUsers().forEach(({ socket }) => socket.send(`${blue}${user2.username} ${green}left the room${blue}>${reset}`));
   logState();
 }
 function chooseRoom(message, state3) {
@@ -186,19 +205,19 @@ function chooseRoom(message, state3) {
   ask(state3.user.socket, "your Nickname");
 }
 function chooseNickname(message, state3) {
-  const { roomCode, user } = state3;
-  const pseudo = message.trim();
-  if (pseudo.length < 3)
-    return ask(user.socket, "your Nickname", true);
-  user.pseudo = pseudo;
+  const { roomCode, user: user2 } = state3;
+  const username = message.trim();
+  if (username.length < 3)
+    return ask(user2.socket, "your Nickname", true);
+  user2.changeUsername(username);
   if (!rooms.has(roomCode)) {
     rooms.set(roomCode, new Room(roomCode));
   }
   const room2 = rooms.get(roomCode);
-  room2.addUser(user);
+  room2.addUser(user2);
   room2.getUsers().forEach(({ socket }) => {
-    if (socket !== user.socket) {
-      socket.send(`${blue}${user.pseudo}${green} joined the room ${blue}>${reset}`);
+    if (socket !== user2.socket) {
+      socket.send(`${blue}${user2.username}${green} joined the room ${blue}>${reset}`);
     } else {
       socket.send(info(roomCode, room2));
     }
@@ -216,7 +235,7 @@ function broadcastMessage(message, state3) {
     }
   }
   rooms.get(state3.roomCode).getUsers().forEach(({ socket }) => {
-    socket.send(`${blue}${state3.user.pseudo} >${reset} ${message}`);
+    socket.send(`${blue}${state3.user.username} >${reset} ${message}`);
   });
 }
 var isJSON = function(str) {
@@ -230,23 +249,23 @@ var isJSON = function(str) {
 var commands = {
   "/help": {
     desc: "Command list",
-    command({ user }) {
-      user.socket.send(`${green}Available commands: \r\n\t${blue}${Object.entries(commands).map(([k, v]) => [k, v.desc].join(` ${green}\t`)).join(`\r\n\t${blue}`)} \r\n${blue}>`);
+    command({ user: user2 }) {
+      user2.socket.send(`${green}Available commands: \r\n\t${blue}${Object.entries(commands).map(([k, v]) => [k, v.desc].join(` ${green}\t`)).join(`\r\n\t${blue}`)} \r\n${blue}>`);
     }
   },
   "/info": {
     desc: "Room information",
-    command({ roomCode, user }) {
-      user.socket.send(info(roomCode, rooms.get(roomCode)));
+    command({ roomCode, user: user2 }) {
+      user2.socket.send(info(roomCode, rooms.get(roomCode)));
     }
   },
   "/list": {
     desc: "Room user list",
-    command({ roomCode, user }) {
+    command({ roomCode, user: user2 }) {
       const room2 = rooms.get(roomCode);
-      user.socket.send(`${playerCount(room2.getUsers().size)}: ${blue}${[
+      user2.socket.send(`${playerCount(room2.getUsers().size)}: ${blue}${[
         ...room2.getUsers()
-      ].map((user2) => user2.pseudo).join(`${green}, ${blue}`)} >`);
+      ].map((user3) => user3.username).join(`${green}, ${blue}`)} >`);
     }
   },
   "/quit": {
@@ -255,12 +274,12 @@ var commands = {
       leaveRoom(state3);
     }
   },
-  "/globalecho": {
+  "/broadcast": {
     desc: "Send a message to all connected sockets",
     command(state3, message) {
       rooms.forEach((room2) => {
         room2.getUsers().forEach(({ socket }) => {
-          socket.send(`${blue}${state3.user.pseudo} >${reset} ${message}`);
+          socket.send(`${blue}${state3.user.username} >${reset} ${message}`);
         });
       });
     }
@@ -302,7 +321,7 @@ var commands = {
           break;
       }
       room2.getUsers().forEach(({ socket }) => {
-        socket.send(`${blue}${state3.user.pseudo} >${reset} ${response}`);
+        socket.send(`${blue}${state3.user.username} >${reset} ${response}`);
       });
     }
   },
@@ -312,7 +331,28 @@ var commands = {
       let diceNotation = operation.split(" ")[0];
       let showRolls = operation.split(" ")[1] === "false" ? false : true;
       let result = Rand.roll(diceNotation, showRolls);
-      state3.user.socket.send(`${blue}${state3.user.pseudo} >${reset} ${result}`);
+      state3.user.socket.send(`${blue}${state3.user.username} >${reset} ${result}`);
+    }
+  },
+  "/usr": {
+    desc: "Perform operations with your own user. Usage: /usr [changeUsername] [newUsername]",
+    command(state3, operation) {
+      const room2 = rooms.get(state3.roomCode);
+      if (!room2)
+        return;
+      let response = null;
+      const [op, ...args] = operation.split(" ");
+      switch (op) {
+        case "changeUsername":
+          response = state3.user.changeUsername(args[0]);
+          break;
+        default:
+          response = "Invalid operation";
+          break;
+      }
+      room2.getUsers().forEach(({ socket }) => {
+        socket.send(`${blue}${state3.user.username} >${reset} ${response}`);
+      });
     }
   }
 };

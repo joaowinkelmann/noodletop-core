@@ -1,8 +1,8 @@
 {
-  "name": "plot",
-  "version": "1.0.0",
-  "author": "dayblox",
-  "description": "WebSocket chatrooms server",
+  "name": "noodletop-ws",
+  "version": "0.0.1",
+  "author": "joaowinkelmann",
+  "description": "WebSocket tabletop manager",
   "engines": {
     "node": ">=18.11"
   },
@@ -13,12 +13,10 @@
   },
   "dependencies": {
     "esbuild": "^0.17.16",
-    "ws": "^8.13.0",
     "bun": "^1.0.0"
   },
   "devDependencies": {
     "@types/bun": "^1.0.7",
-    "@types/node": "^18.15.11",
-    "@types/ws": "^8.5.4"
+    "@types/node": "^18.15.11"
   }
 }

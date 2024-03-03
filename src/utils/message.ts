@@ -1,6 +1,5 @@
 import { ask, blue, green, info, logState, playerCount, reset } from "./log.js";
 import { State, rooms } from "./state.js";
-import { WebSocket } from "ws";
 import { Rand } from "./randomizer";
 
 // import { ObjectManager, rObject } from "./objects/object.js";
@@ -29,10 +28,7 @@ export function leaveRoom(state: State) {
 	else
 		room.getUsers().forEach(({ socket }) =>
 			socket.send(
-				// `${blue}${user.pseudo} ${green}left the room${
-				// 	user.socket.isAlive ? "" : " (inactivity)"
-				// } ${blue}>${reset}`
-				`${blue}${user.pseudo} ${green}left the room${blue}>${reset}`
+				`${blue}${user.username} ${green}left the room${blue}>${reset}`
 			)
 		);
 	logState();
@@ -48,9 +44,10 @@ export function chooseRoom(message: string, state: State) {
 
 export function chooseNickname(message: string, state: State) {
 	const { roomCode, user } = state;
-	const pseudo = message.trim();
-	if (pseudo.length < 3) return ask(user.socket, "your Nickname", true);
-	user.pseudo = pseudo;
+	const username = message.trim();
+	if (username.length < 3) return ask(user.socket, "your Nickname", true);
+	// user.username = username;
+	user.changeUsername(username);
 	// if (!rooms.has(roomCode)) rooms.set(roomCode, new Set());
 
 	if (!rooms.has(roomCode)) {
@@ -65,7 +62,7 @@ export function chooseNickname(message: string, state: State) {
 		if (socket !== user.socket) {
 			// alert the other users that a new user has joined
 			socket.send(
-				`${blue}${user.pseudo}${green} joined the room ${blue}>${reset}`
+				`${blue}${user.username}${green} joined the room ${blue}>${reset}`
 			);
 		} else {
 			// if the user is the first to join, send the room information
@@ -105,7 +102,7 @@ const commands = {
 				`${playerCount(room.getUsers().size)}: ${blue}${[
 					...room.getUsers(),
 				]
-					.map((user) => user.pseudo)
+					.map((user) => user.username)
 					.join(`${green}, ${blue}`)} >`
 			);
 		},
@@ -117,14 +114,14 @@ const commands = {
 			leaveRoom(state);
 		},
 	},
-	"/globalecho": {
+	"/broadcast": {
 		desc: "Send a message to all connected sockets",
 		command(state: State, message: string) {
 			rooms.forEach((room) => {
 				// room.forEach(({ socket }) => {
 				room.getUsers().forEach(({ socket }) => {
 					socket.send(
-						`${blue}${state.user.pseudo} >${reset} ${message}`
+						`${blue}${state.user.username} >${reset} ${message}`
 					);
 				});
 			});
@@ -177,7 +174,7 @@ const commands = {
 
 			room.getUsers().forEach(({ socket }) => {
 				socket.send(
-					`${blue}${state.user.pseudo} >${reset} ${response}`
+					`${blue}${state.user.username} >${reset} ${response}`
 				);
 			});
 		},
@@ -191,10 +188,36 @@ const commands = {
 			let result = Rand.roll(diceNotation, showRolls);
 			// send the result to the user
 			state.user.socket.send(
-				`${blue}${state.user.pseudo} >${reset} ${result}`
+				`${blue}${state.user.username} >${reset} ${result}`
 			);
 		},
 	},
+	"/usr": {
+		desc: "Perform operations with your own user. Usage: /usr [changeUsername] [newUsername]",
+		command(state: State, operation: string) {
+			const room = rooms.get(state.roomCode);
+			if (!room) return;
+
+			let response = null;
+
+			// get the operation
+			const [op, ...args] = operation.split(" ");
+			switch (op) {
+				case "changeUsername":
+					response = state.user.changeUsername(args[0]);
+					break;
+				default:
+					response = "Invalid operation";
+					break;
+			}
+
+			room.getUsers().forEach(({ socket }) => {
+				socket.send(
+					`${blue}${state.user.username} >${reset} ${response}`
+				);
+			});
+		}
+	}
 };
 
 export function broadcastMessage(message: string, state: State) {
@@ -211,7 +234,7 @@ export function broadcastMessage(message: string, state: State) {
 		.get(state.roomCode)
 		.getUsers()
 		.forEach(({ socket }) => {
-			socket.send(`${blue}${state.user.pseudo} >${reset} ${message}`);
+			socket.send(`${blue}${state.user.username} >${reset} ${message}`);
 		});
 }
 

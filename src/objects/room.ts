@@ -2,7 +2,7 @@ import { User } from "./user";
 import { rObject, ObjectManager } from "./object";
 
 /**
- * Class representing a room, containing a set of users.
+ * Class representing a room, containing a set of users and objects.
  */
 export class Room {
 	private users: Set<User>;
