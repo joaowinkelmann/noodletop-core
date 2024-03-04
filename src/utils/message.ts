@@ -7,12 +7,12 @@ import { Room } from "../objects/room.js";
 // import { send } from "process";
 
 export function leaveRoom(state: State) {
-		if (!state) {
-		  throw new Error('State is undefined');
-		}
-	  
-		const { roomCode, user } = state;
-		// rest of your code
+	if (!state) {
+		throw new Error("State is undefined");
+	}
+
+	const { roomCode, user } = state;
+	// rest of your code
 
 	const room = rooms.get(roomCode);
 	if (!room) return;
@@ -128,23 +128,25 @@ const commands = {
 		},
 	},
 	"/obj": {
-		desc: 'Perform operations with objects. Usage: /obj [read|create|update|delete] [id] [{"property": "value"}]',
+		desc: 'Documentation: https://t.ly/daGAP\nPerform operations with objects. Usage: /obj [read|create|update|delete] [id] [{"property": "value"}]',
 		command(state: State, operation: string) {
 			const room = rooms.get(state.roomCode);
 			if (!room) return;
 
-			let response = null;
-
+			// let response = null;
+			
 			// get the operation
 			const [op, ...args] = operation.split(" ");
 			switch (op) {
 				case "read":
-					response = room.getObj(args[0]);
+					// case "r":
+					let response = room.getObj(args[0]);
 					break;
 				case "readall":
 					response = room.getAllObj();
 					break;
 				case "update":
+					// case "u":
 					// update example '/obj update NAGswjYK {"radius": 10, "color": "blue"}'
 					// the id is the first argument, the properties are the second argument (as JSON string)
 					let id = args.shift();
@@ -152,7 +154,7 @@ const commands = {
 					let properties = null;
 
 					if (isJSON(args.join(" ")) === false) {
-						response = "Invalid JSON properties";
+						// response = "Invalid JSON properties";
 						break;
 					} else {
 						properties = JSON.parse(args.join(" "));
@@ -163,12 +165,30 @@ const commands = {
 					response = room.updateObj(id, properties);
 					break;
 				case "delete":
-					response = room.deleteObj(args[0]);
+					// case "d":
+					response = JSON.stringify(room.deleteObj(args[0]));
 					break;
 				case "create":
+					// case "c":
+					// '/obj create timer {"duration": 10}' | '/obj create'
+					let type = null;
+					properties = null;
+
+					if (args.length > 0) {
+						type = args.shift();
+					} else if (args.length === 0) {
+						type = null;
+					}
+
+					if (isJSON(args.join(" ")) === true) {
+						properties = JSON.parse(args.join(" "));
+					}
+					// create the object
+					response = room.createObj(type, properties);
+					break;
 				default:
-					// Call the createObject method on the instance
-					response = room.createObj();
+					response =
+						"Invalid operation.\nPlease refer to the documentation at https://t.ly/daGAP";
 					break;
 			}
 
@@ -216,8 +236,8 @@ const commands = {
 					`${blue}${state.user.username} >${reset} ${response}`
 				);
 			});
-		}
-	}
+		},
+	},
 };
 
 export function broadcastMessage(message: string, state: State) {
@@ -237,7 +257,6 @@ export function broadcastMessage(message: string, state: State) {
 			socket.send(`${blue}${state.user.username} >${reset} ${message}`);
 		});
 }
-
 
 function isJSON(str: string) {
 	try {

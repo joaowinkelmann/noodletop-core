@@ -94,7 +94,7 @@ class ObjectManager {
   constructor() {
     this.objects = new Map;
   }
-  create(properties) {
+  create(type, properties) {
     const id = this.uniqId();
     const object = {
       id,
@@ -159,8 +159,8 @@ class Room {
   getRoomCode() {
     return this.roomCode;
   }
-  createObj(properties) {
-    return this.objects.create(properties);
+  createObj(type, properties) {
+    return this.objects.create(type, properties);
   }
   getObj(id) {
     return this.objects.get(id);
@@ -285,39 +285,49 @@ var commands = {
     }
   },
   "/obj": {
-    desc: 'Perform operations with objects. Usage: /obj [read|create|update|delete] [id] [{"property": "value"}]',
+    desc: 'Documentation: https://t.ly/daGAP\nPerform operations with objects. Usage: /obj [read|create|update|delete] [id] [{"property": "value"}]',
     command(state3, operation) {
       const room2 = rooms.get(state3.roomCode);
       if (!room2)
         return;
-      let response = null;
       const [op, ...args] = operation.split(" ");
       switch (op) {
         case "read":
-          response = room2.getObj(args[0]);
+          let response2 = room2.getObj(args[0]);
           break;
         case "readall":
-          response = room2.getAllObj();
+          response2 = room2.getAllObj();
           break;
         case "update":
           let id = args.shift();
           let properties = null;
           if (isJSON(args.join(" ")) === false) {
-            response = "Invalid JSON properties";
             break;
           } else {
             properties = JSON.parse(args.join(" "));
           }
           console.log(args.join(" "));
           console.log("properties", properties);
-          response = room2.updateObj(id, properties);
+          response2 = room2.updateObj(id, properties);
           break;
         case "delete":
-          response = room2.deleteObj(args[0]);
+          response2 = JSON.stringify(room2.deleteObj(args[0]));
           break;
         case "create":
+          let type = null;
+          properties = null;
+          if (args.length > 0) {
+            type = args.shift();
+          } else if (args.length === 0) {
+            type = null;
+          }
+          if (isJSON(args.join(" ")) === true) {
+            properties = JSON.parse(args.join(" "));
+          }
+          response2 = room2.createObj(type, properties);
+          break;
         default:
-          response = room2.createObj();
+          response2 = "Invalid operation.\nPlease refer to the documentation at https://t.ly/daGAP";
           break;
       }
       room2.getUsers().forEach(({ socket }) => {
@@ -340,18 +350,18 @@ var commands = {
       const room2 = rooms.get(state3.roomCode);
       if (!room2)
         return;
-      let response = null;
+      let response2 = null;
       const [op, ...args] = operation.split(" ");
       switch (op) {
         case "changeUsername":
-          response = state3.user.changeUsername(args[0]);
+          response2 = state3.user.changeUsername(args[0]);
           break;
         default:
-          response = "Invalid operation";
+          response2 = "Invalid operation";
           break;
       }
       room2.getUsers().forEach(({ socket }) => {
-        socket.send(`${blue}${state3.user.username} >${reset} ${response}`);
+        socket.send(`${blue}${state3.user.username} >${reset} ${response2}`);
       });
     }
   }

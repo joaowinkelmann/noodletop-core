@@ -45,8 +45,9 @@ export class Room {
 	}
 
 	// CRUD operations for objects
-	createObj(properties?: string | undefined): string {
-		return this.objects.create(properties);
+	// createObj(properties?: string | undefined): string {
+	createObj(type?: string, properties?: string): string {
+		return this.objects.create(type, properties);
 	}
 
 	getObj(id: string): string | undefined {
