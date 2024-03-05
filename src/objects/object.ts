@@ -21,7 +21,8 @@ export class ObjectManager {
 	 * @param properties - If provided, a JSON object containing the properties of the object to be created. Ex: "{type: 'circle', radius: 5, color: 'red'}"
 	 * @returns The created object as a JSON string
 	 */
-	create(properties: Object | undefined): string {
+	// create(properties: Object | undefined): string {
+	create(type?: string, properties?: Object | undefined): string {
 		const id = this.uniqId();
 		const object: rObject = {
 			id: id,

@@ -7,12 +7,12 @@ import { Room } from "../objects/room.js";
 // import { send } from "process";
 
 export function leaveRoom(state: State) {
-		if (!state) {
-		  throw new Error('State is undefined');
-		}
-	  
-		const { roomCode, user } = state;
-		// rest of your code
+	if (!state) {
+		throw new Error("State is undefined");
+	}
+
+	const { roomCode, user } = state;
+	// rest of your code
 
 	const room = rooms.get(roomCode);
 	if (!room) return;
@@ -128,7 +128,7 @@ const commands = {
 		},
 	},
 	"/obj": {
-		desc: 'Perform operations with objects. Usage: /obj [read|create|update|delete] [id] [{"property": "value"}]',
+		desc: 'Documentation: https://t.ly/daGAP\nPerform operations with objects. Usage: /obj [read|create|update|delete] [id] [{"property": "value"}]',
 		command(state: State, operation: string) {
 			const room = rooms.get(state.roomCode);
 			if (!room) return;
@@ -139,12 +139,14 @@ const commands = {
 			const [op, ...args] = operation.split(" ");
 			switch (op) {
 				case "read":
+				case "r":
 					response = room.getObj(args[0]);
 					break;
 				case "readall":
 					response = room.getAllObj();
 					break;
 				case "update":
+				case "u":
 					// update example '/obj update NAGswjYK {"radius": 10, "color": "blue"}'
 					// the id is the first argument, the properties are the second argument (as JSON string)
 					let id = args.shift();
@@ -163,12 +165,24 @@ const commands = {
 					response = room.updateObj(id, properties);
 					break;
 				case "delete":
+				case "d":
 					response = room.deleteObj(args[0]);
 					break;
 				case "create":
-				default:
+				case "c":
 					// Call the createObject method on the instance
-					response = room.createObj();
+
+					let type = args.shift(); //get type as first argument
+					let props = null;
+
+					if (isJSON(args.join(" "))) {
+						props = JSON.parse(args.join(" "));
+					}
+
+					response = room.createObj(type, props);
+					break;
+				default:
+					response = "Invalid operation";
 					break;
 			}
 
@@ -216,8 +230,8 @@ const commands = {
 					`${blue}${state.user.username} >${reset} ${response}`
 				);
 			});
-		}
-	}
+		},
+	},
 };
 
 export function broadcastMessage(message: string, state: State) {
@@ -237,7 +251,6 @@ export function broadcastMessage(message: string, state: State) {
 			socket.send(`${blue}${state.user.username} >${reset} ${message}`);
 		});
 }
-
 
 function isJSON(str: string) {
 	try {

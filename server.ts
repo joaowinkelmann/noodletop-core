@@ -94,7 +94,7 @@ class ObjectManager {
   constructor() {
     this.objects = new Map;
   }
-  create(properties) {
+  create(type, properties) {
     const id = this.uniqId();
     const object = {
       id,
@@ -159,8 +159,8 @@ class Room {
   getRoomCode() {
     return this.roomCode;
   }
-  createObj(properties) {
-    return this.objects.create(properties);
+  createObj(type, properties) {
+    return this.objects.create(type, properties);
   }
   getObj(id) {
     return this.objects.get(id);
@@ -285,7 +285,7 @@ var commands = {
     }
   },
   "/obj": {
-    desc: 'Perform operations with objects. Usage: /obj [read|create|update|delete] [id] [{"property": "value"}]',
+    desc: 'Documentation: https://t.ly/daGAP\nPerform operations with objects. Usage: /obj [read|create|update|delete] [id] [{"property": "value"}]',
     command(state3, operation) {
       const room2 = rooms.get(state3.roomCode);
       if (!room2)
@@ -294,12 +294,14 @@ var commands = {
       const [op, ...args] = operation.split(" ");
       switch (op) {
         case "read":
+        case "r":
           response = room2.getObj(args[0]);
           break;
         case "readall":
           response = room2.getAllObj();
           break;
         case "update":
+        case "u":
           let id = args.shift();
           let properties = null;
           if (isJSON(args.join(" ")) === false) {
@@ -313,11 +315,20 @@ var commands = {
           response = room2.updateObj(id, properties);
           break;
         case "delete":
+        case "d":
           response = room2.deleteObj(args[0]);
           break;
         case "create":
+        case "c":
+          let type = args.shift();
+          let props = null;
+          if (isJSON(args.join(" "))) {
+            props = JSON.parse(args.join(" "));
+          }
+          response = room2.createObj(type, props);
+          break;
         default:
-          response = room2.createObj();
+          response = "Invalid operation";
           break;
       }
       room2.getUsers().forEach(({ socket }) => {
