@@ -49,13 +49,16 @@ export class Rand {
 	}
 	
 	// Function to generate a random alphanumeric ID of a given length
-	static id(len: number = 8): string {
-		let result = "";
-		const characters =
-			"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+	static id(length: number = 8, includeTimestamp: boolean = true): string {
+		let result = '';
+		const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
 		const charactersLength = characters.length;
-		for (let i = 0; i < len; i++) {
-			result += characters.charAt(this.int(0, charactersLength));
+		for (let i = 0; i < length; i++) {
+			result += characters.charAt(Math.floor(Math.random() * charactersLength));
+		}
+		if (includeTimestamp) {
+			let timestampString = Date.now().toString(36); // 8 characters
+			result = timestampString + result;
 		}
 		return result;
 	}
