@@ -2,9 +2,7 @@ import { ask, blue, green, info, logState, playerCount, reset } from "./log.js";
 import { State, rooms } from "./state.js";
 import { Rand } from "./randomizer";
 
-// import { ObjectManager, rObject } from "./objects/object.js";
 import { Room } from "../objects/room.js";
-// import { send } from "process";
 
 export function leaveRoom(state: State) {
 	if (!state) {

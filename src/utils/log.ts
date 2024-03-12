@@ -1,6 +1,5 @@
 import { Socket, rooms } from "./state.js";
 import { Room } from "../objects/room.js";
-import { WebSocketServer } from "ws";
 import { ServerWebSocket } from "bun";
 
 export const blue = ">";

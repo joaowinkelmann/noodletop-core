@@ -1,8 +1,6 @@
 import { ServerWebSocket } from "bun";
 import { Rand } from "~/utils/randomizer";
 
-// import { Socket } from "../utils/state";
-
 export class User {
 	socket: ServerWebSocket<unknown>;
 	username: string;
