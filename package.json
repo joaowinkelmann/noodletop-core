@@ -8,8 +8,8 @@
   },
   "scripts": {
     "dev": "bun dev",
-    "build": "bun build ./src/index.ts --target=bun --outfile=server.ts",
-    "start": "bun run ./server.ts"
+    "build": "bun build ./src/index.ts --target=bun --outfile=websocket.ts",
+    "start": "bun run ./websocket.ts"
   },
   "dependencies": {
     "esbuild": "^0.17.16",
