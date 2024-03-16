@@ -1,3 +1,8 @@
+#usage:
+# docker build -t noodletop-ws .
+# docker run -p 3000:3000 noodletop-ws
+
+
 # use the official Bun image
 # see all versions at https://hub.docker.com/r/oven/bun/tags
 FROM oven/bun:1 as base
