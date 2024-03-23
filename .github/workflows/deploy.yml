@@ -1,0 +1,43 @@
+name: Noodletop WebSocket
+
+on:
+    push:
+        branches: [master]
+    pull_request:
+        branches: [master]
+    
+    workflow_dispatch:
+    
+jobs:
+    deploy:
+        name: Deploy to OCI
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+
+            - name: Copy files with SSH
+              uses: easingthemes/ssh-deploy@main
+              env:
+                    SSH_PRIVATE_KEY: ${{ secrets.SERVER_SSH_KEY }}
+                    ARGS: "-rltgoDzvO --delete"
+                    SOURCE: "./"
+                    REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
+                    REMOTE_USER: ${{ secrets.REMOTE_USER }}
+                    TARGET: ${{ secrets.TARGET_DIR }}
+                    EXCLUDE: "/node_modules/, **.env, .env.local, .gitignore, .git/, .github/, .scripts/, .vscode/"
+                    SCRIPT_BEFORE: |
+                        echo "===> Starting deployment"
+                        sudo systemctl stop nginx
+                        echo "Halting Node process..."
+                        cd ${{ secrets.TARGET_DIR }}
+                        .scripts/halt_ws.sh
+                    SCRIPT_AFTER: |
+                        whoami
+                        ls -al
+                        echo $RSYNC_STDOUT
+                        cd ${{ secrets.TARGET_DIR }}
+                        sudo systemctl start nginx
+                        echo "Starting Node process..."
+                        .scripts/run_ws.sh
+                        echo "===> Finished deployment"
