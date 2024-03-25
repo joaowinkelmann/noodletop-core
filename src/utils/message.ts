@@ -60,11 +60,14 @@ export function chooseNickname(message: string, state: State) {
 			socket.send(
 				`${user.username} joined the room >${reset}`
 			);
-		} else { // the user itself
+		} else { // the user itself (private info goes here)
 			// if the user is the first to join, send the room information
 			socket.send(info(roomCode, room));
 			// sending user id so that it may be saved by the client
 			socket.send(`userId: ${user.id}`);
+
+			//test: user created at
+			socket.send(`User created at:` + Rand.dateFromId(user.id));
 		}
 		// else socket.send(info(roomCode, room));
 	});
