@@ -56,7 +56,7 @@ Bun.serve({
 		open(ws) {
 			const state = newState(ws);
 			stateMap.set(ws, state); // Store the state in the Map, associated with the ws object
-			ws.send(">> Enter a room code");
+			ws.send("Enter room code");
 
 			// Set the initial ping time when the connection is opened
 			lastPingMap.set(ws, Date.now());

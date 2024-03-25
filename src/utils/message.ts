@@ -244,7 +244,7 @@ export function broadcastMessage(message: string, state: State) {
 		.get(state.roomCode)
 		.getUsers()
 		.forEach(({ socket }) => {
-			socket.send(`${state.user.username} >${reset} ${message}`);
+			socket.send(`${state.user.username}: ${reset} ${message}`);
 		});
 }
 
