@@ -56,14 +56,15 @@ export function chooseNickname(message: string, state: State) {
 	room.addUser(user);
 	// room.forEach(({ socket }) => {
 	room.getUsers().forEach(({ socket }) => {
-		if (socket !== user.socket) {
-			// alert the other users that a new user has joined
+		if (socket !== user.socket) { // the other users
 			socket.send(
 				`${user.username} joined the room >${reset}`
 			);
-		} else {
+		} else { // the user itself
 			// if the user is the first to join, send the room information
 			socket.send(info(roomCode, room));
+			// sending user id so that it may be saved by the client
+			socket.send(`userId: ${user.id}`);
 		}
 		// else socket.send(info(roomCode, room));
 	});
