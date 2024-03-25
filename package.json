@@ -4,7 +4,7 @@
   "author": "joaowinkelmann",
   "description": "WebSocket tabletop manager",
   "engines": {
-    "node": ">=18.11"
+    "node": ">=20.0.0"
   },
   "scripts": {
     "dev": "bun dev",
@@ -12,7 +12,6 @@
     "start": "bun run ./websocket.ts"
   },
   "dependencies": {
-    "esbuild": "^0.17.16",
     "bun": "^1.0.0"
   },
   "devDependencies": {

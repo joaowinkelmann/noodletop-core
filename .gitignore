@@ -5,4 +5,8 @@
 /node_modules/
 
 # Environment variables
-/env.ts
+**.env
+.env.local
+
+# IDE files
+# add vscode here
