@@ -2,22 +2,22 @@ import { Socket, rooms } from "./state.js";
 import { Room } from "../objects/room.js";
 import { ServerWebSocket } from "bun";
 
-export const blue = ">";
-export const green = ">>";
+// export const blue = ">";
+// export const green = ">>";
 export const reset = "";
 
 export function ask(socket: ServerWebSocket<unknown>, item: string, error?: boolean) {
 	if (error) {
-		socket.send(`${green}Minimum length is 3 characters ${blue}>${reset}`);
+		socket.send(`Minimum length is 3 characters ${reset}`);
 	}
-	socket.send(`${green}Enter ${item} ${blue}>${reset}`);
+	socket.send(`Enter ${item}${reset}`);
 }
 
 export const info = (roomCode: string, room: Room) =>
-	`${green}Connected to room ${blue}${roomCode}${green} with ${playerCount(
+	`Connected to room ${roomCode} with ${playerCount(
 		// room.size - 1
 		room.getUsers().size
-	)} ${blue}>${reset}`;
+	)} ${reset}`;
 
 export const logState = () =>
 	console.table(
@@ -30,4 +30,4 @@ export const logState = () =>
 	);
 
 export const playerCount = (count: number) =>
-	`${blue}${count > 0 ? count : "no"}${green} user${count !== 1 ? "s" : ""}`;
+	`${count > 0 ? count : "no"} user${count !== 1 ? "s" : ""}`;
