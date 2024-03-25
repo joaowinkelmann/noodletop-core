@@ -2,8 +2,6 @@ import { Socket, rooms } from "./state.js";
 import { Room } from "../objects/room.js";
 import { ServerWebSocket } from "bun";
 
-// export const blue = ">";
-// export const green = ">>";
 export const reset = "";
 
 export function ask(socket: ServerWebSocket<unknown>, item: string, error?: boolean) {

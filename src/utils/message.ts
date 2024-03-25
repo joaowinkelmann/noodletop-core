@@ -1,4 +1,4 @@
-import { ask, blue, green, info, logState, playerCount, reset } from "./log.js";
+import { ask, info, logState, playerCount, reset } from "./log.js";
 import { State, rooms } from "./state.js";
 import { Rand } from "./randomizer";
 
@@ -10,7 +10,6 @@ export function leaveRoom(state: State) {
 	}
 
 	const { roomCode, user } = state;
-	// rest of your code
 
 	const room = rooms.get(roomCode);
 	if (!room) return;
@@ -26,7 +25,7 @@ export function leaveRoom(state: State) {
 	else
 		room.getUsers().forEach(({ socket }) =>
 			socket.send(
-				`${blue}${user.username} ${green}left the room${blue}>${reset}`
+				`${user.username} left the room${reset}`
 			)
 		);
 	logState();
@@ -60,7 +59,7 @@ export function chooseNickname(message: string, state: State) {
 		if (socket !== user.socket) {
 			// alert the other users that a new user has joined
 			socket.send(
-				`${blue}${user.username}${green} joined the room ${blue}>${reset}`
+				`${user.username} joined the room >${reset}`
 			);
 		} else {
 			// if the user is the first to join, send the room information
@@ -77,11 +76,11 @@ const commands = {
 		desc: "Command list",
 		command({ user }: State) {
 			user.socket.send(
-				`${green}Available commands: \r\n\t${blue}${Object.entries(
+				`Available commands: \r\n\t${Object.entries(
 					commands
 				)
-					.map(([k, v]) => [k, v.desc].join(` ${green}\t`))
-					.join(`\r\n\t${blue}`)} \r\n${blue}>`
+					.map(([k, v]) => [k, v.desc].join(` \t`))
+					.join(`\r\n\t`)} \r\n}>`
 			);
 		},
 	},
@@ -96,12 +95,11 @@ const commands = {
 		command({ roomCode, user }: State) {
 			const room = rooms.get(roomCode);
 			user.socket.send(
-				// `${playerCount(room.size)}: ${blue}${[...room.values()]
-				`${playerCount(room.getUsers().size)}: ${blue}${[
+				`${playerCount(room.getUsers().size)}: ${[
 					...room.getUsers(),
 				]
 					.map((user) => user.username)
-					.join(`${green}, ${blue}`)} >`
+					.join(``)} >`
 			);
 		},
 	},
@@ -119,7 +117,7 @@ const commands = {
 				// room.forEach(({ socket }) => {
 				room.getUsers().forEach(({ socket }) => {
 					socket.send(
-						`${blue}${state.user.username} >${reset} ${message}`
+						`${state.user.username} >${reset} ${message}`
 					);
 				});
 			});
@@ -186,7 +184,7 @@ const commands = {
 
 			room.getUsers().forEach(({ socket }) => {
 				socket.send(
-					`${blue}${state.user.username} >${reset} ${response}`
+					`${state.user.username} >${reset} ${response}`
 				);
 			});
 		},
@@ -200,7 +198,7 @@ const commands = {
 			let result = Rand.roll(diceNotation, showRolls);
 			// send the result to the user
 			state.user.socket.send(
-				`${blue}${state.user.username} >${reset} ${result}`
+				`${state.user.username} >${reset} ${result}`
 			);
 		},
 	},
@@ -225,7 +223,7 @@ const commands = {
 
 			room.getUsers().forEach(({ socket }) => {
 				socket.send(
-					`${blue}${state.user.username} >${reset} ${response}`
+					`${state.user.username} >${reset} ${response}`
 				);
 			});
 		},
@@ -246,7 +244,7 @@ export function broadcastMessage(message: string, state: State) {
 		.get(state.roomCode)
 		.getUsers()
 		.forEach(({ socket }) => {
-			socket.send(`${blue}${state.user.username} >${reset} ${message}`);
+			socket.send(`${state.user.username} >${reset} ${message}`);
 		});
 }
 
