@@ -17,7 +17,7 @@ type WebSocketData = {
 Bun.serve<WebSocketData>({
 	fetch(req, server) {
 		console.log(JSON.stringify(req.headers, null, 2));
-		const cookies = req.headers.get("cookie");
+		const cookies = req.headers.get("cookie") ?? "";
 		const [user, room] = parseCookies(cookies);
 		const success = server.upgrade(req, {
 			data: {
