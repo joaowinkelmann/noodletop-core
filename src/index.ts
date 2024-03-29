@@ -8,19 +8,25 @@ import { newState } from "./utils/state.js";
 
 const stateMap = new Map();
 
-Bun.serve({
+type WebSocketData = {
+	userId: string;
+};
+
+Bun.serve<WebSocketData>({
 	fetch(req, server) {
-		// upgrade logic
-		if (server.upgrade(req)) {
-			return;
-		}
-		return new Response();
+		server.upgrade(req, {
+			data: {
+				userId: new URL(req.url).searchParams.get("userId"),
+			},
+		});
 	},
 	websocket: {
 		open(ws) {
 			const state = newState(ws);
 			stateMap.set(ws, state); // Store the state in the Map, associated with the ws object
 			ws.send("Enter room code");
+			// debug: userId
+			ws.send(`Your sent userId was` + ws.data.userId ?? "undefined");
 		},
 		message(ws, message) {
 			const state = stateMap.get(ws); // Retrieve the state from the Map
