@@ -23,8 +23,8 @@ Bun.serve<WebSocketData>({
 			data: {
 				roomCode: room,
 				userId: user,
-				isDebug: req.url.searchParams.get("debug") === "true" ? true : false,
-			}
+				isDebug: req.url && req.url.searchParams.get("debug") === "true" ? true : false,
+			},
 		});
 
 		if (success) {
