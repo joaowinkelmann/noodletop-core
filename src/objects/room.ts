@@ -27,6 +27,16 @@ export class Room {
 		this.capacity = capacity;
 	}
 
+	// standard properties
+	getCapacity(): number | undefined {
+		return this.capacity;
+	}
+
+	setCapacity(capacity: number | undefined) {
+		this.capacity = capacity;
+	}
+
+
 	// CRUD operations for users
 	addUser(user: User) {
 		this.users.add(user);
@@ -42,6 +52,11 @@ export class Room {
 
 	getRoomCode(): string {
 		return this.roomCode;
+	}
+
+	// Method to get a single user by its ID, used for recconecting a user back to a room
+	getUserById(id: string): User | undefined {
+		return Array.from(this.users).find((user) => user.getId() === id);
 	}
 
 	// CRUD operations for objects

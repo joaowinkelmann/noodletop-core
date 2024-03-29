@@ -64,7 +64,7 @@ export function chooseNickname(message: string, state: State) {
 			// if the user is the first to join, send the room information
 			socket.send(info(roomCode, room));
 			// sending user id so that it may be saved by the client
-			socket.send(`userId: ${user.id}`);
+			socket.send(`u: ${user.id}`);
 
 			//test: user created at
 			socket.send(`User created at:` + Rand.dateFromId(user.id));
@@ -110,7 +110,6 @@ const commands = {
 	"/quit": {
 		desc: "Leave the room",
 		command(state: State) {
-			// send(state.user.socket, "You left the room"); // Bun não suporta send
 			leaveRoom(state);
 		},
 	},
@@ -118,7 +117,6 @@ const commands = {
 		desc: "Send a message to all connected sockets",
 		command(state: State, message: string) {
 			rooms.forEach((room) => {
-				// room.forEach(({ socket }) => {
 				room.getUsers().forEach(({ socket }) => {
 					socket.send(
 						`${state.user.username} >${reset} ${message}`

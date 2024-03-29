@@ -4,7 +4,7 @@ import {
 	chooseRoom,
 	leaveRoom,
 } from "./utils/message.js";
-import { newState } from "./utils/state.js";
+import { createState, getState } from "./utils/state.js";
 
 const stateMap = new Map();
 
@@ -25,14 +25,26 @@ Bun.serve<WebSocketData>({
 		});
 	},
 	websocket: {
+		idleTimeout: 600, // 10 minutes
+		maxPayloadLength: 2048 * 1024, // 2 MiB
 		open(ws) {
-			const state = newState(ws);
-			stateMap.set(ws, state); // Store the state in the Map, associated with the ws object
-			ws.send("Enter room code");
+			// Throwing back debug info
 			if (ws.data.isDebug) {
-				ws.send(`Received roomId was ` + ws.data.roomId);
-				ws.send(`Received userId was ` + ws.data.userId);
+				ws.send(`Query roomId: ` + ws.data.roomId);
+				ws.send(`Query userId: ` + ws.data.userId);
 			}
+
+			let state;
+			if (ws.data.userId && ws.data.roomId) {
+				state = getState(ws, ws.data.userId, ws.data.roomId);
+				ws.send(`u: ` + state.user.getId());
+			}
+			if (!state) {
+				// If reconnection failed or wasn't attempted, create a new user
+				state = createState(ws);
+				ws.send("Enter room code");
+			}
+			stateMap.set(ws, state);
 		},
 		message(ws, message) {
 			const state = stateMap.get(ws); // Retrieve the state from the Map
