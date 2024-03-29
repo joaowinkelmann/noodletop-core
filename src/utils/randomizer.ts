@@ -8,7 +8,7 @@ export class Rand {
 	}
 
 	// Function to generate a random dice roll from a string of dice notation (e.g. "2d6+3", "d8-3" or "d8")
-	static roll(diceNotation: string, showRolls: boolean): number | string {
+	static roll(diceNotation: string, showRolls: boolean, diceLimit: number = 100): string | number {
 		// Check if the dice notation is valid
 		if (!/^(\d*d\d+)([-+]\d+)*$/.test(diceNotation)) {
 			return "Invalid dice notation";
@@ -19,11 +19,11 @@ export class Rand {
 		const numDice = parseInt(matches[1]) || 1;
 		const diceSides = parseInt(matches[2]);
 		const modifiers = matches[0].match(/[-+]\d+/g) || [];
-	  
+
 		const rolls: number[] = [];
 
 		let total = 0;
-		for (let i = 0; i < numDice; i++) {
+		for (let i = 0; i < Math.min(numDice, diceLimit); i++) {
 			const roll = this.int(1, diceSides + 1);
 			rolls.push(roll);
 			total += roll;
@@ -47,7 +47,7 @@ export class Rand {
 			return total;
 		}
 	}
-	
+
 	// Function to generate a random alphanumeric ID of a given length
 	static id(length: number = 8, includeTimestamp: boolean = true): string {
 		let result = '';
