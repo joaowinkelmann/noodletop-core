@@ -18,12 +18,13 @@ Bun.serve<WebSocketData>({
 	fetch(req, server) {
 		console.log(JSON.stringify(req.headers, null, 2));
 		const cookies = req.headers.get("cookie") ?? "";
+		const url = new URL(req.url);
 		const [user, room] = parseCookies(cookies);
 		const success = server.upgrade(req, {
 			data: {
 				roomCode: room,
 				userId: user,
-				isDebug: req.url && req.url.searchParams.get("debug") === "true" ? true : false,
+				isDebug: url.searchParams.has("debug"),
 			},
 		});
 
