@@ -17,22 +17,31 @@ export const createState = (socket: ServerWebSocket<unknown>, username: string |
 });
 
 // Method to reconnect a user by receiving a userId and roomCode
-export const getState = (socket: ServerWebSocket<unknown>, userId: string, roomCode: string): State => {
+export const getState = (socket: ServerWebSocket<unknown>, userId: string, roomCode: string): State | null => {
 	const room = rooms.get(roomCode);
 	if (!room) {
-		return createState(socket);
+		return null;
 	}
 	const user = room.getUserById(userId);
 
 	if (!room || !user) {
-		return createState(socket);
+		return null;
 	}
-	user.socket = socket;
+	user.socket = socket; // update the found user with the new socket to be used
 	return {
 		status: "CONNECTED",
 		roomCode,
 		user
 	};
+}
+
+export const parseCookies = (cookies: string): [string, string] => {
+	const userId = cookies.match(/userId=([^;]*)/);
+	const roomCode = cookies.match(/roomCode=([^;]*)/);
+	if (!userId || !roomCode) {
+		return [null, null];
+	}
+	return [userId[1], roomCode[1]];
 }
 
 export const rooms = new Map<string, Room>();

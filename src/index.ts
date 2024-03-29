@@ -4,46 +4,55 @@ import {
 	chooseRoom,
 	leaveRoom,
 } from "./utils/message.js";
-import { createState, getState } from "./utils/state.js";
+import { createState, getState, parseCookies } from "./utils/state.js";
 
 const stateMap = new Map();
 
 type WebSocketData = {
-	roomId: string;
+	roomCode: string;
 	userId: string;
 	isDebug: boolean;
 };
 
 Bun.serve<WebSocketData>({
 	fetch(req, server) {
-		return server.upgrade(req, {
+		console.log(JSON.stringify(req.headers, null, 2));
+		const cookies = req.headers.get("cookie");
+		const [user, room] = parseCookies(cookies);
+		const success = server.upgrade(req, {
 			data: {
-				roomId: new URL(req.url).searchParams.get("roomId"),
-				userId: new URL(req.url).searchParams.get("userId"),
-				isDebug: new URL(req.url).searchParams.get("debug") ? true : false,
-			},
+				roomCode: room,
+				userId: user,
+				isDebug: req.url.searchParams.get("debug") === "true",
+			}
 		});
+
+		if (success) {
+			return undefined;
+		}
+
+		return Response.redirect("/");
 	},
 	websocket: {
 		idleTimeout: 600, // 10 minutes
 		maxPayloadLength: 2048 * 1024, // 2 MiB
 		open(ws) {
-			console.log(ws.data);
 			// Throwing back debug info
 			if (ws.data.isDebug) {
-				ws.send(`Query roomId: ` + ws.data.roomId);
-				ws.send(`Query userId: ` + ws.data.userId);
+				ws.send(`d:roomCode: ` + ws.data.roomCode);
+				ws.send(`d:userId: ` + ws.data.userId);
 			}
 
 			let state;
-			if (ws.data.userId && ws.data.roomId) {
-				state = getState(ws, ws.data.userId, ws.data.roomId);
-				ws.send(`u: ` + state.user.getId());
+			if (ws.data.userId && ws.data.roomCode) {
+				state = getState(ws, ws.data.userId, ws.data.roomCode);
 			}
 			if (!state) {
 				// If reconnection failed or wasn't attempted, create a new user
 				state = createState(ws);
 				ws.send("Enter room code");
+			} else {
+				ws.send(`u: ` + state.user.getId());
 			}
 			stateMap.set(ws, state);
 		},
