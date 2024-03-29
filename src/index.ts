@@ -16,7 +16,7 @@ type WebSocketData = {
 
 Bun.serve<WebSocketData>({
 	fetch(req, server) {
-		server.upgrade(req, {
+		return server.upgrade(req, {
 			data: {
 				roomId: new URL(req.url).searchParams.get("roomId"),
 				userId: new URL(req.url).searchParams.get("userId"),
