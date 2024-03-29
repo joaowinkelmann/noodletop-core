@@ -65,9 +65,6 @@ export function chooseNickname(message: string, state: State) {
 			socket.send(info(roomCode, room));
 			// sending user id so that it may be saved by the client
 			socket.send(`u: ${user.id}`);
-
-			//test: user created at
-			socket.send(`User created at:` + Rand.dateFromId(user.id));
 		}
 		// else socket.send(info(roomCode, room));
 	});
