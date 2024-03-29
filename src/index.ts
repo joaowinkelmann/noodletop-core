@@ -9,8 +9,8 @@ import { createState, getState, parseCookies } from "./utils/state.js";
 const stateMap = new Map();
 
 type WebSocketData = {
-	roomCode: string;
-	userId: string;
+	roomCode: string | null;
+	userId: string | null;
 	isDebug: boolean;
 };
 
@@ -23,7 +23,7 @@ Bun.serve<WebSocketData>({
 			data: {
 				roomCode: room,
 				userId: user,
-				isDebug: req.url.searchParams.get("debug") === "true",
+				isDebug: req.url.searchParams.get("debug") === "true" ? true : false,
 			}
 		});
 
