@@ -1,6 +1,6 @@
 import { ask, info, logState, playerCount, reset } from "./log.js";
 import { State, rooms } from "./state.js";
-import { Rand } from "./randomizer";
+import { Rand } from "./randomizer.js";
 
 import { Room } from "../objects/room.js";
 
@@ -16,18 +16,20 @@ export function leaveRoom(state: State) {
 	if (user.socket.readyState === WebSocket.OPEN) {
 		state.roomCode = null;
 		state.status = "ROOM";
-		ask(user.socket, "Room Code");
+		ask(user.getSocket(), "Room Code");
 	}
-	room.removeUser(user);
-	// if (room.size === 0) rooms.delete(roomCode);
-	if (room.getUsers().size === 0) rooms.delete(roomCode);
-	// room.forEach(({ socket }) =>
-	else
+	room.removeUser(user); // TODO: change this to a "leave" method that will allow the user to come back
+	// room.
+	if (room.getUsers().size === 0) {
+		// TODO: this is not right, we should keep the room in a "closed" state, and wait for a while before deleting it for good
+		rooms.delete(roomCode);
+	} else {
 		room.getUsers().forEach(({ socket }) =>
 			socket.send(
-				`${user.username} left the room${reset}`
+				`${user.getUsername()} left the room${reset}`
 			)
 		);
+	}
 	logState();
 }
 
@@ -43,9 +45,7 @@ export function chooseNickname(message: string, state: State) {
 	const { roomCode, user } = state;
 	const username = message.trim();
 	if (username.length < 3) return ask(user.socket, "your Nickname", true);
-	// user.username = username;
 	user.changeUsername(username);
-	// if (!rooms.has(roomCode)) rooms.set(roomCode, new Set());
 
 	if (!rooms.has(roomCode)) {
 		// the room does not exist, create it
@@ -66,7 +66,6 @@ export function chooseNickname(message: string, state: State) {
 			// sending user id so that it may be saved by the client
 			socket.send(`u: ${user.id}`);
 		}
-		// else socket.send(info(roomCode, room));
 	});
 	state.status = "CONNECTED";
 	logState();

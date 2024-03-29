@@ -79,6 +79,9 @@ Bun.serve<WebSocketData>({
 		},
 		drain(ws) {
 		},
+		onerror(ws, error) {
+			console.error(`Error on ${ws.data.userId}: ${error}`);
+		}
 	},
 	port: Number(process.env.PORT || 3000),
 });
