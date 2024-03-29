@@ -28,6 +28,7 @@ Bun.serve<WebSocketData>({
 		idleTimeout: 600, // 10 minutes
 		maxPayloadLength: 2048 * 1024, // 2 MiB
 		open(ws) {
+			console.log(ws.data);
 			// Throwing back debug info
 			if (ws.data.isDebug) {
 				ws.send(`Query roomId: ` + ws.data.roomId);
