@@ -50,6 +50,14 @@ Bun.serve<WebSocketData>({
 				ws.send(`u: ` + state.user.getId());
 			}
 			stateMap.set(ws, state);
+			const keepaliveIntervalId = setInterval(() => {
+				if (ws.readyState === WebSocket.OPEN) {
+					ws.send('ping');
+					console.log("PINGED!");
+				} else {
+					clearInterval(keepaliveIntervalId);
+				}
+			}, 30000); // 30 seconds
 		},
 		message(ws, message) {
 			const state = stateMap.get(ws); // Retrieve the state from the Map
