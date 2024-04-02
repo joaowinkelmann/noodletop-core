@@ -9,4 +9,4 @@
 .env.local
 
 # IDE files
-# add vscode here
+/.vscode/

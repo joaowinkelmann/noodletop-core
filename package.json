@@ -4,15 +4,15 @@
   "author": "joaowinkelmann",
   "description": "WebSocket tabletop manager",
   "engines": {
-    "node": ">=20.0.0"
+    "node": ">=20.11.0"
   },
   "scripts": {
-    "dev": "bun dev",
-    "build": "bun build ./src/index.ts --target=bun --outfile=websocket.ts",
-    "start": "bun run ./websocket.ts"
+    "dev": "bun --watch ./src/index.ts",
+    "build": "bun build ./src/index.ts --target=bun --outfile=./dist/websocket.ts --minify",
+    "start": "bun run ./dist/websocket.ts"
   },
   "dependencies": {
-    "bun": "^1.0.0"
+    "bun": "^1.1.0"
   },
   "devDependencies": {
     "@types/bun": "^1.0.7",

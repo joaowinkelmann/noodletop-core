@@ -115,7 +115,7 @@ const commands = {
 			rooms.forEach((room) => {
 				room.getUsers().forEach(({ socket }) => {
 					socket.send(
-						`${state.user.username} >${reset} ${message}`
+						`${state.user.username}: ${reset} ${message}`
 					);
 				});
 			});
