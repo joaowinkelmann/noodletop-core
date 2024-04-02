@@ -35,12 +35,13 @@ export const getState = (socket: ServerWebSocket<unknown>, userId: string, roomC
 	};
 }
 
-export const parseCookies = (cookies: string): [string, string] => {
+export const parseHeaders = (headers: Headers): [string, string] | [null, null] => {
 	try {
-		const userId   = cookies.match(/userId=([^;]*)/);
-		const roomCode = cookies.match(/roomCode=([^;]*)/);
-		return [userId[1], roomCode[1]];
-	} catch (e) {
+		const userId = headers.get("userId");
+		const roomCode = headers.get("roomCode");
+		return [userId, roomCode];
+	}
+	catch (e) {
 		return [null, null];
 	}
 }
