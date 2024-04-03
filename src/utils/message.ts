@@ -87,7 +87,7 @@ const commands = {
 	"/info": {
 		desc: "Room information",
 		command({ roomCode, user }: State) {
-			user.socket.send(info(roomCode, rooms.get(roomCode)));
+			user.socket.send(rooms.get(roomCode).getRoomInfo());
 		},
 	},
 	"/list": {

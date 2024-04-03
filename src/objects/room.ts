@@ -42,6 +42,15 @@ export class Room {
 		this.settings.capacity = capacity;
 	}
 
+	getRoomInfo(): string {
+		return JSON.stringify({
+			roomSessionId: this.roomSessionId,
+			settings: this.settings,
+			roomCode: this.roomCode,
+			users: Array.from(this.users).map((user) => user.getUsername()),
+			objects: this.objects.getAll()
+		});
+	}
 
 	// CRUD operations for users
 	addUser(user: User) {
