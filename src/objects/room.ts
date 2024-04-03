@@ -1,15 +1,18 @@
 import { User } from "./user";
 import { rObject, ObjectManager } from "./object";
+import { Rand } from "../utils/randomizer";
+import { RoomSettingsDTO } from "../dto/RoomSettings";
 
 /**
  * Class representing a room, containing a set of users and objects.
  */
 export class Room {
 	private users: Set<User>;
-	private roomCode: string;
-	private capacity: number | undefined;
-	private isPublic: boolean;
 	private objects: ObjectManager = new ObjectManager();
+	private roomCode: string;
+	private roomSessionId: string;
+	private status: string = "active"; // active, inactive, closed
+	private settings: RoomSettingsDTO;
 
 	/**
 	 * @param roomCode - The unique code for the room
@@ -23,17 +26,20 @@ export class Room {
 	) {
 		this.roomCode = roomCode;
 		this.users = new Set();
-		this.isPublic = isPublic;
-		this.capacity = capacity;
+		this.settings = {
+			isPublic,
+			capacity
+		};
+		this.roomSessionId = Rand.id(16);
 	}
 
 	// standard properties
 	getCapacity(): number | undefined {
-		return this.capacity;
+		return this.settings.capacity;
 	}
 
 	setCapacity(capacity: number | undefined) {
-		this.capacity = capacity;
+		this.settings.capacity = capacity;
 	}
 
 

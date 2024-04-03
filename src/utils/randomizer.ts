@@ -48,7 +48,12 @@ export class Rand {
 		}
 	}
 
-	// Function to generate a random alphanumeric ID of a given length
+	/**
+	 * Generates a random alphanumeric ID of a given length.
+	 * @param length The length of the ID string. Default is 8.
+	 * @param includeTimestamp Whether to include a timestamp at the beginning of the ID string. Default is true.
+	 * @returns The generated ID string.
+	 */
 	static id(length: number = 8, includeTimestamp: boolean = true): string {
 		let result = '';
 		const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';

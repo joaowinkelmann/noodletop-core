@@ -4,7 +4,7 @@ import {
 	chooseRoom,
 	leaveRoom,
 } from "./utils/message.js";
-import { createState, getState, parseHeaders } from "./utils/state.js";
+import { createState, getState, parseHeaders, keepAlive } from "./utils/state.js";
 
 const stateMap = new Map();
 
@@ -50,15 +50,7 @@ Bun.serve<WebSocketData>({
 				ws.send(`u: ` + state.user.getId());
 			}
 			stateMap.set(ws, state);
-			const keepaliveIntervalId = setInterval(() => {
-				if (ws.readyState === WebSocket.OPEN) {
-					ws.ping();
-					// ws.send('ping');
-					// console.log("PINGED!");
-				} else {
-					clearInterval(keepaliveIntervalId);
-				}
-			}, 30000); // 30 seconds
+			keepAlive(ws);
 		},
 		message(ws, message) {
 			const state = stateMap.get(ws); // Retrieve the state from the Map
@@ -78,12 +70,8 @@ Bun.serve<WebSocketData>({
 			leaveRoom(state);
 			stateMap.delete(ws);
 		},
-		ping(ws) {
-			console.log("PING!");
-		},
-		pong(ws) {
-			console.log("PONG!");
-		}
+		ping(ws) { },
+		pong(ws) { }
 	},
 	port: Number(process.env.PORT || 3000),
 });

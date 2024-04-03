@@ -1,3 +1,4 @@
+// Class to manage the state of the user, room, and socket connection
 import { User } from "../objects/user";
 import { Room } from "../objects/room";
 import { ServerWebSocket } from "bun";
@@ -8,15 +9,19 @@ export type State = {
 	user: User;
 };
 
-export type Socket = WebSocket & { isAlive: boolean };
-
 export const createState = (socket: ServerWebSocket<unknown>, username: string | null = null): State => ({
 	status: "ROOM",
 	roomCode: null,
 	user: new User(socket, username)
 });
 
-// Method to reconnect a user by receiving a userId and roomCode
+/**
+ * Retrieves the state of a user in a room. Used to reconnect a user to a room, for example.
+ * @param socket - The socket associated with the user.
+ * @param userId - The ID of the user.
+ * @param roomCode - The code of the room.
+ * @returns The state of the user in the room, or null if the room or user is not found.
+ */
 export const getState = (socket: ServerWebSocket<unknown>, userId: string, roomCode: string): State | null => {
 	const room = rooms.get(roomCode);
 	if (!room) {
@@ -35,6 +40,12 @@ export const getState = (socket: ServerWebSocket<unknown>, userId: string, roomC
 	};
 }
 
+/**
+ * Parses the headers and extracts the userId and roomCode.
+ * 
+ * @param headers - The headers object containing the userId and roomCode.
+ * @returns An array containing the userId and roomCode, or [null, null] if an error occurs.
+ */
 export const parseHeaders = (headers: Headers): [string, string] | [null, null] => {
 	try {
 		const userId = headers.get("userId");
@@ -45,5 +56,21 @@ export const parseHeaders = (headers: Headers): [string, string] | [null, null] 
 		return [null, null];
 	}
 }
+
+/**
+ * Keeps the WebSocket connection alive by sending periodic ping messages.
+ * @param socket - The WebSocket connection.
+ * @param interval - The interval (in seconds) between each ping message. Default is 30 seconds.
+ */
+export const keepAlive = (socket: ServerWebSocket<unknown>, interval: number = 30) => {
+	const intervalId = setInterval(() => {
+		if (socket.readyState === WebSocket.OPEN) {
+			socket.ping();
+		} else {
+			clearInterval(intervalId);
+		}
+	}, interval * 1000);
+}
+
 
 export const rooms = new Map<string, Room>();

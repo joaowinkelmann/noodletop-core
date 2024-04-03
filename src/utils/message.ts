@@ -26,7 +26,7 @@ export function leaveRoom(state: State) {
 	} else {
 		room.getUsers().forEach(({ socket }) =>
 			socket.send(
-				`${user.getUsername()} left the room${reset}`
+				`${user.getUsername()} left the room`
 			)
 		);
 	}
@@ -58,7 +58,7 @@ export function chooseNickname(message: string, state: State) {
 	room.getUsers().forEach(({ socket }) => {
 		if (socket !== user.socket) { // the other users
 			socket.send(
-				`${user.username} joined the room >${reset}`
+				`${user.username} joined the room`
 			);
 		} else { // the user itself (private info goes here)
 			// if the user is the first to join, send the room information

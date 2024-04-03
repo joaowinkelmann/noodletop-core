@@ -13,7 +13,7 @@ export class User {
 		this.username = username;
 		this.status = {
 			connection: "active",
-			last_active: Date.now()
+			last_seen: Date.now()
 		};
 	}
 	
@@ -37,6 +37,7 @@ export class User {
 
 	// analogy: user leaves the room for a bit, but they can come back, so we keep them for now
 	leaveRoom(): void {
+		this.status.last_seen = Date.now(); // keep this value so that we can remove the user if they don't come back after a while 
 		this.status.connection = "away";
 	}
 
