@@ -232,6 +232,9 @@ const commands = {
 };
 
 export function broadcastMessage(message: string, state: State) {
+	// updating last_seen on user
+	state.user.heartbeat();
+
 	if (message.startsWith("/") && message.length > 1) {
 		const command = message.split(" ")[0];
 		const commandArgs = message.slice(command.length + 1);

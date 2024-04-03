@@ -29,6 +29,10 @@ export class User {
 			cosmetics: this.cosmetics
 		});
 	}
+
+	heartbeat(): void {
+		this.status.last_seen = Date.now();
+	}
 	
 	getSocket(): ServerWebSocket<unknown> {
 		return this.socket;
