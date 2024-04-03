@@ -20,6 +20,15 @@ export class User {
 			color: Rand.color()
 		};
 	}
+
+	getInfo(): string {
+		return JSON.stringify({
+			id: this.id,
+			username: this.username,
+			status: this.status,
+			cosmetics: this.cosmetics
+		});
+	}
 	
 	getSocket(): ServerWebSocket<unknown> {
 		return this.socket;

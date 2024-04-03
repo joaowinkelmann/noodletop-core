@@ -201,7 +201,7 @@ const commands = {
 		},
 	},
 	"/usr": {
-		desc: "Perform operations with your own user. Usage: /usr [changeUsername] [newUsername]",
+		desc: "Perform operations with your own user. Usage: /usr [changeUsername] [newUsername]\n || /usr info",
 		command(state: State, operation: string) {
 			const room = rooms.get(state.roomCode);
 			if (!room) return;
@@ -213,6 +213,9 @@ const commands = {
 			switch (op) {
 				case "changeUsername":
 					response = state.user.changeUsername(args[0]);
+					break;
+				case "info":
+					response = state.user.getInfo();
 					break;
 				default:
 					response = "Invalid operation";
