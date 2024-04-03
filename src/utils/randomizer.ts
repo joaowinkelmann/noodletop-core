@@ -74,4 +74,8 @@ export class Rand {
 		let timestamp = parseInt(timestampString, 36);
 		return new Date(timestamp);
 	}
+
+	static color(): string {
+		return "#" + Math.floor(Math.random() * 16777215).toString(16);
+	}
 }

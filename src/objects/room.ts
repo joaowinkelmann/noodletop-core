@@ -1,7 +1,7 @@
 import { User } from "./user";
 import { rObject, ObjectManager } from "./object";
 import { Rand } from "../utils/randomizer";
-import { RoomSettingsDTO } from "../dto/RoomSettings";
+import { RoomSettings } from "../dto/roomDTO";
 
 /**
  * Class representing a room, containing a set of users and objects.
@@ -12,7 +12,7 @@ export class Room {
 	private roomCode: string;
 	private roomSessionId: string;
 	private status: string = "active"; // active, inactive, closed
-	private settings: RoomSettingsDTO;
+	private settings: RoomSettings;
 
 	/**
 	 * @param roomCode - The unique code for the room
@@ -22,7 +22,7 @@ export class Room {
 	constructor(
 		roomCode: string,
 		isPublic: boolean = true,
-		capacity: number | undefined = undefined
+		capacity: number = 20,
 	) {
 		this.roomCode = roomCode;
 		this.users = new Set();
@@ -34,11 +34,11 @@ export class Room {
 	}
 
 	// standard properties
-	getCapacity(): number | undefined {
+	getCapacity(): number {
 		return this.settings.capacity;
 	}
 
-	setCapacity(capacity: number | undefined) {
+	setCapacity(capacity: number) {
 		this.settings.capacity = capacity;
 	}
 
@@ -48,7 +48,8 @@ export class Room {
 			settings: this.settings,
 			roomCode: this.roomCode,
 			users: Array.from(this.users).map((user) => user.getUsername()),
-			objects: this.objects.getAll()
+			objects: this.objects.getAll(),
+			status: this.status,
 		});
 	}
 

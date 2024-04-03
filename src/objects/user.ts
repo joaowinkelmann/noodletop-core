@@ -1,12 +1,13 @@
 import { ServerWebSocket } from "bun";
 import { Rand } from "~/utils/randomizer";
-import { UserStatusDTO } from "~/dto/UserStatus";
+import { UserStatus, UserCosmetics } from "~/dto/userDTO";
 
 export class User {
 	socket: ServerWebSocket<unknown>;
 	username: string;
 	id: string = Rand.id();
-	status: UserStatusDTO;
+	status: UserStatus;
+	cosmetics: UserCosmetics;	
 
 	constructor(socket: ServerWebSocket<unknown>, username: string) {
 		this.socket = socket;
@@ -14,6 +15,9 @@ export class User {
 		this.status = {
 			connection: "active",
 			last_seen: Date.now()
+		};
+		this.cosmetics = {
+			color: Rand.color()
 		};
 	}
 	
@@ -27,6 +31,14 @@ export class User {
 
 	getId(): string {
 		return this.id;
+	}
+
+	getColor(): string {
+		return this.cosmetics.color;
+	}
+
+	setColor(newColor: string): void {
+		this.cosmetics.color = newColor;
 	}
 
 	changeUsername(newUsername: string): string {

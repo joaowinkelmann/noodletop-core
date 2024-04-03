@@ -1,4 +1,4 @@
-export interface RoomSettingsDTO {
+export interface RoomSettings {
     isPublic: boolean;
     capacity: number;
 }
