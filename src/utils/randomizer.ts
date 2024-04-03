@@ -75,7 +75,18 @@ export class Rand {
 		return new Date(timestamp);
 	}
 
-	static color(): string {
-		return "#" + Math.floor(Math.random() * 16777215).toString(16);
+	/**
+	 * Generates a random color in hexadecimal format.
+	 * @param bright - A boolean indicating whether the generated color should be bright. Default is true.
+	 * @returns A string representing the random color in hexadecimal format.
+	 */
+	static color(bright: boolean = true): string {
+		const randomChannel = () => {
+			const channel = this.int(0, 256);
+			const mix = bright ? 128 : 0;
+			const result = channel + mix;
+			return result > 255 ? 255 : result;
+		};
+		return `#${randomChannel().toString(16)}${randomChannel().toString(16)}${randomChannel().toString(16)}`;
 	}
 }
