@@ -52,8 +52,9 @@ Bun.serve<WebSocketData>({
 			stateMap.set(ws, state);
 			const keepaliveIntervalId = setInterval(() => {
 				if (ws.readyState === WebSocket.OPEN) {
-					ws.send('ping');
-					console.log("PINGED!");
+					ws.ping();
+					// ws.send('ping');
+					// console.log("PINGED!");
 				} else {
 					clearInterval(keepaliveIntervalId);
 				}
@@ -76,6 +77,12 @@ Bun.serve<WebSocketData>({
 			let state = stateMap.get(ws);
 			leaveRoom(state);
 			stateMap.delete(ws);
+		},
+		ping(ws) {
+			console.log("PING!");
+		},
+		pong(ws) {
+			console.log("PONG!");
 		}
 	},
 	port: Number(process.env.PORT || 3000),
