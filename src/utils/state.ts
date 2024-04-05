@@ -1,6 +1,7 @@
-// Class to manage the state of the user, room, and socket connection
-import { User } from "../objects/user";
-import { Room } from "../objects/room";
+// Class to manage the state of the user, room, and socket connections
+import { User } from "../models/user";
+import { Room } from "../models/room";
+import { Sweeper } from "./sweeper";
 import { ServerWebSocket } from "bun";
 
 export type State = {
@@ -32,6 +33,12 @@ export const getState = (socket: ServerWebSocket<unknown>, userId: string, roomC
 	if (!room || !user) {
 		return null;
 	}
+
+	// disconnect the old socket
+	if (user.socket.readyState === WebSocket.OPEN) {
+		user.socket.close(4007, "User reconnected");
+	}
+
 	user.socket = socket; // update the found user with the new socket to be used
 	return {
 		status: "CONNECTED",
@@ -73,4 +80,25 @@ export const keepAlive = (socket: ServerWebSocket<unknown>, interval: number = 3
 }
 
 
-export const rooms = new Map<string, Room>();
+class ObservableMap extends Map {
+    constructor(private callback: Function) {
+        super();
+    }
+
+    set(key, value) {
+        const result = super.set(key, value);
+        this.callback();
+        return result;
+    }
+
+    delete(key) {
+        const result = super.delete(key);
+        this.callback();
+        return result;
+    }
+}
+
+export const rooms = new ObservableMap(() => {
+    Sweeper.sweepInactiveUsers(rooms)
+	Sweeper.sweepInactiveRooms(rooms)
+});

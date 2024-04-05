@@ -1,8 +1,7 @@
 import {
 	broadcastMessage,
 	chooseNickname,
-	chooseRoom,
-	leaveRoom,
+	chooseRoom
 } from "./utils/message.js";
 import { createState, getState, parseHeaders, keepAlive } from "./utils/state.js";
 
@@ -38,7 +37,6 @@ Bun.serve<WebSocketData>({
 			if (ws.data.isDebug) {
 				ws.send(`d:data: ${JSON.stringify(ws.data)}`);
 			}
-
 			let state;
 			if (ws.data.userId && ws.data.roomCode) {
 				state = getState(ws, ws.data.userId, ws.data.roomCode);
@@ -67,8 +65,9 @@ Bun.serve<WebSocketData>({
 		},
 		close(ws, code, message) {
 			let state = stateMap.get(ws);
-			leaveRoom(state);
-			stateMap.delete(ws);
+			// leaveRoom(state);
+			state.user.userLeaveRoom();
+			// stateMap.delete(ws);
 		},
 		ping(ws) { },
 		pong(ws) { }

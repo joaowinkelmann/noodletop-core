@@ -1,5 +1,5 @@
 import { Socket, rooms } from "./state.js";
-import { Room } from "../objects/room.js";
+import { Room } from "../models/room.js";
 import { ServerWebSocket } from "bun";
 
 export const reset = "";

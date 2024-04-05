@@ -12,6 +12,7 @@ export class Room {
 	private roomCode: string;
 	private roomSessionId: string;
 	private status: string = "active"; // active, inactive, closed
+	private last_seen: number;
 	private settings: RoomSettings;
 
 	/**
@@ -31,6 +32,8 @@ export class Room {
 			capacity
 		};
 		this.roomSessionId = Rand.id(16);
+		this.last_seen = Date.now();
+		this.status = "active";
 	}
 
 	// standard properties
@@ -40,6 +43,10 @@ export class Room {
 
 	setCapacity(capacity: number) {
 		this.settings.capacity = capacity;
+	}
+
+	getCode(): string {
+		return this.roomCode;
 	}
 
 	getRoomInfo(): string {
@@ -58,16 +65,19 @@ export class Room {
 		this.users.add(user);
 	}
 
+	disconnectUser(user: User, remove: boolean, code: number = 1000, reason: string | undefined = undefined) {
+		user.getSocket().close(code, reason);
+		if (remove) {
+			this.removeUser(user);
+		}
+	}
+
 	removeUser(user: User) {
 		this.users.delete(user);
 	}
 
 	getUsers(): Set<User> {
 		return this.users;
-	}
-
-	getRoomCode(): string {
-		return this.roomCode;
 	}
 
 	// Method to get a single user by its ID, used for recconecting a user back to a room
@@ -94,5 +104,22 @@ export class Room {
 
 	deleteObj(id: string): boolean {
 		return this.objects.delete(id);
+	}
+
+	heartbeat(user: User): void {
+		this.last_seen = Date.now();
+		user.userHeartbeat();
+	}
+
+	getLastSeen(): number {
+		return this.last_seen;
+	}
+
+	selfDestruct(): void {
+		this.users.forEach((user) => {
+			this.disconnectUser(user, true, 4001, "Room closed");
+		});
+		//this.objects.deleteAll();
+		//this.status = "closed";
 	}
 }

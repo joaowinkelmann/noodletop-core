@@ -1,37 +1,9 @@
 import { ask, info, logState, playerCount, reset } from "./log.js";
-import { State, rooms } from "./state.js";
+import { isJSON } from "./common.js";
 import { Rand } from "./randomizer.js";
+import { State, rooms } from "./state.js";
 
-import { Room } from "../objects/room.js";
-
-export function leaveRoom(state: State) {
-	if (!state) {
-		throw new Error("State is undefined");
-	}
-
-	const { roomCode, user } = state;
-
-	const room = rooms.get(roomCode);
-	if (!room) return;
-	if (user.socket.readyState === WebSocket.OPEN) {
-		state.roomCode = null;
-		state.status = "ROOM";
-		ask(user.getSocket(), "Room Code");
-	}
-	room.removeUser(user); // TODO: change this to a "leave" method that will allow the user to come back
-	// room.
-	if (room.getUsers().size === 0) {
-		// TODO: this is not right, we should keep the room in a "closed" state, and wait for a while before deleting it for good
-		rooms.delete(roomCode);
-	} else {
-		room.getUsers().forEach(({ socket }) =>
-			socket.send(
-				`${user.getUsername()} left the room`
-			)
-		);
-	}
-	logState();
-}
+import { Room } from "../models/room.js";
 
 export function chooseRoom(message: string, state: State) {
 	state.roomCode = message.trim().toUpperCase();
@@ -104,9 +76,16 @@ const commands = {
 		},
 	},
 	"/quit": {
-		desc: "Leave the room",
+		desc: "Quit the room",
 		command(state: State) {
-			leaveRoom(state);
+			rooms.get(state.roomCode).disconnectUser(state.user, true, 4900, "/quit");
+		},
+	},
+	"/leave": {
+		desc: "Leave the room temporarily",
+		command(state: State) {
+			state.user.userLeaveRoom(); // set away status
+			rooms.get(state.roomCode).disconnectUser(state.user, false, 4100, "/leave");
 		},
 	},
 	"/broadcast": {
@@ -141,10 +120,7 @@ const commands = {
 					break;
 				case "update":
 				case "u":
-					// update example '/obj update NAGswjYK {"radius": 10, "color": "blue"}'
-					// the id is the first argument, the properties are the second argument (as JSON string)
 					let id = args.shift();
-
 					let properties = null;
 
 					if (isJSON(args.join(" ")) === false) {
@@ -153,9 +129,6 @@ const commands = {
 					} else {
 						properties = JSON.parse(args.join(" "));
 					}
-
-					console.log(args.join(" "));
-					console.log("properties", properties);
 					response = room.updateObj(id, properties);
 					break;
 				case "delete":
@@ -232,8 +205,8 @@ const commands = {
 };
 
 export function broadcastMessage(message: string, state: State) {
-	// updating last_seen on user
-	state.user.heartbeat();
+	// updating last_seen on user and room
+	rooms.get(state.roomCode).heartbeat(state.user);
 
 	if (message.startsWith("/") && message.length > 1) {
 		const command = message.split(" ")[0];
@@ -250,13 +223,4 @@ export function broadcastMessage(message: string, state: State) {
 		.forEach(({ socket }) => {
 			socket.send(`${state.user.username}: ${reset} ${message}`);
 		});
-}
-
-function isJSON(str: string) {
-	try {
-		JSON.parse(str);
-	} catch (e) {
-		return false;
-	}
-	return true;
 }
