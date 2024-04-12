@@ -9,13 +9,13 @@
   "scripts": {
     "dev": "bun --watch ./src/index.ts",
     "build": "bun build ./src/index.ts --target=bun --outfile=./dist/websocket.ts --minify",
-    "start": "bun run ./dist/websocket.ts"
+    "start": "bun run --bun ./dist/websocket.ts"
   },
   "dependencies": {
-    "bun": "^1.1.0"
+    "bun": "^1.1.3"
   },
   "devDependencies": {
     "@types/bun": "^1.0.12",
-    "@types/node": "^20.12.2"
+    "@types/node": "^20.12.7"
   }
 }
