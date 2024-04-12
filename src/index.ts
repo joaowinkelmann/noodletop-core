@@ -74,3 +74,4 @@ Bun.serve<WebSocketData>({
 	},
 	port: Number(process.env.PORT || 3000),
 });
+console.log("🔌 WebSocket avaliable on port " + (process.env.PORT || 3000));
