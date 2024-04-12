@@ -1,9 +1,15 @@
-import crypto from "crypto";
+import { webcrypto } from 'crypto';
 export class Rand {
-	// Function to generate a random number between a minimum and maximum value using crypto.getRandomValues
+	/**
+	 * Generates a high entropy random integer.
+	 *
+	 * @param min - The minimum value (inclusive).
+	 * @param max - The maximum value (inclusive).
+	 * @returns A random integer between min (inclusive) and max (inclusive).
+	 */
 	static int(min: number = 0, max: number): number {
 		return (
-			(crypto.getRandomValues(new Uint32Array(1))[0] % (max - min)) + min
+			webcrypto.getRandomValues(new Uint32Array(1))[0] % (max - min + 1) + min
 		);
 	}
 
@@ -24,7 +30,7 @@ export class Rand {
 
 		let total = 0;
 		for (let i = 0; i < Math.min(numDice, diceLimit); i++) {
-			const roll = this.int(1, diceSides + 1);
+			const roll = this.int(1, diceSides);
 			rolls.push(roll);
 			total += roll;
 		}
@@ -77,16 +83,31 @@ export class Rand {
 
 	/**
 	 * Generates a random color in hexadecimal format.
-	 * @param bright - A boolean indicating whether the generated color should be bright. Default is true.
-	 * @returns A string representing the random color in hexadecimal format.
+	 * @param saturated - A boolean indicating whether the generated color should be more saturated (not grayed out). Default is true.
+	 * @returns - #FF22BB - String of a color in hexadecimal format.
 	 */
-	static color(bright: boolean = true): string {
-		const randomChannel = () => {
-			const channel = this.int(0, 256);
-			const mix = bright ? 128 : 0;
-			const result = channel + mix;
-			return result > 255 ? 255 : result;
-		};
-		return `#${randomChannel().toString(16)}${randomChannel().toString(16)}${randomChannel().toString(16)}`;
+	static color(saturated: boolean = true): string {
+		let rgb = [0, 0, 0];
+
+		if (saturated) {
+			// Let's choose between one or two channels and "amp" them up, by keeping their values high
+			let numChannels = this.int(1, 2);
+
+			for (let i = 0; i < numChannels; i++) {
+				rgb[this.int(0, 2)] = this.int(180, 255);
+			}
+
+			// Keeping the remaining channel(s) at a low value, preventing "grayish" colors
+			for (let i = 0; i < 3; i++) {
+				if (rgb[i] === 0) {
+					rgb[i] = this.int(0, 64);
+				}
+			}
+		} else {
+			for (let i = 0; i < 3; i++) {
+				rgb[i] = this.int(0, 255);
+			}
+		}
+		return `#${rgb.map((c) => c.toString(16).padStart(2, '0')).join('')}`;
 	}
 }
