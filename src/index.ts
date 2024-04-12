@@ -5,6 +5,9 @@ import {
 } from "./utils/message.js";
 import { createState, getState, parseHeaders, keepAlive } from "./utils/state.js";
 
+// global.log = console.log; // Enables logging
+global.log = () => { }; // Disables logging
+
 const stateMap = new Map();
 
 type WebSocketData = {

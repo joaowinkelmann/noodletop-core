@@ -18,10 +18,10 @@ export const createState = (socket: ServerWebSocket<unknown>, username: string |
 
 /**
  * Retrieves the state of a user in a room. Used to reconnect a user to a room, for example.
- * @param socket - The socket associated with the user.
+ * @param socket - The newly assigned WebSocket connection.
  * @param userId - The ID of the user.
  * @param roomCode - The code of the room.
- * @returns The state of the user in the room, or null if the room or user is not found.
+ * @returns The state of the user in the room, or null if the room or user was not found.
  */
 export const getState = (socket: ServerWebSocket<unknown>, userId: string, roomCode: string): State | null => {
 	const room = rooms.get(roomCode);

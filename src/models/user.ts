@@ -31,7 +31,7 @@ export class User {
 	}
 
 	userHeartbeat(): void {
-		//console.log("Heartbeat");
+		global.log(`User ${this.username} has sent a heartbeat`);
 		this.status.last_seen = Date.now();
 	}
 	
@@ -63,8 +63,7 @@ export class User {
 
 	// analogy: user leaves the room for a bit, but they can come back, so we keep them for now
 	userLeaveRoom(): void {
-		//console.log(`User left the room`);
-		// console.log(Date.prototype.toISOString().toString());
+		global.log(`User ${this.username} left the room at ${new Date().toISOString()}`);
 		this.status.last_seen = Date.now(); // keep this value so that we can remove the user if they don't come back after a while 
 		this.status.connection = "away";
 	}

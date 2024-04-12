@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "allowJs": true,
+    "allowJs": false,
     "esModuleInterop": true,
     "isolatedModules": true,
     "module": "ESNext",
@@ -8,5 +8,7 @@
     "outDir": "dist",
     "paths": { "~/*": ["./src/*"] },
     "target": "ESNext"
-  }
+  },
+  "include": ["src/**/*.ts", "src/**/*.d.ts"],
+  "exclude": ["node_modules", "dist/*"]
 }
