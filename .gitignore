@@ -4,6 +4,9 @@
 # Dependencies
 /node_modules/
 
+# Lock file
+bun.lockb
+
 # Environment variables
 **.env
 .env.local
