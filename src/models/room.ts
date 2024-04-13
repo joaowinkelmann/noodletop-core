@@ -1,5 +1,5 @@
 import { User } from "./user";
-import { rObject, ObjectManager } from "./object";
+import { ObjectManager } from "./object";
 import { Rand } from "../utils/randomizer";
 import { RoomSettings } from "../dto/roomDTO";
 

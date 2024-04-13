@@ -23,7 +23,7 @@ export class ObjectManager {
 	 */
 	// create(properties: Object | undefined): string {
 	create(type?: string, properties?: Object | undefined): string {
-		const id = this.uniqId();
+		const id = Rand.id(8);
 		const object: rObject = {
 			id: id,
 			props: null,
@@ -85,14 +85,5 @@ export class ObjectManager {
 	 */
 	delete(id: string): boolean {
 		return this.objects.delete(id);
-	}
-
-	// generates a random 8 char alphanumeric unique id, checking if it already exists in the manager
-	private uniqId(): string {
-		let id = Rand.id(8);
-		while (this.objects.has(id)) {
-			id = Rand.id(8);
-		}
-		return id;
 	}
 }
