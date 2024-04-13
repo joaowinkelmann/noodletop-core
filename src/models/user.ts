@@ -1,76 +1,76 @@
-import { ServerWebSocket } from "bun";
-import { Rand } from "~/utils/randomizer";
-import { UserStatus, UserCosmetics } from "~/dto/userDTO";
+import { ServerWebSocket } from 'bun';
+import { Rand } from '~/utils/randomizer';
+import { UserStatus, UserCosmetics } from '~/dto/userDTO';
 
 export class User {
-	socket: ServerWebSocket<unknown>;
-	username: string;
-	id: string = Rand.id();
-	status: UserStatus;
-	cosmetics: UserCosmetics;
+    socket: ServerWebSocket<unknown>;
+    username: string;
+    id: string = Rand.id();
+    status: UserStatus;
+    cosmetics: UserCosmetics;
 
-	constructor(socket: ServerWebSocket<unknown>, username: string) {
-		this.socket = socket;
-		this.username = username;
-		this.status = {
-			connection: "active",
-			last_seen: Date.now()
-		};
-		this.cosmetics = {
-			color: Rand.color()
-		};
-	}
+    constructor(socket: ServerWebSocket<unknown>, username: string) {
+        this.socket = socket;
+        this.username = username;
+        this.status = {
+            connection: 'active',
+            last_seen: Date.now()
+        };
+        this.cosmetics = {
+            color: Rand.color()
+        };
+    }
 
-	getInfo(): string {
-		return JSON.stringify({
-			id: this.id,
-			username: this.username,
-			status: this.status,
-			cosmetics: this.cosmetics
-		});
-	}
+    getInfo(): string {
+        return JSON.stringify({
+            id: this.id,
+            username: this.username,
+            status: this.status,
+            cosmetics: this.cosmetics
+        });
+    }
 
-	userHeartbeat(): void {
-		global.log(`User ${this.username} has sent a heartbeat`);
-		this.status.last_seen = Date.now();
-	}
-	
-	getSocket(): ServerWebSocket<unknown> {
-		return this.socket;
-	}
+    userHeartbeat(): void {
+        global.log(`User ${this.username} has sent a heartbeat`);
+        this.status.last_seen = Date.now();
+    }
 
-	getUsername(): string {
-		return this.username;
-	}
+    getSocket(): ServerWebSocket<unknown> {
+        return this.socket;
+    }
 
-	getId(): string {
-		return this.id;
-	}
+    getUsername(): string {
+        return this.username;
+    }
 
-	getColor(): string {
-		return this.cosmetics.color;
-	}
+    getId(): string {
+        return this.id;
+    }
 
-	setColor(newColor: string): void {
-		this.cosmetics.color = newColor;
-	}
+    getColor(): string {
+        return this.cosmetics.color;
+    }
 
-	changeUsername(newUsername: string): string {
-		let currentUsername = this.username;
-		this.username = newUsername;
-		return `Username changed from ${currentUsername} to ${newUsername}`;
-	}
+    setColor(newColor: string): void {
+        this.cosmetics.color = newColor;
+    }
 
-	// analogy: user leaves the room for a bit, but they can come back, so we keep them for now
-	userLeaveRoom(): void {
-		global.log(`User ${this.username} left the room at ${new Date().toISOString()}`);
-		this.status.last_seen = Date.now(); // keep this value so that we can remove the user if they don't come back after a while 
-		this.status.connection = "away";
-	}
+    changeUsername(newUsername: string): string {
+        const currentUsername = this.username;
+        this.username = newUsername;
+        return `Username changed from ${currentUsername} to ${newUsername}`;
+    }
 
-	// User has effectively left the room, we can safely remove them
-	quitRoom(): void {
-		this.status.connection = "exited";
-	}
-	
+    // analogy: user leaves the room for a bit, but they can come back, so we keep them for now
+    userLeaveRoom(): void {
+        global.log(`User ${this.username} left the room at ${new Date().toISOString()}`);
+        this.status.last_seen = Date.now(); // keep this value so that we can remove the user if they don't come back after a while
+        this.status.connection = 'away';
+    }
+
+    // User has effectively left the room, we can safely remove them
+    quitRoom(): void {
+        this.status.connection = 'exited';
+    }
+
 }

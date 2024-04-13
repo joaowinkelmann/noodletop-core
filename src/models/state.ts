@@ -1,7 +1,7 @@
-import { User } from "./user";
+import { User } from './user';
 
 export type State = {
-	status: "ROOM" | "NICKNAME" | "CONNECTED";
-	roomCode: string;
-	user: User;
+    status: 'ROOM' | 'NICKNAME' | 'CONNECTED';
+    roomCode: string;
+    user: User;
 };

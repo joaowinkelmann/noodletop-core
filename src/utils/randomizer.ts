@@ -1,113 +1,113 @@
 import { webcrypto } from 'crypto';
 export class Rand {
-	/**
-	 * Generates a high entropy random integer.
-	 *
-	 * @param min - The minimum value (inclusive).
-	 * @param max - The maximum value (inclusive).
-	 * @returns A random integer between min (inclusive) and max (inclusive).
-	 */
-	static int(min: number = 0, max: number): number {
-		return (
-			webcrypto.getRandomValues(new Uint32Array(1))[0] % (max - min + 1) + min
-		);
-	}
+    /**
+     * Generates a high entropy random integer.
+     *
+     * @param min - The minimum value (inclusive).
+     * @param max - The maximum value (inclusive).
+     * @returns A random integer between min (inclusive) and max (inclusive).
+     */
+    static int(min: number = 0, max: number): number {
+        return (
+            webcrypto.getRandomValues(new Uint32Array(1))[0] % (max - min + 1) + min
+        );
+    }
 
-	// Function to generate a random dice roll from a string of dice notation (e.g. "2d6+3", "d8-3" or "d8")
-	static roll(diceNotation: string, showRolls: boolean, diceLimit: number = 100): string | number {
-		// Check if the dice notation is valid
-		if (!/^(\d*d\d+)([-+]\d+)*$/.test(diceNotation)) {
-			return "Invalid dice notation";
-		}
+    // Function to generate a random dice roll from a string of dice notation (e.g. "2d6+3", "d8-3" or "d8")
+    static roll(diceNotation: string, showRolls: boolean, diceLimit: number = 100): string | number {
+        // Check if the dice notation is valid
+        if (!/^(\d*d\d+)([-+]\d+)*$/.test(diceNotation)) {
+            return 'Invalid dice notation';
+        }
 
-		const matches = diceNotation.match(/(\d*)d(\d+)([-+]\d+)*/);
+        const matches = diceNotation.match(/(\d*)d(\d+)([-+]\d+)*/);
 
-		const numDice = parseInt(matches[1]) || 1;
-		const diceSides = parseInt(matches[2]);
-		const modifiers = matches[0].match(/[-+]\d+/g) || [];
+        const numDice = parseInt(matches[1], 10) || 1;
+        const diceSides = parseInt(matches[2], 10);
+        const modifiers = matches[0].match(/[-+]\d+/g) || [];
 
-		const rolls: number[] = [];
+        const rolls: number[] = [];
 
-		let total = 0;
-		for (let i = 0; i < Math.min(numDice, diceLimit); i++) {
-			const roll = this.int(1, diceSides);
-			rolls.push(roll);
-			total += roll;
-		}
+        let total = 0;
+        for (let i = 0; i < Math.min(numDice, diceLimit); i++) {
+            const roll = this.int(1, diceSides);
+            rolls.push(roll);
+            total += roll;
+        }
 
-		// Adjust the total based on the modifiers
-		modifiers.forEach((modifier) => {
-			const modifierSign = modifier[0];
-			const modifierValue = parseInt(modifier.slice(1));
+        // Adjust the total based on the modifiers
+        modifiers.forEach((modifier) => {
+            const modifierSign = modifier[0];
+            const modifierValue = parseInt(modifier.slice(1), 10);
 
-			if (modifierSign === "+") {
-				total += modifierValue;
-			} else if (modifierSign === "-") {
-				total -= Math.abs(modifierValue);
-			}
-		});
+            if (modifierSign === '+') {
+                total += modifierValue;
+            } else if (modifierSign === '-') {
+                total -= Math.abs(modifierValue);
+            }
+        });
 
-		if (showRolls) {
-			return `${total} (${rolls.join(", ")})${modifiers.join("")}`;
-		} else {
-			return total;
-		}
-	}
+        if (showRolls) {
+            return `${total} (${rolls.join(', ')})${modifiers.join('')}`;
+        } else {
+            return total;
+        }
+    }
 
-	/**
-	 * Generates a random alphanumeric ID of a given length.
-	 * @param length The length of the ID string. Default is 8.
-	 * @param includeTimestamp Whether to include a timestamp at the beginning of the ID string. Default is true.
-	 * @returns The generated ID string.
-	 */
-	static id(length: number = 8, includeTimestamp: boolean = true): string {
-		let result = '';
-		const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-		const charactersLength = characters.length;
-		for (let i = 0; i < length; i++) {
-			result += characters.charAt(Math.floor(Math.random() * charactersLength));
-		}
-		if (includeTimestamp) {
-			let timestampString = Date.now().toString(36); // 8 characters
-			result = timestampString + result;
-		}
-		return result;
-	}
+    /**
+     * Generates a random alphanumeric ID of a given length.
+     * @param length The length of the ID string. Default is 8.
+     * @param includeTimestamp Whether to include a timestamp at the beginning of the ID string. Default is true.
+     * @returns The generated ID string.
+     */
+    static id(length: number = 8, includeTimestamp: boolean = true): string {
+        let result = '';
+        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+        const charactersLength = characters.length;
+        for (let i = 0; i < length; i++) {
+            result += characters.charAt(Math.floor(Math.random() * charactersLength));
+        }
+        if (includeTimestamp) {
+            const timestampString = Date.now().toString(36); // 8 characters
+            result = timestampString + result;
+        }
+        return result;
+    }
 
-	// returns a Date object from an ID generated by the id() method
-	static dateFromId(id: string): Date {
-		let timestampString = id.slice(0, 8); // gets the first 8 characters from the id
-		let timestamp = parseInt(timestampString, 36);
-		return new Date(timestamp);
-	}
+    // returns a Date object from an ID generated by the id() method
+    static dateFromId(id: string): Date {
+        const timestampString = id.slice(0, 8); // gets the first 8 characters from the id
+        const timestamp = parseInt(timestampString, 36);
+        return new Date(timestamp);
+    }
 
-	/**
-	 * Generates a random color in hexadecimal format.
-	 * @param saturated - A boolean indicating whether the generated color should be more saturated (not grayed out). Default is true.
-	 * @returns - #FF22BB - String of a color in hexadecimal format.
-	 */
-	static color(saturated: boolean = true): string {
-		let rgb = [0, 0, 0];
+    /**
+     * Generates a random color in hexadecimal format.
+     * @param saturated - A boolean indicating whether the generated color should be more saturated (not grayed out). Default is true.
+     * @returns - #FF22BB - String of a color in hexadecimal format.
+     */
+    static color(saturated: boolean = true): string {
+        const rgb = [0, 0, 0];
 
-		if (saturated) {
-			// Let's choose between one or two channels and "amp" them up, by keeping their values high
-			let numChannels = this.int(1, 2);
+        if (saturated) {
+            // Let's choose between one or two channels and "amp" them up, by keeping their values high
+            const numChannels = this.int(1, 2);
 
-			for (let i = 0; i < numChannels; i++) {
-				rgb[this.int(0, 2)] = this.int(180, 255);
-			}
+            for (let i = 0; i < numChannels; i++) {
+                rgb[this.int(0, 2)] = this.int(180, 255);
+            }
 
-			// Keeping the remaining channel(s) at a low value, preventing "grayish" colors
-			for (let i = 0; i < 3; i++) {
-				if (rgb[i] === 0) {
-					rgb[i] = this.int(0, 64);
-				}
-			}
-		} else {
-			for (let i = 0; i < 3; i++) {
-				rgb[i] = this.int(0, 255);
-			}
-		}
-		return `#${rgb.map((c) => c.toString(16).padStart(2, '0')).join('')}`;
-	}
+            // Keeping the remaining channel(s) at a low value, preventing "grayish" colors
+            for (let i = 0; i < 3; i++) {
+                if (rgb[i] === 0) {
+                    rgb[i] = this.int(0, 64);
+                }
+            }
+        } else {
+            for (let i = 0; i < 3; i++) {
+                rgb[i] = this.int(0, 255);
+            }
+        }
+        return `#${rgb.map((c) => c.toString(16).padStart(2, '0')).join('')}`;
+    }
 }
