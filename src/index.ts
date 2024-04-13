@@ -1,9 +1,5 @@
-import {
-	broadcastMessage,
-	chooseNickname,
-	chooseRoom
-} from "./utils/message.js";
-import { createState, getState, parseHeaders, keepAlive } from "./utils/state.js";
+import { broadcastMessage, chooseNickname, chooseRoom } from "./utils/message.js";
+import { createState, getState, parseHeaders, keepAlive } from "./utils/stateManager.js";
 
 // global.log = console.log; // Enables logging
 global.log = () => { }; // Disables logging

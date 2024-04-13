@@ -1,15 +1,16 @@
 // Class to manage the state of the user, room, and socket connections
 import { User } from "../models/user";
 import { Room } from "../models/room";
+import { State } from "../models/state";
 import { Sweeper } from "./sweeper";
 import { ServerWebSocket } from "bun";
 
-export type State = {
-	status: "ROOM" | "NICKNAME" | "CONNECTED";
-	roomCode: string;
-	user: User;
-};
-
+/**
+ * Creates a new state.
+ * @param socket - The server WebSocket.
+ * @param username - The username (optional).
+ * @returns The new state object.
+ */
 export const createState = (socket: ServerWebSocket<unknown>, username: string | null = null): State => ({
 	status: "ROOM",
 	roomCode: null,
@@ -77,6 +78,12 @@ export const keepAlive = (socket: ServerWebSocket<unknown>, interval: number = 3
 			clearInterval(intervalId);
 		}
 	}, interval * 1000);
+}
+
+export const createRoom = (roomCode: string): Room => {
+	const room = new Room(roomCode);
+	rooms.set(roomCode, room);
+	return room;
 }
 
 

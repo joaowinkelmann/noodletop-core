@@ -80,6 +80,10 @@ export class Room {
 		return this.users;
 	}
 
+	countUsers(): number {
+		return this.users.size;
+	}
+
 	// Method to get a single user by its ID, used for recconecting a user back to a room
 	getUserById(id: string): User | undefined {
 		return Array.from(this.users).find((user) => user.getId() === id);

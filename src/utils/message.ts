@@ -1,9 +1,8 @@
-import { ask, info, logState, playerCount, reset } from "./log.js";
+import { ask, info } from "./log.js";
 import { isJSON } from "./common.js";
 import { Rand } from "./randomizer.js";
-import { State, rooms } from "./state.js";
-
-import { Room } from "../models/room.js";
+import { State } from "../models/state.js";
+import { rooms, createRoom } from "./stateManager.js";
 
 export function chooseRoom(message: string, state: State) {
 	state.roomCode = message.trim().toUpperCase();
@@ -21,7 +20,7 @@ export function chooseNickname(message: string, state: State) {
 
 	if (!rooms.has(roomCode)) {
 		// the room does not exist, create it
-		rooms.set(roomCode, new Room(roomCode));
+		createRoom(roomCode);
 	}
 
 	const room = rooms.get(roomCode);
@@ -40,7 +39,6 @@ export function chooseNickname(message: string, state: State) {
 		}
 	});
 	state.status = "CONNECTED";
-	logState();
 }
 
 const commands = {
@@ -66,13 +64,7 @@ const commands = {
 		desc: "Room user list",
 		command({ roomCode, user }: State) {
 			const room = rooms.get(roomCode);
-			user.socket.send(
-				`${playerCount(room.getUsers().size)}: ${[
-					...room.getUsers(),
-				]
-					.map((user) => user.username)
-					.join(``)} >`
-			);
+			user.socket.send(`User count: ${room.countUsers()} > (${[...room.getUsers()].map((user) => user.username).join(", ")})`);
 		},
 	},
 	"/quit": {
@@ -94,7 +86,7 @@ const commands = {
 			rooms.forEach((room) => {
 				room.getUsers().forEach(({ socket }) => {
 					socket.send(
-						`${state.user.username}: ${reset} ${message}`
+						`${state.user.username}: ${message}`
 					);
 				});
 			});
@@ -155,7 +147,7 @@ const commands = {
 
 			room.getUsers().forEach(({ socket }) => {
 				socket.send(
-					`${state.user.username} >${reset} ${response}`
+					`${state.user.username} > ${response}`
 				);
 			});
 		},
@@ -169,7 +161,7 @@ const commands = {
 			let result = Rand.roll(diceNotation, showRolls);
 			// send the result to the user
 			state.user.socket.send(
-				`${state.user.username} >${reset} ${result}`
+				`${state.user.username} > ${result}`
 			);
 		},
 	},
@@ -197,7 +189,7 @@ const commands = {
 
 			room.getUsers().forEach(({ socket }) => {
 				socket.send(
-					`${state.user.username} >${reset} ${response}`
+					`${state.user.username} > ${response}`
 				);
 			});
 		},
@@ -221,6 +213,6 @@ export function broadcastMessage(message: string, state: State) {
 		.get(state.roomCode)
 		.getUsers()
 		.forEach(({ socket }) => {
-			socket.send(`${state.user.username}: ${reset} ${message}`);
+			socket.send(`${state.user.username}: ${message}`);
 		});
 }
