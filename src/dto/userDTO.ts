@@ -11,4 +11,5 @@ export interface UserStatus {
 export interface UserCosmetics {
     // The user's current cosmetics
     color: string; // hex color '#RRGGBB'
+    team?: string; // team id
 }

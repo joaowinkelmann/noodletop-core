@@ -20,7 +20,7 @@ export class ObjectManager {
      * @returns The created object as a JSON string
      */
     create(type?: string, properties?: object | undefined): string {
-        const id = Rand.id(8);
+        const id = Rand.id();
         const object: rObject = {
             id,
             props: null

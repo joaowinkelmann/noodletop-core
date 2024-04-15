@@ -1,8 +1,8 @@
 import { broadcastMessage, chooseNickname, chooseRoom } from './utils/message.js';
 import { createState, getState, parseHeaders, keepAlive } from './utils/stateManager.js';
 
-global.log = () => {
-    // console.log // Uncomment this line to enable logging
+global.log = (msg) => {
+    // console.log(msg); // Uncomment this line to enable logging
 };
 
 const stateMap = new Map();
@@ -43,9 +43,9 @@ Bun.serve<WebSocketData>({
             }
             if (!state) {
                 state = createState(ws);
-                ws.send('Enter room code');
+                ws.send('?room');
             } else {
-                ws.send(`u: ` + state.user.getId());
+                ws.send(`u ` + state.user.getId());
             }
             stateMap.set(ws, state);
             keepAlive(ws);
@@ -64,10 +64,7 @@ Bun.serve<WebSocketData>({
             }
         },
         close(ws, code, message) {
-            const state = stateMap.get(ws);
-            // leaveRoom(state);
-            state.user.userLeaveRoom();
-            // stateMap.delete(ws);
+            stateMap.delete(ws);
         },
         ping(ws) {
             // global.log('Ping');

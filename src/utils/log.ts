@@ -1,11 +1,11 @@
 import { Room } from '../models/room.js';
 import { ServerWebSocket } from 'bun';
 
-export function ask(socket: ServerWebSocket<unknown>, item: string, error?: boolean) {
-    if (error) {
-        socket.send(`Minimum length is 3 characters`);
+export function ask(socket: ServerWebSocket<unknown>, item: string, errorText?: string) {
+    if (errorText) {
+        socket.send(errorText);
     }
-    socket.send(`Enter ${item}`);
+    socket.send(`?${item}`);
 }
 
 export const info = (roomCode: string, room: Room) =>

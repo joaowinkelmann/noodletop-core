@@ -55,6 +55,14 @@ export class User {
         this.cosmetics.color = newColor;
     }
 
+    getTeam(): string | null {
+        return this.cosmetics.team;
+    }
+
+    setTeam(teamId: string | null): void {
+        this.cosmetics.team = teamId;
+    }
+
     changeUsername(newUsername: string): string {
         const currentUsername = this.username;
         this.username = newUsername;

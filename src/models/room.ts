@@ -1,4 +1,5 @@
 import { User } from './user';
+import { TeamManager } from './team';
 import { ObjectManager } from './object';
 import { Rand } from '../utils/randomizer';
 import { RoomSettings } from '../dto/roomDTO';
@@ -9,6 +10,7 @@ import { RoomSettings } from '../dto/roomDTO';
 export class Room {
     private users: Set<User>;
     private objects: ObjectManager = new ObjectManager();
+    private teams: TeamManager = new TeamManager();
     private roomCode: string;
     private roomSessionId: string;
     private status: string = 'active'; // active, inactive, closed
@@ -31,7 +33,7 @@ export class Room {
             isPublic,
             capacity
         };
-        this.roomSessionId = Rand.id(16);
+        this.roomSessionId = Rand.id(7);
         this.lastSeen = Date.now();
         this.status = 'active';
     }
@@ -42,7 +44,11 @@ export class Room {
     }
 
     setCapacity(capacity: number) {
-        this.settings.capacity = capacity;
+        if (capacity < this.countUsers()) {
+            // invalid capacity, we've got more users than the new capacity
+            return false; // perhaps throw an error instead
+        }
+        return this.settings.capacity = capacity;
     }
 
     getCode(): string {
@@ -54,15 +60,51 @@ export class Room {
             roomSessionId: this.roomSessionId,
             settings: this.settings,
             roomCode: this.roomCode,
+            userCount: this.countUsers(),
             users: Array.from(this.users).map((user) => user.getUsername()),
             objects: this.objects.getAll(),
             status: this.status
         });
     }
 
+    /**
+     * Sets the value of a specific key in the room's settings.
+     * If the key is valid, it calls the corresponding setter method.
+     * If the setter method exists, it invokes the method with the provided value.
+     * If the key is invalid or the setter method doesn't exist, it does nothing.
+     *
+     * @param key - The key of the setting to be updated.
+     * @param value - The new value for the setting.
+     */
+    setRoomData(key: string, value: any): void {
+        // check if the key is valid
+        if (key in this.settings) {
+            // this.settings[key] = value;
+            const method = `set${key.charAt(0).toUpperCase() + key.slice(1)}`;
+            if (typeof this[method] === 'function') {
+                return this[method](value);
+            } else {
+                // this.settings[key] = value;
+            }
+        } else {
+            // handle invalid keys (perhaps a message informing the user)
+        }
+    }
+
     // CRUD operations for users
-    addUser(user: User) {
+    addUser(user: User): boolean {
+        // check if the room is full before adding a user
+        if (this.settings.capacity && this.countUsers() >= this.settings.capacity) {
+            global.log(`Room ${this.roomCode} is full`);
+            return false;
+        }
+        // check if the user with the same name is already in the room
+        if (Array.from(this.users).find((u) => u.getUsername() === user.getUsername())) {
+            global.log(`User ${user.getUsername()} is already in the room`);
+            return false;
+        }
         this.users.add(user);
+        return true;
     }
 
     disconnectUser(user: User, remove: boolean, code: number = 1000, reason: string | undefined = undefined) {
@@ -71,6 +113,10 @@ export class Room {
             this.removeUser(user);
         }
     }
+
+    // getUserTeam(user: User): string | undefined {
+    //     return this.teams.getTeamByUser(user.getId());
+    // }
 
     removeUser(user: User) {
         this.users.delete(user);
@@ -87,6 +133,42 @@ export class Room {
     // Method to get a single user by its ID, used for recconecting a user back to a room
     getUserById(id: string): User | undefined {
         return Array.from(this.users).find((user) => user.getId() === id);
+    }
+
+    // CRUD operations for teams
+    createTeam(name: string): string {
+        return JSON.stringify(this.teams.create(name));
+    }
+
+    getTeam(teamId: string): string {
+        return JSON.stringify(this.teams.get(teamId));
+    }
+
+    joinTeam(teamId: string, user: User): string {
+        this.teams.join(teamId, user.getId());
+        user.setTeam(teamId);
+        return JSON.stringify(this.teams.get(teamId));
+    }
+
+    leaveTeam(user: User): string {
+        const teamId = user.getTeam();
+        this.teams.leave(teamId, user.getId());
+        user.setTeam(null);
+        return JSON.stringify(this.teams.get(teamId));
+    }
+
+    /**
+     * Deletes a team from the room.
+     * @param {string} teamId - The ID of the team to delete.
+     * @returns {boolean} - Returns true if the team was successfully deleted, false otherwise.
+     */
+    deleteTeam(teamId: string): boolean {
+        // TODO: Add admin privileges once user roles are implemented
+        return this.teams.delete(teamId);
+    }
+
+    listTeams(): string {
+        return this.teams.list();
     }
 
     // CRUD operations for objects

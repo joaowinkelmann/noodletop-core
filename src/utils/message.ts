@@ -2,43 +2,48 @@ import { ask, info } from './log.js';
 import { isJSON } from './common.js';
 import { Rand } from './randomizer.js';
 import { State } from '../models/state.js';
+import { Room } from '../models/room.js';
 import { rooms, createRoom } from './stateManager.js';
 
 export function chooseRoom(message: string, state: State) {
-    state.roomCode = message.trim().toUpperCase();
-    if (state.roomCode.length < 3)
-        return ask(state.user.socket, 'Room Code', true);
+    state.roomCode = message.trim().toLowerCase();
+    if (state.roomCode.length < 3) {
+        return ask(state.user.socket, 'room', 'Room should have at least 3 characters');
+    }
     state.status = 'NICKNAME';
-    ask(state.user.socket, 'your Nickname');
+    ask(state.user.socket, 'nick');
 }
 
 export function chooseNickname(message: string, state: State) {
     const { roomCode, user } = state;
     const username = message.trim();
-    if (username.length < 3) return ask(user.socket, 'your Nickname', true);
+    if (username.length < 3) return ask(user.socket, 'nick', 'Nickname should have at least 3 characters');
     user.changeUsername(username);
 
     if (!rooms.has(roomCode)) {
-        // the room does not exist, create it
         createRoom(roomCode);
     }
 
-    const room = rooms.get(roomCode);
-    room.addUser(user);
-    // room.forEach(({ socket }) => {
-    room.getUsers().forEach(({ socket }) => {
-        if (socket !== user.socket) { // the other users
-            socket.send(
-                `${user.username} joined the room`
-            );
-        } else { // the user itself (private info goes here)
-            // if the user is the first to join, send the room information
-            socket.send(info(roomCode, room));
-            // sending user id so that it may be saved by the client
-            socket.send(`u: ${user.id}`);
-        }
-    });
-    state.status = 'CONNECTED';
+    const room: Room = rooms.get(roomCode) as Room;
+
+    if (room.addUser(user)) {
+        // user joined the room successfully
+        room.getUsers().forEach(({ socket }) => {
+            if (socket !== user.socket) { // the other users
+                socket.send(
+                    `${user.username} joined the room`
+                );
+            } else { // the user itself (private info goes here)
+                socket.send(room.getRoomInfo());
+                // sending user id so that it may be saved by the client
+                socket.send(`u ${user.id}`);
+            }
+        });
+        state.status = 'CONNECTED';
+    } else {
+        // user could not join the room, because it was full (or some other reason in the future)
+        ask(user.socket, 'room', 'Room is full or your username is already taken');
+    }
 }
 
 const commands = {
@@ -50,20 +55,14 @@ const commands = {
                     commands
                 )
                     .map(([k, v]) => [k, v.desc].join(` \t`))
-                    .join(`\r\n\t`)} \r\n}>`
+                    .join(`\r\n\t`)} \r\n\n\tWiki: https://t.ly/daGAP`
             );
-        }
-    },
-    '/info': {
-        desc: 'Room information',
-        command({ roomCode, user }: State) {
-            user.socket.send(rooms.get(roomCode).getRoomInfo());
         }
     },
     '/list': {
         desc: 'Room user list',
         command({ roomCode, user }: State) {
-            const room = rooms.get(roomCode);
+            const room: Room = rooms.get(roomCode) as Room;
             user.socket.send(`User count: ${room.countUsers()} > (${[...room.getUsers()].map((user) => user.username).join(', ')})`);
         }
     },
@@ -80,22 +79,10 @@ const commands = {
             rooms.get(state.roomCode).disconnectUser(state.user, false, 4100, '/leave');
         }
     },
-    '/broadcast': {
-        desc: 'Send a message to all connected sockets',
-        command(state: State, message: string) {
-            rooms.forEach((room) => {
-                room.getUsers().forEach(({ socket }) => {
-                    socket.send(
-                        `${state.user.username}: ${message}`
-                    );
-                });
-            });
-        }
-    },
     '/obj': {
-        desc: 'Documentation: https://t.ly/daGAP\nPerform operations with objects. Usage: /obj [read|create|update|delete] [id] [{"property": "value"}]',
+        desc: 'Perform operations with objects. Usage: /obj [read|create|update|delete] [id] [{"property": "value"}]',
         command(state: State, operation: string) {
-            const room = rooms.get(state.roomCode);
+            const room: Room = rooms.get(state.roomCode) as Room;
             if (!room) return;
 
             let response = null;
@@ -152,23 +139,10 @@ const commands = {
             });
         }
     },
-    '/roll': {
-        desc: 'Roll dice. Usage: /roll [dice notation (2d6+3)] [show rolls (true|false)]',
-        command(state: State, operation: string) {
-            const diceNotation = operation.split(' ')[0];
-            const showRolls = operation.split(' ')[1] === 'false' ? false : true;
-
-            const result = Rand.roll(diceNotation, showRolls);
-            // send the result to the user
-            state.user.socket.send(
-                `${state.user.username} > ${result}`
-            );
-        }
-    },
     '/usr': {
-        desc: 'Perform operations with your own user. Usage: /usr [changeUsername] [newUsername]\n || /usr info',
+        desc: 'Perform operations with your own user. Usage: /usr [changeUsername|info] [newUsername]',
         command(state: State, operation: string) {
-            const room = rooms.get(state.roomCode);
+            const room: Room = rooms.get(state.roomCode) as Room;
             if (!room) return;
 
             let response = null;
@@ -193,12 +167,106 @@ const commands = {
                 );
             });
         }
+    },
+    '/room': {
+        desc: 'Perform operations within the room. Usage: /room [set|close|info|list|kick] [username]',
+        command(state: State, operation: string) {
+            const room: Room = rooms.get(state.roomCode) as Room;
+            if (!room) return;
+
+            let response = null;
+            const [op, ...args] = operation.split(' ');
+            const argArr = args.map((arg) => arg.trim());
+            switch (op) {
+                case 'set':
+                    response = room.setRoomData(argArr[0], argArr[1]);
+                    break;
+                case 'info':
+                    response = room.getRoomInfo();
+                    break;
+                default:
+                    response = 'Invalid operation';
+                    break;
+            }
+
+            room.getUsers().forEach(({ socket }) => {
+                socket.send(
+                    `$${response}`
+                );
+            });
+        }
+    },
+    '/roll': {
+        desc: 'Roll dice. Usage: /roll [dice notation (2d6+3)] [show rolls (true|false)]',
+        command(state: State, operation: string) {
+            const diceNotation = operation.split(' ')[0];
+            const showRolls = operation.split(' ')[1] === 'false' ? false : true;
+
+            const result = Rand.roll(diceNotation, showRolls);
+            // send the result to the user
+            state.user.socket.send(
+                `${state.user.username} > ${result}`
+            );
+        }
+    },
+    '/team': {
+        desc: 'Perform operations with teams. Usage: /team [create|join|leave|list] [teamName]',
+        command(state: State, operation: string) {
+            const room: Room = rooms.get(state.roomCode) as Room;
+            if (!room) return;
+
+            let response = null;
+            const [op, ...args] = operation.split(' ');
+            const argArr = args.map((arg) => arg.trim());
+            switch (op) {
+                case 'create':
+                case 'add':
+                    response = room.createTeam(argArr[0]);
+                    break;
+                case 'join':
+                    response = room.joinTeam(argArr[0], state.user);
+                    break;
+                case 'leave':
+                    response = room.leaveTeam(state.user);
+                    break;
+                case 'delete':
+                    response = room.deleteTeam(argArr[0]);
+                    break;
+                case 'list':
+                    response = room.listTeams();
+                    break;
+                case 'get':
+                    response = room.getTeam(argArr[0]);
+                    break;
+                default:
+                    response = 'Invalid operation';
+                    break;
+            }
+            state.user.socket.send(`${response}`);
+        }
+    },
+    '/debug': {
+        desc: 'Developer debug command',
+        command(state: State, operation: string) {
+            const [op, ...args] = operation.split(' ');
+            switch (op) {
+                case 'dateFromId':
+                    const idString = args[0];
+                    state.user.socket.send(String(Rand.dateFromId(idString)));
+                    break;
+                default:
+                    state.user.socket.send(`Invalid operation`);
+                    break;
+            }
+        }
     }
 };
 
 export function broadcastMessage(message: string, state: State) {
-    // updating last_seen on user and room
-    rooms.get(state.roomCode).heartbeat(state.user);
+    const room: Room = rooms.get(state.roomCode) as Room;
+    room.heartbeat(state.user);
+
+    if (message.length === 0) return;
 
     if (message.startsWith('/') && message.length > 1) {
         const command = message.split(' ')[0];
@@ -213,6 +281,6 @@ export function broadcastMessage(message: string, state: State) {
         .get(state.roomCode)
         .getUsers()
         .forEach(({ socket }) => {
-            socket.send(`${state.user.username}: ${message}`);
+            socket.send(`m ${state.user.username}: ${message}`);
         });
 }

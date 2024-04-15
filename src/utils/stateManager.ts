@@ -87,7 +87,7 @@ export const createRoom = (roomCode: string): Room => {
 };
 
 
-class ObservableMap extends Map {
+class ObservableMap<Room> extends Map {
     constructor(private callback: () => void) {
         super();
     }
@@ -105,7 +105,7 @@ class ObservableMap extends Map {
     }
 }
 
-export const rooms = new ObservableMap(() => {
+export const rooms = new ObservableMap<Room>(() => {
     Sweeper.sweepInactiveUsers(rooms);
     Sweeper.sweepInactiveRooms(rooms);
 });
