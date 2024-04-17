@@ -10,6 +10,9 @@ export function chooseRoom(message: string, state: State) {
     if (state.roomCode.length < 3) {
         return ask(state.user.socket, 'room', 'Room should have at least 3 characters');
     }
+    if (rooms.get(state.roomCode)?.isFull()) {
+        return ask(state.user.socket, 'room', 'Room is full');
+    }
     state.status = 'NICKNAME';
     ask(state.user.socket, 'nick');
 }
@@ -18,7 +21,7 @@ export function chooseNickname(message: string, state: State) {
     const { roomCode, user } = state;
     const username = message.trim();
     if (username.length < 3) return ask(user.socket, 'nick', 'Nickname should have at least 3 characters');
-    user.changeUsername(username);
+    user.setUsername(username);
 
     if (!rooms.has(roomCode)) {
         createRoom(roomCode);
@@ -42,6 +45,8 @@ export function chooseNickname(message: string, state: State) {
         state.status = 'CONNECTED';
     } else {
         // user could not join the room, because it was full (or some other reason in the future)
+        global.log(JSON.stringify(user.socket));
+        global.log(JSON.stringify(state));
         ask(user.socket, 'room', 'Room is full or your username is already taken');
     }
 }
@@ -140,7 +145,7 @@ const commands = {
         }
     },
     '/usr': {
-        desc: 'Perform operations with your own user. Usage: /usr [changeUsername|info] [newUsername]',
+        desc: 'Perform operations with your own user. Usage: /usr [setUsername|info] [newUsername]',
         command(state: State, operation: string) {
             const room: Room = rooms.get(state.roomCode) as Room;
             if (!room) return;
@@ -150,8 +155,8 @@ const commands = {
             // get the operation
             const [op, ...args] = operation.split(' ');
             switch (op) {
-                case 'changeUsername':
-                    response = state.user.changeUsername(args[0]);
+                case 'setUsername':
+                    response = state.user.setUsername(args[0]);
                     break;
                 case 'info':
                     response = state.user.getInfo();
@@ -191,7 +196,7 @@ const commands = {
 
             room.getUsers().forEach(({ socket }) => {
                 socket.send(
-                    `$${response}`
+                    `${response}`
                 );
             });
         }

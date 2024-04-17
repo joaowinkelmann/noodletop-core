@@ -43,6 +43,15 @@ export class User {
         return this.username;
     }
 
+    setUsername(newUsername: string): string {
+        if (!newUsername) {
+            return;
+        }
+        const currentUsername = this.username;
+        this.username = newUsername;
+        return `Username changed from ${currentUsername} to ${newUsername}`;
+    }
+
     getId(): string {
         return this.id;
     }
@@ -61,12 +70,6 @@ export class User {
 
     setTeam(teamId: string | null): void {
         this.cosmetics.team = teamId;
-    }
-
-    changeUsername(newUsername: string): string {
-        const currentUsername = this.username;
-        this.username = newUsername;
-        return `Username changed from ${currentUsername} to ${newUsername}`;
     }
 
     // analogy: user leaves the room for a bit, but they can come back, so we keep them for now

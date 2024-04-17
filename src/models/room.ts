@@ -11,8 +11,8 @@ export class Room {
     private users: Set<User>;
     private objects: ObjectManager = new ObjectManager();
     private teams: TeamManager = new TeamManager();
-    private roomCode: string;
-    private roomSessionId: string;
+    private code: string;
+    private sessionId: string;
     private status: string = 'active'; // active, inactive, closed
     private lastSeen: number;
     private settings: RoomSettings;
@@ -27,13 +27,13 @@ export class Room {
         isPublic: boolean = true,
         capacity: number = 20
     ) {
-        this.roomCode = roomCode;
+        this.code = roomCode;
         this.users = new Set();
         this.settings = {
             isPublic,
             capacity
         };
-        this.roomSessionId = Rand.id(7);
+        this.sessionId = Rand.id(7);
         this.lastSeen = Date.now();
         this.status = 'active';
     }
@@ -51,15 +51,19 @@ export class Room {
         return this.settings.capacity = capacity;
     }
 
+    isFull(): boolean {
+        return this.settings.capacity && this.countUsers() >= this.settings.capacity;
+    }
+
     getCode(): string {
-        return this.roomCode;
+        return this.code;
     }
 
     getRoomInfo(): string {
         return JSON.stringify({
-            roomSessionId: this.roomSessionId,
+            sessionId: this.sessionId,
             settings: this.settings,
-            roomCode: this.roomCode,
+            code: this.code,
             userCount: this.countUsers(),
             users: Array.from(this.users).map((user) => user.getUsername()),
             objects: this.objects.getAll(),
@@ -93,11 +97,6 @@ export class Room {
 
     // CRUD operations for users
     addUser(user: User): boolean {
-        // check if the room is full before adding a user
-        if (this.settings.capacity && this.countUsers() >= this.settings.capacity) {
-            global.log(`Room ${this.roomCode} is full`);
-            return false;
-        }
         // check if the user with the same name is already in the room
         if (Array.from(this.users).find((u) => u.getUsername() === user.getUsername())) {
             global.log(`User ${user.getUsername()} is already in the room`);
@@ -113,10 +112,6 @@ export class Room {
             this.removeUser(user);
         }
     }
-
-    // getUserTeam(user: User): string | undefined {
-    //     return this.teams.getTeamByUser(user.getId());
-    // }
 
     removeUser(user: User) {
         this.users.delete(user);
@@ -152,6 +147,9 @@ export class Room {
 
     leaveTeam(user: User): string {
         const teamId = user.getTeam();
+        if (!teamId) {
+            return;
+        }
         this.teams.leave(teamId, user.getId());
         user.setTeam(null);
         return JSON.stringify(this.teams.get(teamId));
