@@ -1,9 +1,16 @@
-import { ask, info } from './log.js';
 import { isJSON } from './common.js';
 import { Rand } from './randomizer.js';
 import { State } from '../models/state.js';
 import { Room } from '../models/room.js';
 import { rooms, createRoom } from './stateManager.js';
+import { ServerWebSocket } from 'bun';
+
+function ask(socket: ServerWebSocket<unknown>, item: string, errorText?: string) {
+    if (errorText) {
+        socket.send(errorText);
+    }
+    socket.send(`?${item}`);
+}
 
 export function chooseRoom(message: string, state: State) {
     state.roomCode = message.trim().toLowerCase();
