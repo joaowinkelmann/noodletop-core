@@ -49,23 +49,6 @@ export const getState = (socket: ServerWebSocket<unknown>, userId: string, roomC
 };
 
 /**
- * Parses the headers and extracts the userId and roomCode.
- *
- * @param headers - The headers object containing the userId and roomCode.
- * @returns An array containing the userId and roomCode, or [null, null] if an error occurs.
- */
-export const parseHeaders = (headers: Headers): [string, string] | [null, null] => {
-    try {
-        const userId = headers.get('userId');
-        const roomCode = headers.get('roomCode');
-        return [userId, roomCode];
-    }
-    catch (e) {
-        return [null, null];
-    }
-};
-
-/**
  * Keeps the WebSocket connection alive by sending periodic ping messages.
  * @param socket - The WebSocket connection.
  * @param interval - The interval (in seconds) between each ping message. Default is 30 seconds.
