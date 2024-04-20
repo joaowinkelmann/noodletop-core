@@ -1,4 +1,4 @@
-import { isJSON } from './common.js';
+import { isJSON, isAdmin } from './common.js';
 import { Rand } from './randomizer.js';
 import { State } from '../models/state.js';
 import { Room } from '../models/room.js';
@@ -242,7 +242,8 @@ const commands = {
                     response = room.leaveTeam(state.user);
                     break;
                 case 'delete':
-                    response = room.deleteTeam(argArr[0]);
+                    if (!isAdmin(state.user)) return;
+                    response = room.deleteTeam(argArr[0], state.user);
                     break;
                 case 'list':
                     response = room.listTeams();
@@ -265,6 +266,10 @@ const commands = {
                 case 'dateFromId':
                     const idString = args[0];
                     state.user.socket.send(String(Rand.dateFromId(idString)));
+                    break;
+                case 'getId':
+                    const length = parseInt(args[0], 10);
+                    state.user.socket.send(Rand.id(length));
                     break;
                 default:
                     state.user.socket.send(`Invalid operation`);

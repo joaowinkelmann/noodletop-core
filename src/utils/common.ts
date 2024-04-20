@@ -1,5 +1,7 @@
 // Common utility functions
 
+import { User } from '../models/user';
+
 export function isJSON(str: string): boolean {
     try {
         JSON.parse(str);
@@ -24,4 +26,8 @@ export const parseHeaders = (headers: Headers): [string, string] | [null, null] 
     catch (e) {
         return [null, null];
     }
+};
+
+export const isAdmin = (user: User): boolean => {
+    return user.getRole() === 0; // 0 is the admin role
 };

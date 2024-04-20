@@ -5,7 +5,7 @@ import { UserStatus, UserCosmetics, Connection, Role } from '~/dto/userDTO';
 export class User {
     socket: ServerWebSocket<unknown>;
     username: string;
-    id: string = Rand.id();
+    id: string = Rand.id(24);
     role: Role;
     status: UserStatus;
     cosmetics: UserCosmetics;
@@ -36,7 +36,8 @@ export class User {
             id: this.id,
             username: this.username,
             status: this.status,
-            cosmetics: this.cosmetics
+            cosmetics: this.cosmetics,
+            role: this.role
         });
     }
 
