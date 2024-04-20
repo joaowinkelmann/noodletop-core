@@ -1,11 +1,12 @@
 import { ServerWebSocket } from 'bun';
 import { Rand } from '~/utils/randomizer';
-import { UserStatus, UserCosmetics } from '~/dto/userDTO';
+import { UserStatus, UserCosmetics, Connection, Role } from '~/dto/userDTO';
 
 export class User {
     socket: ServerWebSocket<unknown>;
     username: string;
     id: string = Rand.id();
+    role: Role;
     status: UserStatus;
     cosmetics: UserCosmetics;
 
@@ -13,12 +14,21 @@ export class User {
         this.socket = socket;
         this.username = username;
         this.status = {
-            connection: 'active',
+            connection: Connection.Active,
             last_seen: Date.now()
         };
         this.cosmetics = {
             color: Rand.color()
         };
+        this.role = Role.Player;
+    }
+
+    setRole(role: Role): void {
+        this.role = role;
+    }
+
+    getRole(): Role {
+        return this.role;
     }
 
     getInfo(): string {
@@ -31,8 +41,8 @@ export class User {
     }
 
     userHeartbeat(): void {
-        global.log(`User ${this.username} has sent a heartbeat`);
         this.status.last_seen = Date.now();
+        global.log(`heartbeat: ${this.username}`);
     }
 
     getSocket(): ServerWebSocket<unknown> {
@@ -76,12 +86,12 @@ export class User {
     userLeaveRoom(): void {
         global.log(`User ${this.username} left the room at ${new Date().toISOString()}`);
         this.status.last_seen = Date.now(); // keep this value so that we can remove the user if they don't come back after a while
-        this.status.connection = 'away';
+        this.status.connection = Connection.Away;
     }
 
     // User has effectively left the room, we can safely remove them
     quitRoom(): void {
-        this.status.connection = 'exited';
+        this.status.connection = Connection.Exited;
     }
 
 }

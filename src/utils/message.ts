@@ -31,7 +31,7 @@ export function chooseNickname(message: string, state: State) {
     user.setUsername(username);
 
     if (!rooms.has(roomCode)) {
-        createRoom(roomCode);
+        createRoom(roomCode, state.user);
     }
 
     const room: Room = rooms.get(roomCode) as Room;

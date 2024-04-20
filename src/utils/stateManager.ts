@@ -63,9 +63,13 @@ export const keepAlive = (socket: ServerWebSocket<unknown>, interval: number = 3
     }, interval * 1000);
 };
 
-export const createRoom = (roomCode: string): Room => {
+export const createRoom = (roomCode: string, user: User): Room => {
     const room = new Room(roomCode);
     rooms.set(roomCode, room);
+
+    // Promote the user to admin, as they're the first to enter the room
+    room.promoteToAdmin(user);
+
     return room;
 };
 

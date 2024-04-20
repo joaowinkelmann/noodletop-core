@@ -3,6 +3,7 @@ import { TeamManager } from './team';
 import { ObjectManager } from './object';
 import { Rand } from '../utils/randomizer';
 import { RoomSettings } from '../dto/roomDTO';
+import { Role } from '../dto/userDTO';
 
 /**
  * Class representing a room, containing a set of users and objects.
@@ -18,16 +19,16 @@ export class Room {
     private settings: RoomSettings;
 
     /**
-     * @param roomCode - The unique code for the room
+     * @param code - The unique code for the room
      * @param isPublic - Whether the room is public (can be seen by anyone) or private (can only be joined by invitation)
      * @param capacity - The maximum number of users that can be in the room at once. If null, there is no limit.
      */
     constructor(
-        roomCode: string,
+        code: string,
         isPublic: boolean = true,
         capacity: number = 20
     ) {
-        this.code = roomCode;
+        this.code = code;
         this.users = new Set();
         this.settings = {
             isPublic,
@@ -106,6 +107,15 @@ export class Room {
         return true;
     }
 
+    promoteToAdmin(user: User): boolean {
+        user.setRole(Role.Admin);
+        return true;
+    }
+
+    isAdmin(user: User): boolean {
+        return user.getRole() === Role.Admin;
+    }
+
     disconnectUser(user: User, remove: boolean, code: number = 1000, reason: string | undefined = undefined) {
         user.getSocket().close(code, reason);
         if (remove) {
@@ -160,8 +170,11 @@ export class Room {
      * @param {string} teamId - The ID of the team to delete.
      * @returns {boolean} - Returns true if the team was successfully deleted, false otherwise.
      */
-    deleteTeam(teamId: string): boolean {
-        // TODO: Add admin privileges once user roles are implemented
+    deleteTeam(teamId: string, user: User): boolean {
+        if (!this.isAdmin(user)) {
+            // throw new Error('User does not have permission to delete teams');
+            return;
+        }
         return this.teams.delete(teamId);
     }
 
