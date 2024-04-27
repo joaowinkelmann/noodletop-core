@@ -32,6 +32,7 @@ export const getState = (socket: ServerWebSocket<unknown>, userId: string, roomC
     const user = room.getUserById(userId);
 
     if (!room || !user) {
+        global.l(`User ${userId} not found in room ${roomCode}`);
         return null;
     }
 

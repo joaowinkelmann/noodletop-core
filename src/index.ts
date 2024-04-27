@@ -2,7 +2,7 @@ import { broadcastMessage, chooseNickname, chooseRoom } from './utils/message';
 import { createState, getState, keepAlive } from './utils/stateManager';
 import { parseHeaders } from './utils/common';
 
-global.log = (msg) => {
+global.l = (msg) => {
     // console.log(msg); // Uncomment this line to enable logging
 };
 
@@ -68,10 +68,10 @@ Bun.serve<WebSocketData>({
             stateMap.delete(ws);
         },
         ping(ws) {
-            // global.log('Ping');
+            // global.l('Ping');
         },
         pong(ws) {
-            // global.log('Pong');
+            // global.l('Pong');
         }
     },
     port: Number(process.env.PORT || 3000)

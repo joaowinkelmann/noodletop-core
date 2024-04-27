@@ -1,4 +1,4 @@
 declare global {
-    var log: (message: string) => void;
+    var l: (message: string) => void;
 }
 export {};

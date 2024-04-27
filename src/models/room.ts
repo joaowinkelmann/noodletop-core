@@ -100,7 +100,7 @@ export class Room {
     addUser(user: User): boolean {
         // check if the user with the same name is already in the room
         if (Array.from(this.users).find((u) => u.getUsername() === user.getUsername())) {
-            global.log(`User ${user.getUsername()} is already in the room`);
+            global.l(`User ${user.getUsername()} is already in the room`);
             return false;
         }
         this.users.add(user);

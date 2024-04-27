@@ -52,9 +52,9 @@ export function chooseNickname(message: string, state: State) {
         state.status = 'CONNECTED';
     } else {
         // user could not join the room, because it was full (or some other reason in the future)
-        global.log(JSON.stringify(user.socket));
-        global.log(JSON.stringify(state));
-        ask(user.socket, 'room', 'Room is full or your username is already taken');
+        global.l(JSON.stringify(user.socket));
+        global.l(JSON.stringify(state));
+        ask(user.socket, 'nick', 'Username is already taken');
     }
 }
 

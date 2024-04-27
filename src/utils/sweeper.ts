@@ -9,13 +9,13 @@ export class Sweeper {
      * @param retaskMins - The interval in minutes to perform the sweeping. Default is 30 minutes.
      */
     static sweepInactiveUsers(rooms: Map<string, Room>, thresholdMins: number = 10, retaskMins: number = 30): void {
-        global.log(`TASK: Sweeping inactive users every ${retaskMins} minutes`);
+        global.l(`TASK: Sweeping inactive users every ${retaskMins} minutes`);
         setInterval(() => {
             rooms.forEach((room: Room) => {
-                global.log(`Sweeping room ${room.getCode()}`);
+                global.l(`Sweeping room ${room.getCode()}`);
                 room.getUsers().forEach((user) => {
                     if (Date.now() - user.status.last_seen > thresholdMins * 60 * 1000) {
-                        global.log(`User ${user.getUsername()}@${room.getCode()} removed after being inactive for ${thresholdMins} minutes`);
+                        global.l(`User ${user.getUsername()}@${room.getCode()} removed after being inactive for ${thresholdMins} minutes`);
                         room.removeUser(user);
                     }
                 });
@@ -39,11 +39,11 @@ export class Sweeper {
 
 
     static sweepInactiveRooms(rooms: Map<string, Room>, thresholdMins: number = 60, retaskMins: number = 30): void {
-        global.log(`TASK: Sweeping inactive rooms every ${retaskMins} minutes`);
+        global.l(`TASK: Sweeping inactive rooms every ${retaskMins} minutes`);
         setInterval(() => {
             rooms.forEach((room: Room) => {
                 if (room.getUsers().size === 0 && Date.now() - room.getLastSeen() > thresholdMins * 60 * 1000) {
-                    global.log(`Room ${room.getCode()} has been inactive for ${thresholdMins} minutes, self-destructing...`);
+                    global.l(`Room ${room.getCode()} has been inactive for ${thresholdMins} minutes, self-destructing...`);
                     room.selfDestruct();
                     rooms.delete(room.getCode());
                 }

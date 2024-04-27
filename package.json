@@ -4,17 +4,18 @@
   "author": "joaowinkelmann",
   "description": "WebSocket tabletop manager",
   "engines": {
-    "node": ">=20.11.0"
+    "node": ">=20.12.2"
   },
   "scripts": {
     "dev": "bun --watch ./src/index.ts",
+    "dev:debug": "bun --watch --inspect ./src/index.ts",
     "build": "bun build ./src/index.ts --target=bun --outfile=./dist/websocket.ts --minify",
     "start": "bun run --bun ./dist/websocket.ts",
     "lint": "tslint --project tsconfig.json",
     "lint:fix": "tslint --project tsconfig.json --fix"
   },
   "dependencies": {
-    "bun": "^1.1.4"
+    "bun": "^1.1.5"
   },
   "devDependencies": {
     "@types/bun": "^1.0.12",
