@@ -1,6 +1,6 @@
 import { webcrypto } from 'crypto';
 
-export const BASE36 = "js2gmdoknufxzpwqcb45liy013vra7et968h";
+export const BASE36 = 'js2gmdoknufxzpwqcb45liy013vra7et968h';
 // export const BASE62 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 
 export class Rand {
@@ -60,9 +60,9 @@ export class Rand {
 
     /**
      * Generates a random alphanumeric ID of a given length.
-     * 
+     *
      * @todo This will break around the year 2059, when the timestamp will be 9 characters long.
-     * 
+     *
      * @param length The length of the ID string. Default is 8. (Collision probability is 1 in 62^length within the same millisecond)
      * @param includeTimestamp Adds a base36 encoded string of milliseconds since epoch at the start of the ID. Default is true.
      * @returns The generated ID string.

@@ -7,15 +7,16 @@
     "node": ">=20.12.2"
   },
   "scripts": {
-    "dev": "bun --watch ./src/index.ts",
-    "dev:debug": "bun --watch --inspect ./src/index.ts",
+    "dev": "bun --watch ./src/main.ts",
+    "dev:debug": "bun --watch --inspect ./src/main.ts",
     "build": "bun build ./src/index.ts --target=bun --outfile=./dist/websocket.ts --minify",
     "start": "bun run --bun ./dist/websocket.ts",
     "lint": "tslint --project tsconfig.json",
     "lint:fix": "tslint --project tsconfig.json --fix"
   },
   "dependencies": {
-    "bun": "^1.1.5"
+    "bun": "^1.1.6",
+    "mongodb": "^6.5.0"
   },
   "devDependencies": {
     "@types/bun": "^1.0.12",

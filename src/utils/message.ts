@@ -20,14 +20,14 @@ export function chooseRoom(message: string, state: State) {
     if (rooms.get(state.roomCode)?.isFull()) {
         return ask(state.user.socket, 'room', 'Room is full');
     }
-    state.status = 'NICKNAME';
-    ask(state.user.socket, 'nick');
+    state.status = 'NAME';
+    ask(state.user.socket, 'name');
 }
 
 export function chooseNickname(message: string, state: State) {
     const { roomCode, user } = state;
     const username = message.trim();
-    if (username.length < 3) return ask(user.socket, 'nick', 'Nickname should have at least 3 characters');
+    if (username.length < 3) return ask(user.socket, 'name', 'Username should have at least 3 characters');
     user.setUsername(username);
 
     if (!rooms.has(roomCode)) {
@@ -49,7 +49,7 @@ export function chooseNickname(message: string, state: State) {
                 socket.send(`u ${user.id}`);
             }
         });
-        state.status = 'CONNECTED';
+        state.status = 'OK';
     } else {
         // user could not join the room, because it was full (or some other reason in the future)
         global.l(JSON.stringify(user.socket));

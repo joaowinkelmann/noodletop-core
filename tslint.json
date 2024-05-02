@@ -2,6 +2,7 @@
     "defaultSeverity": "error",
     "extends": ["tslint:recommended"],
     "rules": {
+        "no-shadowed-variable": false,
         "quotemark": [true, "single"],
         "semicolon": [true, "always"],
         "trailing-comma": [

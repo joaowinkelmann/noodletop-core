@@ -5,6 +5,8 @@ import { Rand } from '../utils/randomizer';
 import { RoomSettings } from '../dto/roomDTO';
 import { Role } from '../dto/userDTO';
 
+// import { db } from '~/database';
+
 /**
  * Class representing a room, containing a set of users and objects.
  */
@@ -34,7 +36,7 @@ export class Room {
             isPublic,
             capacity
         };
-        this.sessionId = Rand.id(7);
+        this.sessionId = Rand.id(9);
         this.lastSeen = Date.now();
         this.status = 'active';
     }
@@ -52,8 +54,23 @@ export class Room {
         return this.settings.capacity = capacity;
     }
 
+    /**
+     * Method that centralizes the logic for checking if a room is available for a user to join.
+     * @todo - If necessary, check the state/user that's trying to join the room, to see if it's allowed to join. (perhaps for the public/private logic)
+     */
+    isAvaliable(): boolean {
+        if (this.status === 'closed' || this.isFull()) {
+            return false;
+        }
+        return true;
+    }
+
     isFull(): boolean {
         return this.settings.capacity && this.countUsers() >= this.settings.capacity;
+    }
+
+    getSessionId(): string {
+        return this.sessionId;
     }
 
     getCode(): string {
@@ -116,7 +133,7 @@ export class Room {
         return user.getRole() === Role.Admin;
     }
 
-    disconnectUser(user: User, remove: boolean, code: number = 1000, reason: string | undefined = undefined) {
+    disconnectUser(user: User, remove: boolean, code: number = 1000, reason?: string) {
         user.getSocket().close(code, reason);
         if (remove) {
             this.removeUser(user);

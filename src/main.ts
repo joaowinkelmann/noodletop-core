@@ -1,12 +1,10 @@
-import { broadcastMessage, chooseNickname, chooseRoom } from './utils/message';
-import { createState, getState, keepAlive } from './utils/stateManager';
+import { stateMap, createState, getState, keepAlive } from './utils/stateManager';
 import { parseHeaders } from './utils/common';
+import { commandHandlers } from './commands';
 
 global.l = (msg) => {
     // console.log(msg); // Uncomment this line to enable logging
 };
-
-const stateMap = new Map();
 
 type WebSocketData = {
     roomCode: string | null;
@@ -34,35 +32,28 @@ Bun.serve<WebSocketData>({
     websocket: {
         maxPayloadLength: 2048 * 1024, // 2 MiB
         open(ws) {
-            // Throwing back debug info
-            if (ws.data.isDebug) {
-                ws.send(`d:data: ${JSON.stringify(ws.data)}`);
-            }
             let state;
             if (ws.data.userId && ws.data.roomCode) {
                 state = getState(ws, ws.data.userId, ws.data.roomCode);
             }
             if (!state) {
                 state = createState(ws);
-                ws.send('?room');
-            } else {
-                ws.send(`u ` + state.user.getId());
             }
-            stateMap.set(ws, state);
             keepAlive(ws);
         },
         message(ws, message) {
-            const state = stateMap.get(ws); // Retrieve the state from the Map
-            const messageString = message.toString();
+            const state = stateMap.get(ws);
+            const [command, ...args] = message.toString().split(' ');
+            let handler = commandHandlers[command];
 
-            switch (state.status) {
-                case 'ROOM':
-                    return chooseRoom(messageString, state);
-                case 'NICKNAME':
-                    return chooseNickname(messageString, state);
-                default:
-                    return broadcastMessage(messageString, state);
+            if (state.status !== 'OK') {
+                handler = commandHandlers['/connect'];
+            } else {
+                if (!handler) {
+                    handler = commandHandlers['/message'];
+                }
             }
+            handler(state, message.toString());
         },
         close(ws, code, message) {
             stateMap.delete(ws);

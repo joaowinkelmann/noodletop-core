@@ -50,6 +50,10 @@ export class User {
         return this.socket;
     }
 
+    setSocket(socket: ServerWebSocket<unknown>): void {
+        this.socket = socket;
+    }
+
     getUsername(): string {
         return this.username;
     }
