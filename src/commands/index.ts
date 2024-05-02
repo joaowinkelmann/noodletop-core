@@ -7,6 +7,7 @@ import { objectCommands } from './objectCommands';
 import { teamCommands } from './teamCommands';
 import { debugCommands } from './debugCommands';
 import { helpCommands } from './helpCommands';
+import { auxCommands } from './auxCommands';
 
 export interface commandHandler {
     [key: string]: (state: any, message: string) => void;
@@ -27,6 +28,7 @@ export const commandHandlers: commandHandler = {
     '/quit': connectionCommands,
     '/leave': connectionCommands,
     '/debug': debugCommands,
-    '/help': helpCommands
+    '/help': helpCommands,
+    '/roll': auxCommands
     // map other command handlers here...
 };
