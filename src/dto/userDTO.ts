@@ -15,12 +15,12 @@ export interface UserCosmetics {
 }
 
 export enum Connection {
-    Active,
     Away,
+    Active,
     Exited
 }
 
 export enum Role {
-    Admin,
-    Player
+    Player,
+    Admin
 }

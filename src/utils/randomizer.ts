@@ -17,7 +17,15 @@ export class Rand {
         );
     }
 
-    // Function to generate a random dice roll from a string of dice notation (e.g. "2d6+3", "d8-3" or "d8")
+    /**
+     * Rolls dice based on the given dice notation and returns the result.
+     * 
+     * @param diceNotation - The dice notation (e.g. "2d6+3", "d8-3" or "d8") string representing the number and sides of the dice, along with optional modifiers.
+     * @param showRolls - A boolean indicating whether to include the individual dice rolls in the result.
+     * @param diceLimit - An optional number indicating the maximum number of dice to roll. Defaults to 100.
+     * @returns The total result of the dice roll, or a string containing the total and individual rolls if `showRolls` is `true`.
+     * @throws If the dice notation is invalid.
+     */
     static roll(diceNotation: string, showRolls: boolean, diceLimit: number = 100): string | number {
         // Check if the dice notation is valid
         if (!/^(\d*d\d+)([-+]\d+)*$/.test(diceNotation)) {

@@ -169,7 +169,16 @@ export class Room {
     joinTeam(teamId: string, user: User): string {
         this.teams.join(teamId, user.getId());
         user.setTeam(teamId);
-        return JSON.stringify(this.teams.get(teamId));
+
+        let team = this.teams.get(teamId);
+
+        // change the User.id from inside each team member to be their current username.
+        team.members = team.members.map((member) => {
+            let user = this.getUserById(member);
+            return user ? user.getUsername() : '';
+        });
+
+        return JSON.stringify(team);
     }
 
     leaveTeam(user: User): string {
@@ -225,6 +234,16 @@ export class Room {
         user.userHeartbeat();
     }
 
+    /**
+     * Sends a message to everyone inside the room
+     * @param message - The message to be sent
+     */
+    announce(message: string): void {
+        this.getUsers().forEach(({ socket }) => {
+            socket.send(message);
+        })
+    }
+
     getLastSeen(): number {
         return this.lastSeen;
     }
@@ -233,6 +252,7 @@ export class Room {
         this.users.forEach((user) => {
             this.disconnectUser(user, true, 4001, 'Room closed');
         });
+        // "saveAllAndDie"
         // this.objects.deleteAll();
         // this.status = "closed";
     }

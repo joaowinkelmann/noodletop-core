@@ -23,5 +23,7 @@ export function userCommands(state: State, message: string) {
     }
 
     // send the response to the user
-    state.user.getSocket().send(response);
+    if (response) {
+        state.user.getSocket().send(response);
+    }
 }

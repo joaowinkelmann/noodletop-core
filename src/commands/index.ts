@@ -2,7 +2,11 @@ import { roomCommands } from './roomCommands';
 import { userCommands } from './userCommands';
 import { connectionCommands } from './connectionCommands';
 import { messageCommands } from './messageCommands';
-// import other command handlers as needed...
+import { ingressCommands } from './ingressCommands';
+import { objectCommands } from './objectCommands';
+import { teamCommands } from './teamCommands';
+import { debugCommands } from './debugCommands';
+import { helpCommands } from './helpCommands';
 
 export interface commandHandler {
     [key: string]: (state: any, message: string) => void;
@@ -15,9 +19,14 @@ export interface commandHandler {
  */
 export const commandHandlers: commandHandler = {
     '/room': roomCommands,
-    // '/usr': userCommands,
     '/user': userCommands,
-    '/connect': connectionCommands,
+    '/obj': objectCommands,
+    '/team': teamCommands,
+    '/ingress': ingressCommands,
     '/message': messageCommands,
+    '/quit': connectionCommands,
+    '/leave': connectionCommands,
+    '/debug': debugCommands,
+    '/help': helpCommands
     // map other command handlers here...
 };

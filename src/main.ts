@@ -1,4 +1,4 @@
-import { stateMap, createState, getState, keepAlive } from './utils/stateManager';
+import { createState, getState, restoreState, deleteState, keepAlive } from './utils/stateManager';
 import { parseHeaders } from './utils/common';
 import { commandHandlers } from './commands';
 
@@ -23,9 +23,7 @@ Bun.serve<WebSocketData>({
             }
         });
 
-        if (success) {
-            return undefined;
-        }
+        if (success) return undefined;
 
         return Response.redirect('/');
     },
@@ -34,7 +32,7 @@ Bun.serve<WebSocketData>({
         open(ws) {
             let state;
             if (ws.data.userId && ws.data.roomCode) {
-                state = getState(ws, ws.data.userId, ws.data.roomCode);
+                state = restoreState(ws, ws.data.userId, ws.data.roomCode);
             }
             if (!state) {
                 state = createState(ws);
@@ -42,12 +40,12 @@ Bun.serve<WebSocketData>({
             keepAlive(ws);
         },
         message(ws, message) {
-            const state = stateMap.get(ws);
+            const state = getState(ws);
             const [command, ...args] = message.toString().split(' ');
             let handler = commandHandlers[command];
 
             if (state.status !== 'OK') {
-                handler = commandHandlers['/connect'];
+                handler = commandHandlers['/ingress'];
             } else {
                 if (!handler) {
                     handler = commandHandlers['/message'];
@@ -56,7 +54,8 @@ Bun.serve<WebSocketData>({
             handler(state, message.toString());
         },
         close(ws, code, message) {
-            stateMap.delete(ws);
+            // stateMap.delete(ws);
+            deleteState(ws);
         },
         ping(ws) {
             // global.l('Ping');

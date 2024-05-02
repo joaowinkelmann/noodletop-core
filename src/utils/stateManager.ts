@@ -5,23 +5,10 @@ import { State } from '../models/state';
 import { Sweeper } from './sweeper';
 import { ServerWebSocket } from 'bun';
 
-
 /**
  * Map that associates a ServerWebSocket with its corresponding State.
  */
-export const stateMap = new Map<ServerWebSocket<unknown>, State>();
-
-/**
- * Creates a new state.
- * @param socket - The server WebSocket.
- * @param username - The username (optional).
- * @returns The new state object.
- */
-// export const createState = (socket: ServerWebSocket<unknown>, username: string | null = null): State => ({
-//     status: 'ROOM',
-//     roomCode: null,
-//     user: new User(socket, username)
-// });
+const stateMap = new Map<ServerWebSocket<unknown>, State>();
 
 /**
  * Creates a new state with and puts it in the stateMap. Sends the user ID to the client, and prompts the client for a room code, putting the state into the 'ROOM' status.
@@ -43,6 +30,18 @@ export function createState(socket: ServerWebSocket<unknown>, username?: string)
     return state;
 }
 
+/**
+ * Gets a state from the stateMap, sending a heartbeat to the user and the room.
+ * @param socket 
+ */
+export function getState(socket: ServerWebSocket<unknown>): State | undefined {
+    const state: State = stateMap.get(socket) ?? undefined;
+    if (state && state.roomCode) {
+        const room: Room = rooms.get(state.roomCode) as Room;
+        room.heartbeat(state.user);
+    }
+    return state;
+}
 
 /**
  * Retrieves the state of a user in a room. Used to reconnect/authenticate a user back into a room.
@@ -51,14 +50,14 @@ export function createState(socket: ServerWebSocket<unknown>, username?: string)
  * @param roomCode - The code of the room.
  * @returns The state of the user in the room, or null if the room or user was not found.
  */
-export const getState = (socket: ServerWebSocket<unknown>, userId: string, roomCode: string): State | null => {
+export const restoreState = (socket: ServerWebSocket<unknown>, userId: string, roomCode: string): State | null => {
     const room: Room = rooms.get(roomCode) as Room;
     if (!room) {
         return null;
     }
     const user = room.getUserById(userId);
 
-    if (!room || !user) {
+    if (!user) {
         global.l(`User ${userId} not found in room ${roomCode}`);
         return null;
     }
@@ -75,6 +74,15 @@ export const getState = (socket: ServerWebSocket<unknown>, userId: string, roomC
         user
     };
 };
+
+/**
+ * Removes a State from the stateMap.
+ * @param socket 
+ * @returns 
+ */
+export function deleteState(socket: ServerWebSocket<unknown>): boolean {
+  return stateMap.delete(socket);
+}
 
 /**
  * Keeps the WebSocket connection alive by sending periodic ping messages.
