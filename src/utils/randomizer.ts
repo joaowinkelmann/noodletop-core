@@ -1,6 +1,6 @@
 import { webcrypto } from 'crypto';
 
-export const BASE36 = "js2gmdoknufxzpwqcb45liy013vra7et968h";
+export const BASE36 = 'js2gmdoknufxzpwqcb45liy013vra7et968h';
 // export const BASE62 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 
 export class Rand {
@@ -17,7 +17,15 @@ export class Rand {
         );
     }
 
-    // Function to generate a random dice roll from a string of dice notation (e.g. "2d6+3", "d8-3" or "d8")
+    /**
+     * Rolls dice based on the given dice notation and returns the result.
+     * 
+     * @param diceNotation - The dice notation (e.g. "2d6+3", "d8-3" or "d8") string representing the number and sides of the dice, along with optional modifiers.
+     * @param showRolls - A boolean indicating whether to include the individual dice rolls in the result.
+     * @param diceLimit - An optional number indicating the maximum number of dice to roll. Defaults to 100.
+     * @returns The total result of the dice roll, or a string containing the total and individual rolls if `showRolls` is `true`.
+     * @throws If the dice notation is invalid.
+     */
     static roll(diceNotation: string, showRolls: boolean, diceLimit: number = 100): string | number {
         // Check if the dice notation is valid
         if (!/^(\d*d\d+)([-+]\d+)*$/.test(diceNotation)) {
@@ -60,9 +68,9 @@ export class Rand {
 
     /**
      * Generates a random alphanumeric ID of a given length.
-     * 
+     *
      * @todo This will break around the year 2059, when the timestamp will be 9 characters long.
-     * 
+     *
      * @param length The length of the ID string. Default is 8. (Collision probability is 1 in 62^length within the same millisecond)
      * @param includeTimestamp Adds a base36 encoded string of milliseconds since epoch at the start of the ID. Default is true.
      * @returns The generated ID string.

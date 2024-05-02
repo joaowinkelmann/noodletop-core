@@ -29,5 +29,5 @@ export const parseHeaders = (headers: Headers): [string, string] | [null, null] 
 };
 
 export const isAdmin = (user: User): boolean => {
-    return user.getRole() === 0; // 0 is the admin role
+    return user.getRole() === 1; // 1 is the admin role
 };
