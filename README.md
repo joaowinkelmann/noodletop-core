@@ -1,16 +1,23 @@
-# Noodletop WebSocket
+# Noodletop Core
 
-A WebSocket server for the Noodletop tabletop engine.
+Core server and manager for the Noodletop engine.
 
- Meant to be used alongside ([Noodletop Front-end](https://github.com/joaowinkelmann/noodletop-front))
+Meant to be used alongside ([Noodletop Client](https://github.com/joaowinkelmann/noodletop-client))
 
 ### Documentation
-See the full documentation over at https://t.ly/daGAP
+
+Default WebSocket server port is 3000.
+Default RESTful server port is 3001.
+
+Please refer to the ```.env.template``` file for the environment variables that can be set under the ```.env``` file.
+
+
+See the full documentation over at ([Noodletop Core Docs](https://winkels7.notion.site/Noodletop-Core-Docs-a6f02baf48e54c9a906d45eae8378c83?pvs=74))
 
 ### Testing
 
 To test the WebSocket server, you can use wscat, as follows:
-```npx wscat -c ws://localhost:3000```
+```npx wscat -c localhost:3000```
 
 
 ### Debugging mode

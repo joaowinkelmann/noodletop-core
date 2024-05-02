@@ -1,16 +1,16 @@
 {
-  "name": "noodletop-ws",
+  "name": "noodletop-core",
   "version": "0.1.0",
   "author": "joaowinkelmann",
-  "description": "WebSocket tabletop manager",
+  "description": "Tabletop manager",
   "engines": {
     "node": ">=20.12.2"
   },
   "scripts": {
     "dev": "bun --watch ./src/main.ts",
     "dev:debug": "bun --watch --inspect ./src/main.ts",
-    "build": "bun build ./src/main.ts --target=bun --outfile=./dist/websocket.ts --minify",
-    "start": "bun run --bun ./dist/websocket.ts",
+    "build": "bun build ./src/main.ts --target=bun --outfile=./dist/core.ts --minify",
+    "start": "bun run --bun ./dist/core.ts",
     "lint": "tslint --project tsconfig.json",
     "lint:fix": "tslint --project tsconfig.json --fix"
   },

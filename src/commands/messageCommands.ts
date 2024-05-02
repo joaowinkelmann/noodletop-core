@@ -1,5 +1,5 @@
 import { State } from '~/models/state';
-import { rooms, createRoom } from '~/utils/stateManager';
+import { rooms } from '~/utils/stateManager';
 import { Room } from '~/models/room';
 
 export function messageCommands(state: State, message: string) {

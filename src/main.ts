@@ -64,6 +64,14 @@ Bun.serve<WebSocketData>({
             // global.l('Pong');
         }
     },
-    port: Number(process.env.PORT || 3000)
+    port: Number(process.env.WS_PORT || 3000)
 });
-console.log('🔌 WebSocket avaliable on port ' + (process.env.PORT || 3000));
+console.log('🔌 WebSocket avaliable on port ' + '\u001b[1;32m' + (process.env.WS_PORT || 3000) + "\x1b[0m");
+
+Bun.serve({
+    port: Number(process.env.REST_PORT || 3001),
+    fetch(request) {
+        return new Response('REST API');
+    }
+});
+console.log('🔄 RESTful API avaliable on port ' + '\u001b[1;36m' + (process.env.REST_PORT || 3001) + "\x1b[0m");
