@@ -1,4 +1,4 @@
-name: Noodletop WebSocket
+name: Noodletop Core
 
 on:
     push:
@@ -10,7 +10,7 @@ on:
     
 jobs:
     deploy:
-        name: Deploy to OCI
+        name: Deploy over SSH
         runs-on: ubuntu-latest
         steps:
             - name: Checkout
