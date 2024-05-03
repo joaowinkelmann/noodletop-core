@@ -68,10 +68,40 @@ Bun.serve<WebSocketData>({
 });
 console.log('🔌 WebSocket avaliable on port ' + '\u001b[1;32m' + (process.env.WS_PORT || 3000) + "\x1b[0m");
 
-Bun.serve({
-    port: Number(process.env.REST_PORT || 3001),
-    fetch(request) {
-        return new Response('REST API');
+
+// import { init } from '@stricjs/app';
+// init({ 
+//     // Auto prefix routes path by directory name
+//     autoprefix: true,
+//     // Load routes from specific directories
+//     routes: ['./src/routes'],
+//     serve: { port: 3001 },
+
+// });
+
+import { build } from '@stricjs/app';
+import { status } from '@stricjs/app/send';
+
+// Build routes
+const rest = await build({
+    autoprefix: true,
+    routes: ['./src/routes'],
+
+    // Serve options
+    serve: {
+        // reusePort: true,
+        error: (err) => {
+            console.error(err);
+            return status(null, 500);
+        },
+        port: Number(process.env.REST_PORT || 3001),
     }
 });
+
+rest.logRoutes();
+
+export default rest.boot();
+
+
+
 console.log('🔄 RESTful API avaliable on port ' + '\u001b[1;36m' + (process.env.REST_PORT || 3001) + "\x1b[0m");

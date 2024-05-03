@@ -2,8 +2,8 @@ import { User } from './user';
 import { TeamManager } from './team';
 import { ObjectManager } from './object';
 import { Rand } from '../utils/randomizer';
-import { RoomSettings } from '../dto/roomDTO';
-import { Role } from '../dto/userDTO';
+import { RoomSettings } from './dto/roomDTO';
+import { Role } from './dto/userDTO';
 
 // import { db } from '~/database';
 
