@@ -15,8 +15,6 @@
     "lint:fix": "tslint --project tsconfig.json --fix"
   },
   "dependencies": {
-    "@stricjs/app": "^1.0.0-rc.34",
-    "@stricjs/utils": "^2.0.7",
     "bun": "^1.1.6",
     "mongodb": "^6.5.0"
   },

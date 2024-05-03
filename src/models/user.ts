@@ -1,6 +1,6 @@
 import { ServerWebSocket } from 'bun';
 import { Rand } from '~/utils/randomizer';
-import { UserStatus, UserCosmetics, Connection, Role } from './dto/userDTO';
+import { UserStatus, UserCosmetics, Connection, Role } from '~/dto/userDTO';
 
 export class User {
     socket: ServerWebSocket<unknown>;
