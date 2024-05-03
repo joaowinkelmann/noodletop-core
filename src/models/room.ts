@@ -170,11 +170,11 @@ export class Room {
         this.teams.join(teamId, user.getId());
         user.setTeam(teamId);
 
-        let team = this.teams.get(teamId);
+        const team = this.teams.get(teamId);
 
         // change the User.id from inside each team member to be their current username.
         team.members = team.members.map((member) => {
-            let user = this.getUserById(member);
+            const user = this.getUserById(member);
             return user ? user.getUsername() : '';
         });
 
@@ -241,7 +241,7 @@ export class Room {
     announce(message: string): void {
         this.getUsers().forEach(({ socket }) => {
             socket.send(message);
-        })
+        });
     }
 
     getLastSeen(): number {

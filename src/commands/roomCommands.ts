@@ -9,7 +9,7 @@ export function roomCommands(state: State, message: string) {
     if (!room) return;
 
     let response = null;
-    
+
     const argArr = args.map((arg) => arg.trim());
     switch (op) {
         case 'set':

@@ -4,15 +4,6 @@ import { routes } from '@stricjs/app';
 import { status, text } from '@stricjs/app/send';
 
 export default routes('/create')
-.post('/', ctx => {
-    // const $id = Date.now().toString();
-    const $id = "Hello WORLD2";
-
-    // Create post
-    // createPost.run({
-    //     $id, $author: ctx.state.name,
-    //     $title: ctx.state.title,
-    // });
-
-    return text($id);
-});
+    .post('/', ctx => {
+        return new Response('Hello, Worldeeeeee!');
+    });

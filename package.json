@@ -1,6 +1,7 @@
 {
   "name": "noodletop-core",
   "version": "0.1.0",
+  "private": true,
   "author": "joaowinkelmann",
   "description": "Tabletop manager",
   "engines": {
@@ -9,10 +10,11 @@
   "scripts": {
     "dev": "bun --watch ./src/main.ts",
     "dev:debug": "bun --watch --inspect ./src/main.ts",
-    "build": "bun build ./src/main.ts --target=bun --outfile=./dist/core.ts --minify",
+    "build": "bun build ./src/main.ts --target=bun --outfile=./dist/core.ts",
     "start": "bun run --bun ./dist/core.ts",
     "lint": "tslint --project tsconfig.json",
-    "lint:fix": "tslint --project tsconfig.json --fix"
+    "lint:fix": "tslint --project tsconfig.json --fix",
+    "prepare": "husky"
   },
   "dependencies": {
     "@stricjs/app": "^1.0.0-rc.34",
@@ -23,6 +25,7 @@
   "devDependencies": {
     "@types/bun": "^1.0.12",
     "@types/node": "^20.12.7",
+    "husky": "^9.0.11",
     "tslint": "^6.1.3",
     "typescript": "^5.4.5"
   }

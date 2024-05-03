@@ -16,11 +16,11 @@ const stateMap = new Map<ServerWebSocket<unknown>, State>();
  * @param username - The username (optional).
  * @returns The new state object.
  */
-export function createState(socket: ServerWebSocket<unknown>, username?: string): State {
+export function createState(socket: ServerWebSocket<unknown>): State {
     const state: State = {
         status: 'ROOM',
         roomCode: null,
-        user: new User(socket, username)
+        user: new User(socket)
     };
 
     stateMap.set(socket, state);
@@ -32,7 +32,7 @@ export function createState(socket: ServerWebSocket<unknown>, username?: string)
 
 /**
  * Gets a state from the stateMap, sending a heartbeat to the user and the room.
- * @param socket 
+ * @param socket
  */
 export function getState(socket: ServerWebSocket<unknown>): State | undefined {
     const state: State = stateMap.get(socket) ?? undefined;
@@ -77,8 +77,8 @@ export const restoreState = (socket: ServerWebSocket<unknown>, userId: string, r
 
 /**
  * Removes a State from the stateMap.
- * @param socket 
- * @returns 
+ * @param socket
+ * @returns
  */
 export function deleteState(socket: ServerWebSocket<unknown>): boolean {
   return stateMap.delete(socket);

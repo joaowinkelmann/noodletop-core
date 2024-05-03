@@ -1,4 +1,4 @@
-import { State } from "~/models/state";
+import { State } from '~/models/state';
 
 export function helpCommands(state: State, message: string) {
     // const [command , op, ...args] = message.split(' ');

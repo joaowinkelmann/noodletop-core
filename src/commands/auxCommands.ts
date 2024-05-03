@@ -1,5 +1,5 @@
-import { Rand } from "~/utils/randomizer";
-import { State } from "~/models/state";
+import { Rand } from '~/utils/randomizer';
+import { State } from '~/models/state';
 
 export function auxCommands(state: State, message: string) {
     const [command , op, ...args] = message.split(' ');
@@ -7,7 +7,7 @@ export function auxCommands(state: State, message: string) {
     let response = null;
 
     switch (command) {
-        case "/roll":
+        case '/roll':
             response = String(Rand.roll(op, true));
     }
 

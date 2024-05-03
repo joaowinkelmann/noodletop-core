@@ -66,18 +66,7 @@ Bun.serve<WebSocketData>({
     },
     port: Number(process.env.WS_PORT || 3000)
 });
-console.log('🔌 WebSocket avaliable on port ' + '\u001b[1;32m' + (process.env.WS_PORT || 3000) + "\x1b[0m");
-
-
-// import { init } from '@stricjs/app';
-// init({ 
-//     // Auto prefix routes path by directory name
-//     autoprefix: true,
-//     // Load routes from specific directories
-//     routes: ['./src/routes'],
-//     serve: { port: 3001 },
-
-// });
+console.log('🔌 WebSocket avaliable on port ' + '\u001b[1;32m' + (process.env.WS_PORT || 3000) + '\x1b[0m');
 
 import { build } from '@stricjs/app';
 import { status } from '@stricjs/app/send';
@@ -85,7 +74,7 @@ import { status } from '@stricjs/app/send';
 // Build routes
 const rest = await build({
     autoprefix: true,
-    routes: ['./src/routes'],
+    routes: ['./src/routes2'],
 
     // Serve options
     serve: {
@@ -94,7 +83,7 @@ const rest = await build({
             console.error(err);
             return status(null, 500);
         },
-        port: Number(process.env.REST_PORT || 3001),
+        port: Number(process.env.REST_PORT || 3001)
     }
 });
 
@@ -102,6 +91,4 @@ rest.logRoutes();
 
 export default rest.boot();
 
-
-
-console.log('🔄 RESTful API avaliable on port ' + '\u001b[1;36m' + (process.env.REST_PORT || 3001) + "\x1b[0m");
+console.log('🔄 RESTful API avaliable on port ' + '\u001b[1;36m' + (process.env.REST_PORT || 3001) + '\x1b[0m');
