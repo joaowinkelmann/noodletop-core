@@ -1,61 +1,61 @@
-# name: Publish library
+name: Publish library
 
-# on:
-#   pull_request:
-#     types:
-#       - closed
-#     branches:
-#       - main
+on:
+  pull_request:
+    types:
+      - closed
+    branches:
+      - main
 
-# jobs:
-#   upgrade_version:
-#     # this job will only run if the PR has been merged
-#     if: github.event.pull_request.merged == true
-#     runs-on: ubuntu-latest
-#     steps:
-#       - name: Checkout code
-#         # original was checkout@v3 \/
-#         uses: actions/checkout@v4
+jobs:
+  upgrade_version:
+    # this job will only run if the PR has been merged
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        # original was checkout@v3 \/
+        uses: actions/checkout@v4
 
-#       - name: Determine source branch
-#         run: |
-#           SOURCE_BRANCH=${{ github.head_ref }}
-#           echo "SOURCE_BRANCH=$SOURCE_BRANCH" >> $GITHUB_ENV
-#       - name: Show source branch
-#         run: echo "Source Branch $SOURCE_BRANCH"
+      - name: Determine source branch
+        run: |
+          SOURCE_BRANCH=${{ github.head_ref }}
+          echo "SOURCE_BRANCH=$SOURCE_BRANCH" >> $GITHUB_ENV
+      - name: Show source branch
+        run: echo "Source Branch $SOURCE_BRANCH"
 
-#       - name: Determine version type
-#         id: determine-version
-#         run: |
-#           VERSION=$(echo "$SOURCE_BRANCH" | awk -F '/' \
-#             -v search1="major" \
-#             -v search2="minor" \
-#             -v search3="patch" \
-#             '$0 ~ search1 { print $1; exit } $0 ~ search2 { print $1; exit } $0 ~ search3 { print $1; exit }')
-#           if [ -n "$VERSION" ]; then
-#               echo "VERSION=$VERSION" >> $GITHUB_ENV
-#           else
-#             echo "Error: Branch name does not follow the naming convention."
-#             exit 1
-#           fi
-#       - name: Set up Git
-#         run: |
-#           git config --global user.email "${{ secrets.GH_EMAIL }}"
-#           git config --global user.name "${{ secrets.GH_NAME }}"
-#       - name: Type of version
-#         run: |
-#           echo "Version is $VERSION"
-#       - name: Create .npmrc
-#         run: |
-#           echo //npm.pkg.github.com/:_authToken=${{ secrets.GH_PAT }}  >> .npmrc
-#           echo @<your-username>:registry=https://npm.pkg.github.com  >> .npmrc
-#       - name: Install package
-#         run: npm install
+      - name: Determine version type
+        id: determine-version
+        run: |
+          VERSION=$(echo "$SOURCE_BRANCH" | awk -F '/' \
+            -v search1="major" \
+            -v search2="minor" \
+            -v search3="patch" \
+            '$0 ~ search1 { print $1; exit } $0 ~ search2 { print $1; exit } $0 ~ search3 { print $1; exit }')
+          if [ -n "$VERSION" ]; then
+              echo "VERSION=$VERSION" >> $GITHUB_ENV
+          else
+            echo "Error: Branch name does not follow the naming convention."
+            exit 1
+          fi
+      - name: Set up Git
+        run: |
+          git config --global user.email "${{ secrets.GH_EMAIL }}"
+          git config --global user.name "${{ secrets.GH_NAME }}"
+      - name: Type of version
+        run: |
+          echo "Version is $VERSION"
+      - name: Create .npmrc
+        run: |
+          echo //npm.pkg.github.com/:_authToken=${{ secrets.GH_PAT }}  >> .npmrc
+          echo @<your-username>:registry=https://npm.pkg.github.com  >> .npmrc
+      - name: Install package
+        run: npm install
 
-#       - name: Update version
-#         run: | 
-#           npm version --no-commit-hooks $VERSION
-#           git push --no-verify origin
-#           git push --no-verify --tags
-#       - name: Publish package
-#         run: npm publish
+      - name: Update version
+        run: | 
+          npm version --no-commit-hooks $VERSION
+          git push --no-verify origin
+          git push --no-verify --tags
+      - name: Publish package
+        run: npm publish
