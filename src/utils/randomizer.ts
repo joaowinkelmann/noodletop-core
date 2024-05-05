@@ -19,7 +19,7 @@ export class Rand {
 
     /**
      * Rolls dice based on the given dice notation and returns the result.
-     * 
+     *
      * @param diceNotation - The dice notation (e.g. "2d6+3", "d8-3" or "d8") string representing the number and sides of the dice, along with optional modifiers.
      * @param showRolls - A boolean indicating whether to include the individual dice rolls in the result.
      * @param diceLimit - An optional number indicating the maximum number of dice to roll. Defaults to 100.

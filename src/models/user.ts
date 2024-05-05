@@ -10,9 +10,8 @@ export class User {
     status: UserStatus;
     cosmetics: UserCosmetics;
 
-    constructor(socket: ServerWebSocket<unknown>, username: string) {
+    constructor(socket: ServerWebSocket<unknown>) {
         this.socket = socket;
-        this.username = username;
         this.status = {
             connection: Connection.Active,
             last_seen: Date.now()
@@ -23,13 +22,19 @@ export class User {
         this.role = Role.Player;
     }
 
-    setRole(role: Role): void {
+    // Role related methods
+    private setRole(role: Role): void {
         this.role = role;
     }
 
     getRole(): Role {
         return this.role;
     }
+
+    isAdmin(): boolean {
+        return this.getRole() === Role.Admin;
+    }
+    // Role related methods END
 
     getInfo(): string {
         return JSON.stringify({
@@ -97,6 +102,31 @@ export class User {
     // User has effectively left the room, we can safely remove them
     quitRoom(): void {
         this.status.connection = Connection.Exited;
+    }
+
+    /**
+     * Sets the value of a specific key in the user data.
+     * If the key is a valid property of the user object, it sets the value directly.
+     * If the key is not a valid property, it attempts to call a setter method with the same name as the key.
+     * If a setter method exists, it calls the method with the provided value.
+     * If neither a valid property nor a setter method is found, it does nothing.
+     *
+     * @param key - The key of the user data to set.
+     * @param value - The value to set for the specified key.
+     */
+    setUserData(key: string, value: any): void {
+        // check if the key is valid
+        if (key in this) {
+            // this.settings[key] = value;
+            const method = `set${key.charAt(0).toUpperCase() + key.slice(1)}`;
+            if (typeof this[method] === 'function') {
+                return this[method](value);
+            } else {
+                // this.settings[key] = value;
+            }
+        } else {
+            // handle invalid keys (perhaps a message informing the user)
+        }
     }
 
 }

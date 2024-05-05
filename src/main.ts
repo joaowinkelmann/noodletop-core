@@ -66,12 +66,17 @@ Bun.serve<WebSocketData>({
     },
     port: Number(process.env.WS_PORT || 3000)
 });
-console.log('🔌 WebSocket avaliable on port ' + '\u001b[1;32m' + (process.env.WS_PORT || 3000) + "\x1b[0m");
+console.log('🔌 WebSocket avaliable on port ' + '\u001b[1;32m' + (process.env.WS_PORT || 3000) + '\x1b[0m');
 
-Bun.serve({
+import { Hono } from 'hono';
+import { routes } from './routes';
+
+const app = new Hono();
+routes.map((route) => app.on(route.method, route.path, ...route.handlers));
+
+export default {
     port: Number(process.env.REST_PORT || 3001),
-    fetch(request) {
-        return new Response('REST API');
-    }
-});
-console.log('🔄 RESTful API avaliable on port ' + '\u001b[1;36m' + (process.env.REST_PORT || 3001) + "\x1b[0m");
+    fetch: app.fetch
+};
+
+console.log('🔄 RESTful API avaliable on port ' + '\u001b[1;36m' + (process.env.REST_PORT || 3001) + '\x1b[0m');

@@ -4,9 +4,9 @@ import { Room } from '~/models/room';
 
 /**
  * Manages an already established connection.
- * @param state 
- * @param message 
- * @returns 
+ * @param state
+ * @param message
+ * @returns
  */
 export function connectionCommands(state: State, message: string) {
     const [command , op, ...args] = message.split(' ');

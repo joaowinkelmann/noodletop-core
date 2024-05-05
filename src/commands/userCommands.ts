@@ -1,16 +1,21 @@
 import { Room } from '~/models/room';
+import { User } from '~/models/user';
 import { rooms } from '~/utils/stateManager';
 import { State } from '~/models/state';
-// import { isAdmin } from '~/utils/common';
 
 export function userCommands(state: State, message: string) {
     const [command , op, ...args] = message.split(' ');
     const room: Room = rooms.get(state.roomCode) as Room;
+    const user: User = state.user;
     if (!room) return;
 
     let response = null;
 
+    const argArr = args.map((arg) => arg.trim());
     switch (op) {
+        case 'set':
+            response = user.setUserData(argArr[0], argArr[1]);
+            break;
         case 'setUsername':
             response = state.user.setUsername(args[0]);
             break;

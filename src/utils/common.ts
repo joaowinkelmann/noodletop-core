@@ -1,7 +1,7 @@
 // Common utility functions
 
-import { Role } from '~/dto/userDTO';
-import { User } from '../models/user';
+import { User } from '~/models/user';
+import { Role } from '~/models/dto/userDTO';
 
 export function isJSON(str: string): boolean {
     try {

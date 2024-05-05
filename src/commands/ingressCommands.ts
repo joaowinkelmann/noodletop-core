@@ -5,9 +5,9 @@ import { User } from '~/models/user';
 
 /**
  * Manages a newly formed incoming connection, with the objetive of getting a state into the "OK" status.
- * @param state 
- * @param message 
- * @returns 
+ * @param state
+ * @param message
+ * @returns
  */
 export function ingressCommands(state: State, message: string) {
     const [command , op, ...args] = message.split(' ');
@@ -22,10 +22,10 @@ export function ingressCommands(state: State, message: string) {
             // room does not exist, so let's create it
             createRoom(roomCode, state.user);
         } else {
-            let room: Room = rooms.get(roomCode);
+            const room: Room = rooms.get(roomCode);
             if (!room.isAvaliable()) {
-                global.l("User wasn't able to join");
-                state.user.getSocket().send("Room isn't avaliable");
+                global.l('User wasn\'t able to join');
+                state.user.getSocket().send('Room isn\'t avaliable');
                 // @todo - inform the user that the room is not avaliable/handle an error
                 return; // if the room is not avaliable, ignore the request
             }

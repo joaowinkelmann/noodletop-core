@@ -9,7 +9,7 @@ import { debugCommands } from './debugCommands';
 import { helpCommands } from './helpCommands';
 import { auxCommands } from './auxCommands';
 
-export interface commandHandler {
+export interface CommandHandler {
     [key: string]: (state: any, message: string) => void;
 }
 
@@ -18,7 +18,7 @@ export interface commandHandler {
  * @parms {object} state - The current state of the user.
  * @parms {string} message - The raw given input.
  */
-export const commandHandlers: commandHandler = {
+export const commandHandlers: CommandHandler = {
     '/room': roomCommands,
     '/user': userCommands,
     '/obj': objectCommands,
