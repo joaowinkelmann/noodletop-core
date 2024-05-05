@@ -68,27 +68,17 @@ Bun.serve<WebSocketData>({
 });
 console.log('🔌 WebSocket avaliable on port ' + '\u001b[1;32m' + (process.env.WS_PORT || 3000) + '\x1b[0m');
 
-import { build } from '@stricjs/app';
-import { status } from '@stricjs/app/send';
+import { Hono } from 'hono'
 
-// Build routes
-const rest = await build({
-    autoprefix: true,
-    routes: ['./src/routes2'],
+const app = new Hono()
 
-    // Serve options
-    serve: {
-        // reusePort: true,
-        error: (err) => {
-            console.error(err);
-            return status(null, 500);
-        },
-        port: Number(process.env.REST_PORT || 3001)
-    }
-});
+app.get('/', (c) => {
+  return c.text('Hello Hono!')
+})
 
-rest.logRoutes();
-
-export default rest.boot();
+export default { 
+    port: Number(process.env.REST_PORT || 3001),
+    fetch: app.fetch, 
+}
 
 console.log('🔄 RESTful API avaliable on port ' + '\u001b[1;36m' + (process.env.REST_PORT || 3001) + '\x1b[0m');
