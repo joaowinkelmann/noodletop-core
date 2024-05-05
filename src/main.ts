@@ -71,7 +71,7 @@ console.log('🔌 WebSocket avaliable on port ' + '\u001b[1;32m' + (process.env.
 import { Hono } from 'hono';
 import { routes } from './routes';
 
-const app = new Hono();
+const app = new Hono().basePath('/api');
 routes.map((route) => app.on(route.method, route.path, ...route.handlers));
 
 export default {
