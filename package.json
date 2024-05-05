@@ -17,6 +17,11 @@
     "lint:fix": "tslint --project tsconfig.json --fix",
     "prepare": "husky"
   },
+  "husky": {
+    "hooks": {
+      "pre-push": "bash .husky/pre-push"
+    }
+  },
   "dependencies": {
     "bun": "^1.1.6",
     "hono": "^4.3.2",
