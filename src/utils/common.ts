@@ -1,5 +1,6 @@
 // Common utility functions
 
+import { Role } from '~/dto/userDTO';
 import { User } from '../models/user';
 
 export function isJSON(str: string): boolean {
@@ -29,5 +30,5 @@ export const parseHeaders = (headers: Headers): [string, string] | [null, null] 
 };
 
 export const isAdmin = (user: User): boolean => {
-    return user.getRole() === 1; // 1 is the admin role
+    return user.getRole() === Role.Admin;
 };
