@@ -110,7 +110,7 @@ export class User {
      * If the key is not a valid property, it attempts to call a setter method with the same name as the key.
      * If a setter method exists, it calls the method with the provided value.
      * If neither a valid property nor a setter method is found, it does nothing.
-     * 
+     *
      * @param key - The key of the user data to set.
      * @param value - The value to set for the specified key.
      */
