@@ -1,1 +1,11 @@
-bun test
+#!/bin/bash
+
+echo "Running pre-commit hook..."
+
+# Check if the version field has been manually modified
+if git diff -U0 --cached --exit-code package.json | grep -qE 'version'; then
+  echo "ERROR: Modifying the 'version' field in package.json is not allowed."
+  exit 1
+fi
+
+exit 0
