@@ -10,7 +10,7 @@
   "scripts": {
     "dev": "bun --watch ./src/main.ts",
     "dev:debug": "bun --watch --inspect ./src/main.ts",
-    "build": "bun build --compile --minify --sourcemap ./src/main.ts --outfile ./dist/core",
+    "build": "bun build --compile --minify --sourcemap ./src/mainccc.ts --outfile ./dist/core",
     "build-arm": "bun build --compile --target=bun-linux-arm64 --minify --sourcemap ./src/main.ts --outfile ./dist/core",
     "start": "./dist/core",
     "lint": "tslint --project tsconfig.json",
