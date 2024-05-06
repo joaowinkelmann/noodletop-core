@@ -2,6 +2,7 @@ import { State } from '~/models/state';
 import { rooms, createRoom } from '~/utils/stateManager';
 import { Room } from '~/models/room';
 import { User } from '~/models/user';
+import { commandHandlers } from '.';
 
 /**
  * Manages a newly formed incoming connection, with the objetive of getting a state into the "OK" status.
@@ -16,7 +17,16 @@ export function ingressCommands(state: State, message: string) {
 
     if (state.status === 'ROOM') {
         // user is answering a prompt to enter a room, so let's understand the sent message as the roomCode
-        const roomCode = message.trim();
+        const roomCode = message.trim().toLowerCase();
+
+        // roomCode validation
+        if (roomCode.length < 3) {
+            // @todo - Handle as error in the future.
+            // @todo - check for profanity, perhaps, if the room code can be defined by the user
+            state.user.getSocket().send('Room code must be at least 3 characters long');
+            state.user.getSocket().send('?room');
+            return; // ignore the request
+        }
 
         if (!rooms.has(roomCode)) {
             // room does not exist, so let's create it
@@ -38,6 +48,15 @@ export function ingressCommands(state: State, message: string) {
     } else if (state.status === 'NAME') {
         // user is answering a prompt to enter a username, so let's understand the sent message as the username
         const username = message.trim();
+
+        // username validation
+        if (username.length < 5) {
+            // @todo - Handle as error in the future.
+            // @todo - check for profanity, perhaps
+            state.user.getSocket().send('Username must be at least 5 characters long');
+            state.user.getSocket().send('?name');
+            return; // ignore the request
+        }
 
         state.user.setUsername(username);
 
@@ -62,7 +81,10 @@ export function ingressCommands(state: State, message: string) {
             // {err: "Username is already taken. Please enter a new one." response: "?name"} or something like that.
         }
     } else {
-        return; // state.status has to be "OK" already for some reason, so just ignore the request
+        // return; // state.status has to be "OK" already for some reason, so just ignore the request
+        const handler = commandHandlers['/message']
+        handler(state, message);
+        return;
     }
 
     if (response) {
