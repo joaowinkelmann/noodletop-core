@@ -73,9 +73,10 @@ export function ingressCommands(state: State, message: string) {
         } else {
             // user could not join the room, because it was full (or some other reason in the future). For now, we only handle duplicate usernames
             global.l(JSON.stringify(state));
-            // ask(user.socket, 'nick', 'Username is already taken');
 
             // inform the user that his name is already taken, prompt him to enter a new one
+            state.user.getSocket().send('Username is already taken.');
+
             response = '?name'; // ask the user to enter a username
             // @todo - Turn index.ts (commandHandlers) into a class, so that we may treat cases in which the response should be presented as an error, and put it into a JSON object for example:
             // {err: "Username is already taken. Please enter a new one." response: "?name"} or something like that.
