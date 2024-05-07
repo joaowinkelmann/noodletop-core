@@ -58,7 +58,7 @@ export const restoreState = (socket: ServerWebSocket<unknown>, userId: string, r
     const user = room.getUserById(userId);
 
     if (!user) {
-        global.l(`User ${userId} not found in room ${roomCode}`);
+        global.log(`User ${userId} not found in room ${roomCode}`);
         return null;
     }
 
@@ -130,5 +130,5 @@ class ObservableMap<Room> extends Map {
 
 export const rooms = new ObservableMap<Room>(() => {
     Sweeper.sweepInactiveUsers(rooms);
-    Sweeper.sweepInactiveRooms(rooms);
+    // Sweeper.sweepInactiveRooms(rooms);
 });

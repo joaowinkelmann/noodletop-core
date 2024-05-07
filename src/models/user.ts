@@ -23,7 +23,7 @@ export class User {
     }
 
     // Role related methods
-    private setRole(role: Role): void {
+    setRole(role: Role): void {
         this.role = role;
     }
 
@@ -46,9 +46,19 @@ export class User {
         });
     }
 
-    userHeartbeat(): void {
+    /**
+     * Updates the last seen timestamp with the current time.
+     */
+    beatHeart(): void {
         this.status.last_seen = Date.now();
-        global.l(`heartbeat: ${this.username}`);
+    }
+
+    /**
+     * Gets the last beat of the user.
+     * @returns The last seen timestamp of the user, in milliseconds since the Unix epoch.
+     */
+    getLastBeat(): number {
+        return this.status.last_seen;
     }
 
     getSocket(): ServerWebSocket<unknown> {
@@ -94,7 +104,7 @@ export class User {
 
     // analogy: user leaves the room for a bit, but they can come back, so we keep them for now
     userLeaveRoom(): void {
-        global.l(`User ${this.username} left the room at ${new Date().toISOString()}`);
+        global.log(`User ${this.username} left the room at ${new Date().toISOString()}`);
         this.status.last_seen = Date.now(); // keep this value so that we can remove the user if they don't come back after a while
         this.status.connection = Connection.Away;
     }

@@ -1,15 +1,9 @@
 import { createState, getState, restoreState, deleteState, keepAlive } from './utils/stateManager';
-import { parseHeaders } from './utils/common';
+import { parseHeaders, WebSocketData } from './utils/common';
 import { commandHandlers } from './commands';
 
-global.l = (msg) => {
+global.log = (msg) => {
     // console.log(msg); // Uncomment this line to enable logging
-};
-
-type WebSocketData = {
-    roomCode: string | null;
-    userId: string | null;
-    isDebug: boolean;
 };
 
 Bun.serve<WebSocketData>({
@@ -18,8 +12,7 @@ Bun.serve<WebSocketData>({
         const success = server.upgrade(req, {
             data: {
                 roomCode: room,
-                userId: user,
-                isDebug: new URL(req.url).searchParams.has('debug')
+                userId: user
             }
         });
 
@@ -41,7 +34,7 @@ Bun.serve<WebSocketData>({
         },
         message(ws, message) {
             const state = getState(ws);
-            const [command, ...args] = message.toString().split(' ');
+            const command = message.toString().split(' ')[0];
             let handler = commandHandlers[command];
 
             if (state.status !== 'OK') {
@@ -58,10 +51,10 @@ Bun.serve<WebSocketData>({
             deleteState(ws);
         },
         ping(ws) {
-            // global.l('Ping');
+            // global.log('Ping');
         },
         pong(ws) {
-            // global.l('Pong');
+            // global.log('Pong');
         }
     },
     port: Number(process.env.WS_PORT || 3000)

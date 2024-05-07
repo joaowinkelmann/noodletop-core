@@ -34,7 +34,7 @@ export function ingressCommands(state: State, message: string) {
         } else {
             const room: Room = rooms.get(roomCode);
             if (!room.isAvaliable()) {
-                global.l('User wasn\'t able to join');
+                global.log('User wasn\'t able to join');
                 state.user.getSocket().send('Room isn\'t avaliable');
                 // @todo - inform the user that the room is not avaliable/handle an error
                 return; // if the room is not avaliable, ignore the request
@@ -72,7 +72,7 @@ export function ingressCommands(state: State, message: string) {
             user.getSocket().send(room.getRoomInfo());
         } else {
             // user could not join the room, because it was full (or some other reason in the future). For now, we only handle duplicate usernames
-            global.l(JSON.stringify(state));
+            global.log(JSON.stringify(state));
 
             // inform the user that his name is already taken, prompt him to enter a new one
             state.user.getSocket().send('Username is already taken.');

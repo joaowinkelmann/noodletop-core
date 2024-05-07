@@ -69,6 +69,10 @@ export class Room {
         return this.settings.capacity && this.countUsers() >= this.settings.capacity;
     }
 
+    isEmpty(): boolean {
+        return this.countUsers() === 0;
+    }
+
     getSessionId(): string {
         return this.sessionId;
     }
@@ -117,7 +121,7 @@ export class Room {
     addUser(user: User): boolean {
         // check if the user with the same name is already in the room
         if (Array.from(this.users).find((u) => u.getUsername() === user.getUsername())) {
-            global.l(`User ${user.getUsername()} is already in the room`);
+            global.log(`User ${user.getUsername()} is already in the room`);
             return false;
         }
         this.users.add(user);
@@ -133,6 +137,18 @@ export class Room {
         return user.getRole() === Role.Admin;
     }
 
+    /**
+     * Disconnects a user from the room.
+     * @param user - The user to disconnect.
+     * @param remove - Indicates whether to remove the user from the room after disconnecting.
+     * @param code - The WebSocket close code to send to the user's socket. Defaults to 1000.
+     * @param reason - The reason for disconnecting the user.
+     * Standard codes and reasons:
+     *  4100 - "/leave"    : User briefly disconnected from the room using /leave
+     *  4700 - "Inactivity": User was removed from the room due to inactivity
+     *  4900 - "/quit"     : User quit the room using /quit
+     * @doc https://developer.mozilla.org/en-US/docs/Web/API/CloseEvent
+     */
     disconnectUser(user: User, remove: boolean, code: number = 1000, reason?: string) {
         user.getSocket().close(code, reason);
         if (remove) {
@@ -140,7 +156,7 @@ export class Room {
         }
     }
 
-    removeUser(user: User) {
+    private removeUser(user: User) {
         this.users.delete(user);
     }
 
@@ -231,7 +247,7 @@ export class Room {
 
     heartbeat(user: User): void {
         this.lastSeen = Date.now();
-        user.userHeartbeat();
+        user.beatHeart();
     }
 
     /**
@@ -248,12 +264,20 @@ export class Room {
         return this.lastSeen;
     }
 
-    selfDestruct(): void {
-        this.users.forEach((user) => {
-            this.disconnectUser(user, true, 4001, 'Room closed');
-        });
-        // "saveAllAndDie"
-        // this.objects.deleteAll();
-        // this.status = "closed";
+    // selfDestruct(): void {
+    //     this.users.forEach((user) => {
+    //         this.disconnectUser(user, true, 4001, 'Room closed');
+    //     });
+    //     // "saveAllAndDie"
+    //     // this.objects.deleteAll();
+    //     // this.status = "closed";
+    // }
+
+    checkEmpty(): void {
+        if (this.isEmpty()) {
+            this.status = 'inactive';
+            // @todo - save to storage
+        }
     }
+
 }
