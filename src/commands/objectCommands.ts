@@ -47,7 +47,7 @@ export function objectCommands(state: State, message: string) {
                 props = JSON.parse(args.join(' '));
             }
 
-            response = room.createObj(type, props);
+            response = room.createObj(type, props, state.user);
             break;
         default:
             response = 'Invalid operation';

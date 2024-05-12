@@ -1,6 +1,7 @@
 import { ServerWebSocket } from 'bun';
 import { Rand } from '~/utils/randomizer';
 import { UserStatus, UserCosmetics, Connection, Role } from '~/models/dto/userDTO';
+import { ObjectManager } from './object';
 
 export class User {
     socket: ServerWebSocket<unknown>;
@@ -67,6 +68,10 @@ export class User {
 
     setSocket(socket: ServerWebSocket<unknown>): void {
         this.socket = socket;
+    }
+
+    setConnectionStatus(status: string): void {
+        this.status.connection = status;
     }
 
     getUsername(): string {

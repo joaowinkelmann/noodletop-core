@@ -5,7 +5,7 @@ import { Rand } from '../utils/randomizer';
 import { RoomSettings } from './dto/roomDTO';
 import { Role } from './dto/userDTO';
 
-// import { db } from '~/database';
+import { Db } from '~/database';
 
 /**
  * Class representing a room, containing a set of users and objects.
@@ -152,7 +152,22 @@ export class Room {
     disconnectUser(user: User, remove: boolean, code: number = 1000, reason?: string) {
         user.getSocket().close(code, reason);
         if (remove) {
-            this.removeUser(user);
+            this.handleUserExit(user);
+            // this.removeUser(user);
+        }
+    }
+
+    /**
+     * Handles a user exiting the room for good, reassinging their belongings and removing them from the room.
+     * @param userId - The ID of the user to remove from the room -> User.id
+     */
+    private handleUserExit(user: User): void {
+        if (user) {
+            user.quitRoom();
+
+            this.objects.yieldOwnership(user.getId(), null);
+
+            // this.removeUser(user);
         }
     }
 
@@ -225,8 +240,8 @@ export class Room {
     }
 
     // CRUD operations for objects
-    createObj(type?: string, properties?: object): string {
-        return this.objects.create(type, properties);
+    createObj(type?: string, properties?: object, creator?: User): string {
+        return this.objects.create(type, properties, creator.id);
     }
 
     getObj(id: string): string | undefined {
