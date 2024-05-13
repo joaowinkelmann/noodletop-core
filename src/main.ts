@@ -61,6 +61,16 @@ Bun.serve<WebSocketData>({
 });
 console.log('🔌 WebSocket avaliable on port ' + '\u001b[1;32m' + (process.env.WS_PORT || 3000) + '\x1b[0m');
 
+
+// Db Testing
+import { Db } from './database';
+const db = new Db();
+db.connect();
+db.insOne('test', { name: 'test3', });
+db.modOne('test', { name: 'test3' }, { name: 'test4' });
+// db.remOne('test', { name: 'test2', });
+// db.disconnect();
+
 import { Hono } from 'hono';
 import { routes } from './routes';
 
