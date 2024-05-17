@@ -83,7 +83,7 @@ export function ingressCommands(state: State, message: string) {
         }
     } else {
         // return; // state.status has to be "OK" already for some reason, so just ignore the request
-        const handler = commandHandlers['/message']
+        const handler = commandHandlers['/message'];
         handler(state, message);
         return;
     }

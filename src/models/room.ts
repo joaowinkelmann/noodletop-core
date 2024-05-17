@@ -5,6 +5,7 @@ import { Rand } from '../utils/randomizer';
 import { RoomSettings } from './dto/roomDTO';
 import { Role } from './dto/userDTO';
 
+import { RoomDataManager } from '~/services/roomDataManager';
 import { Db } from '~/database';
 
 /**
@@ -279,19 +280,20 @@ export class Room {
         return this.lastSeen;
     }
 
-    // selfDestruct(): void {
-    //     this.users.forEach((user) => {
-    //         this.disconnectUser(user, true, 4001, 'Room closed');
-    //     });
-    //     // "saveAllAndDie"
-    //     // this.objects.deleteAll();
-    //     // this.status = "closed";
-    // }
-
     checkEmpty(): void {
         if (this.isEmpty()) {
             this.status = 'inactive';
             // @todo - save to storage
+        }
+    }
+
+    async save(close: boolean = false): Promise<void> {
+        // @todo - save to storage
+        // new RoomDataManager(new Db()).saveRoom(this);
+        await RoomDataManager.saveRoom(this);
+
+        if (close) {
+            this.status = 'closed';
         }
     }
 

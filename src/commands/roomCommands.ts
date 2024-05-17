@@ -38,6 +38,9 @@ export function roomCommands(state: State, message: string) {
         case 'get':
             response = room.getTeam(argArr[0]);
             break;
+        case 'save':
+            response = room.save();
+            break;
         default:
             response = 'Invalid operation';
             break;

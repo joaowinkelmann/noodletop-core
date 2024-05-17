@@ -3,7 +3,7 @@ import { parseHeaders, WebSocketData } from './utils/common';
 import { commandHandlers } from './commands';
 
 global.log = (msg) => {
-    // console.log(msg); // Uncomment this line to enable logging
+    console.log(msg); // Uncomment this line to enable logging
 };
 
 Bun.serve<WebSocketData>({
@@ -63,11 +63,11 @@ console.log('🔌 WebSocket avaliable on port ' + '\u001b[1;32m' + (process.env.
 
 
 // Db Testing
-import { Db } from './database';
-const db = new Db();
-db.connect();
-db.insOne('test', { name: 'test3', });
-db.modOne('test', { name: 'test3' }, { name: 'test4' });
+// import { Db } from './database';
+// const db = new Db();
+// db.connect();
+// db.insOne('test', { name: 'test3', });
+// db.modOne('test', { name: 'test3' }, { $set: { name: 'test4' } });
 // db.remOne('test', { name: 'test2', });
 // db.disconnect();
 

@@ -76,6 +76,7 @@ export class MongoDBAdapter implements DatabaseAdapter {
 
 
     // Update
+    // example db.modOne('test', { name: 'test3' }, { $set: { name: 'test4' } });
     modOne(collection: string, query: object, update: object): Promise<any> {
         return this.client.db(this.database).collection(collection).updateOne(query, update).then
         ((result) => {
@@ -93,7 +94,7 @@ export class MongoDBAdapter implements DatabaseAdapter {
             console.error(err);
         });
     }
-    
+
     remOne(collection: string, query: object): Promise<any> {
         return this.client.db(this.database).collection(collection).deleteOne(query).then
         ((result) => {

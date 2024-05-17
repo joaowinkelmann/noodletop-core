@@ -12,13 +12,14 @@ export class Sweeper {
         global.log(`TASK: Sweeping inactive users every ${retaskMins} minutes`);
         setInterval(() => {
             const now = Date.now();
-            rooms.forEach((room: Room) => {
+            rooms.forEach(async (room: Room) => {
                 global.log(`Sweeping room ${room.getCode()}`);
-                room.getUsers().forEach((user) => {
+                room.getUsers().forEach(async (user) => {
                     if (now - user.status.last_seen > thresholdMins * 60 * 1000) {
                         global.log(`User ${user.getUsername()}@${room.getCode()} removed after being inactive for ${thresholdMins} minutes`);
                         room.disconnectUser(user, true, 4700, 'Inactivity');
                         if (room.isEmpty()) {
+                            await room.save();
                             global.log(`Room ${room.getCode()} is empty and will be closed`);
                             rooms.delete(room.getCode());
                         }

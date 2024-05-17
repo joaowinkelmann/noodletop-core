@@ -12,7 +12,9 @@
     "dev:debug": "bun --watch --inspect ./src/main.ts",
     "build": "bun build --compile --minify --sourcemap ./src/main.ts --outfile ./dist/core",
     "build-arm": "bun build --compile --target=bun-linux-arm64 --minify --sourcemap ./src/main.ts --outfile ./dist/core",
+    "build-js": "bun build ./src/main.ts --target=bun --minify --outfile=./dist/core.ts",
     "start": "./dist/core",
+    "start-js": "bun run --bun ./dist/core.ts",
     "lint": "tslint --project tsconfig.json",
     "lint:fix": "tslint --project tsconfig.json --fix",
     "prepare": "husky"

@@ -15,7 +15,7 @@ export class Db {
             // add other cases for other database systems...
             default:
                 // throw new Error('Unsupported database system');
-                global.log("WARN: Unsupported database system, defaulting to MongoDB");
+                global.log('WARN: Unsupported database system, defaulting to MongoDB');
                 this.adapter = new MongoDBAdapter('mongodb://localhost:27017', process.env.DB_DATABASE || 'noodletop');
         }
 
