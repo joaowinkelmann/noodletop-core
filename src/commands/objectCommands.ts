@@ -1,12 +1,12 @@
 import { Room } from '~/models/room';
-import { rooms } from '~/utils/stateManager';
+import { StateManager } from '~/utils/stateManager';
 import { State } from '~/models/state';
 import { isJSON, isAdmin } from '~/utils/common';
 
 export function objectCommands(state: State, message: string) {
     const [command , op, ...args] = message.split(' ');
 
-    const room: Room = rooms.get(state.roomCode) as Room;
+    const room: Room = StateManager.rooms.get(state.roomCode) as Room;
     if (!room) return;
 
     let response = null;

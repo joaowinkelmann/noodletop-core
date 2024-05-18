@@ -13,6 +13,10 @@ export function debugCommands(state: State, message: string) {
             break;
         case 'getId':
             const length = parseInt(args[0], 10);
+            if (isNaN(length) || length < 1 || length > 32768) {
+                response = `I'm afraid I can't do that, Dave.`;
+                break;
+            }
             response = Rand.id(length);
             break;
         default:

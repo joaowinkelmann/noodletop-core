@@ -1,5 +1,7 @@
 import { RouteInterface, factory } from '~/routes';
 import { RoomDataManager } from '~/services/roomDataManager';
+import { StateManager } from '~/utils/stateManager';
+    // import { Room } from '~/models/room';
 
 export const route: RouteInterface = {
     path: '/room/export/:id?',
@@ -12,7 +14,16 @@ export const route: RouteInterface = {
             (c) =>
                 c.json(
                     {
-                        'data': RoomDataManager.roomExportApi(c.req.param('id'))
+                        // 'data': RoomDataManager.roomExportApi(c.req.param('id'))
+                        'requestedId': c.req.param('id'),
+                        // 'data': StateManager.rooms.forEach((room) => {
+                        //     if (room.getCode() == c.req.param('id')) {
+                        //         return room.getRoomInfo()
+                        //     }
+                        // }),
+                        'teste': 'teste125',
+                        'room': StateManager.getRoom(c.req.param('id')),
+                        'rooms': StateManager.getRooms()
                     }
                 )
         )

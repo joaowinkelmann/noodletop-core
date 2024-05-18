@@ -1,6 +1,6 @@
 import { Db } from '~/database';
 import { Room } from '../models/room';
-import { rooms } from '~/utils/stateManager';
+import { StateManager } from '~/utils/stateManager';
 
 export class RoomDataManager {
     constructor(private db: Db) {}
@@ -37,7 +37,11 @@ export class RoomDataManager {
 
     public static roomExportApi(roomCode: string) {
         // JSONify a room and return it
-        const room = rooms.get(roomCode) as Room;
+        const room = StateManager.rooms.get(roomCode) as Room;
+        if (!room) return { error: 'Room not found' };
+        // let cap = room.getCapacity();
+        // global.log(cap);
+        // global.log(rooms);
 
 
         if (room) {

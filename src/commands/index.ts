@@ -29,6 +29,8 @@ export const commandHandlers: CommandHandler = {
     '/leave': connectionCommands,
     '/debug': debugCommands,
     '/help': helpCommands,
-    '/roll': auxCommands
+    '/roll': auxCommands,
+    '/listroom': auxCommands,
+    '/listrooms': auxCommands,
     // map other command handlers here...
 };

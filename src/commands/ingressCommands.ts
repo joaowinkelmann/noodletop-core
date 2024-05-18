@@ -1,5 +1,5 @@
 import { State } from '~/models/state';
-import { rooms, createRoom } from '~/utils/stateManager';
+import { StateManager } from '~/utils/stateManager';
 import { Room } from '~/models/room';
 import { User } from '~/models/user';
 import { commandHandlers } from '.';
@@ -28,11 +28,11 @@ export function ingressCommands(state: State, message: string) {
             return; // ignore the request
         }
 
-        if (!rooms.has(roomCode)) {
+        if (!StateManager.rooms.has(roomCode)) {
             // room does not exist, so let's create it
-            createRoom(roomCode, state.user);
+            StateManager.createRoom(roomCode, state.user);
         } else {
-            const room: Room = rooms.get(roomCode);
+            const room: Room = StateManager.rooms.get(roomCode) as Room;
             if (!room.isAvaliable()) {
                 global.log('User wasn\'t able to join');
                 state.user.getSocket().send('Room isn\'t avaliable');
@@ -60,7 +60,7 @@ export function ingressCommands(state: State, message: string) {
 
         state.user.setUsername(username);
 
-        const room: Room = rooms.get(state.roomCode);
+        const room: Room = StateManager.rooms.get(state.roomCode) as Room;
         const user: User = state.user;
 
         // try to add the user into the room
