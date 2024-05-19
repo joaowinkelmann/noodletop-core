@@ -296,5 +296,4 @@ export class Room {
             this.status = 'closed';
         }
     }
-
 }

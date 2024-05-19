@@ -6,7 +6,7 @@ import { ObjectManager } from './object';
 export class User {
     socket: ServerWebSocket<unknown>;
     username: string;
-    id: string = Rand.id(24);
+    id: string = Rand.id(56);
     role: Role;
     status: UserStatus;
     cosmetics: UserCosmetics;
@@ -70,7 +70,7 @@ export class User {
         this.socket = socket;
     }
 
-    setConnectionStatus(status: string): void {
+    setConnectionStatus(status: Connection): void {
         this.status.connection = status;
     }
 
