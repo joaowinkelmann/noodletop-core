@@ -11,11 +11,11 @@ export function auxCommands(state: State, message: string) {
         case '/roll':
             response = String(Rand.roll(op, true));
             break;
-        case "/listrooms":
+        case '/listrooms':
             // response = StateManager.rooms;
             response = StateManager.getRooms();
             break;
-        case "/listroom":
+        case '/listroom':
             // response = StateManager.rooms;
             response = StateManager.getRoom(op);
             break;

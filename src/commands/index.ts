@@ -31,6 +31,6 @@ export const commandHandlers: CommandHandler = {
     '/help': helpCommands,
     '/roll': auxCommands,
     '/listroom': auxCommands,
-    '/listrooms': auxCommands,
+    '/listrooms': auxCommands
     // map other command handlers here...
 };

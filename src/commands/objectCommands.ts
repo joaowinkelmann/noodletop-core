@@ -6,7 +6,7 @@ import { isJSON, isAdmin } from '~/utils/common';
 export function objectCommands(state: State, message: string) {
     const [command , op, ...args] = message.split(' ');
 
-    const room: Room = StateManager.rooms.get(state.roomCode) as Room;
+    const room: Room = StateManager.getRoom(state.roomCode) as Room;
     if (!room) return;
 
     let response = null;

@@ -62,7 +62,7 @@ export const shCss = {
     end: '\x1b[0m', // resets the color
     bold: '\u001b[1m',
     underline: '\u001b[4m',
-    italic: '\u001b[3m',
+    italic: '\u001b[3m'
 
     // Background colors
     // bgRed: '\u001b[41m',

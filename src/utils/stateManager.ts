@@ -2,45 +2,14 @@ import { User } from '../models/user';
 import { Room } from '../models/room';
 import { State } from '../models/state';
 import { Sweeper } from './sweeper';
+// import { ObservableMap } from './observableMap';
 import { ServerWebSocket } from 'bun';
-
-class ObservableMap<K, V> extends Map<K, V> {
-    constructor(private callback: () => void) {
-        super();
-    }
-    
-    set(key: K, value: V) {
-        const result = super.set(key, value);
-        this.callback();
-        return result;
-    }
-    
-    delete(key: K) {
-        const result = super.delete(key);
-        this.callback();
-        return result;
-    }
-}
 
 // Class to manage the state of the user, room, and socket connections
 export class StateManager {
-    private stateMap: Map<ServerWebSocket<unknown>, State>;
 
-    // rooms
     public static rooms: Map<string, Room> = new Map();
-    public static stateMap = new ObservableMap<ServerWebSocket<unknown>, State>(() => {});
-
-    // dependency debugging: log how many times the constructor is called
-    private static instanceCount = 0;
-
-    constructor() {
-        StateManager.instanceCount++;
-        // this.stateMap = new ObservableMap<ServerWebSocket<unknown>, State>(this.sweepInactiveUsers);
-    }
-
-    private sweepInactiveUsers() {
-        Sweeper.sweepInactiveUsers(StateManager.rooms);
-    }
+    public static stateMap: Map<ServerWebSocket<unknown>, State> = new Map();
 
     public static createState(socket: ServerWebSocket<unknown>): State {
         const state: State = {
@@ -59,14 +28,14 @@ export class StateManager {
     public static getState(socket: ServerWebSocket<unknown>): State | undefined {
         const state: State = this.stateMap.get(socket) ?? undefined;
         if (state && state.roomCode) {
-            const room: Room = StateManager.rooms.get(state.roomCode) as Room;
+            const room: Room = StateManager.getRoom(state.roomCode) as Room;
             room.heartbeat(state.user);
         }
         return state;
     }
 
     public static restoreState(socket: ServerWebSocket<unknown>, userId: string, roomCode: string): State | null {
-        const room: Room = StateManager.rooms.get(roomCode) as Room;
+        const room: Room = StateManager.getRoom(roomCode) as Room;
         if (!room) {
             return null;
         }
@@ -96,7 +65,7 @@ export class StateManager {
 
     // check if a state received from the client is valid
     public static isValidState(userId: string, roomCode: string): boolean {
-        const room = StateManager.rooms.get(roomCode);
+        const room = StateManager.getRoom(roomCode);
         if (!room) {
             return false;
         }
@@ -107,6 +76,12 @@ export class StateManager {
         return true;
     }
 
+    /**
+     * Keeps the WebSocket connection alive by sending periodic ping messages.
+     * If the WebSocket connection is closed, the interval is cleared.
+     * @param socket - The WebSocket connection.
+     * @param interval - The interval in seconds between each ping message. Default is 30 seconds.
+     */
     public static keepAlive(socket: ServerWebSocket<unknown>, interval: number = 30) {
         const intervalId = setInterval(() => {
             if (socket.readyState === WebSocket.OPEN) {
@@ -124,13 +99,20 @@ export class StateManager {
         // Promote the user(creator) to admin, as they're the first to enter the room
         room.promoteToAdmin(creator);
 
+        // initialize the sweeper if it's the first room
+        if (StateManager.rooms.size === 1) {
+            Sweeper.sweepInactiveUsers();
+        }
+        
         return room;
     }
 
     // queries and returns the rooms map into a JSON object
-    public static getRooms() {
-        const rooms = Array.from(StateManager.rooms.values());
-        return rooms.map((room) => JSON.stringify(room));
+    public static getRooms(): Map<string, Room>{
+        // const rooms = Array.from(StateManager.rooms.values());
+        // return rooms.map((room) => JSON.stringify(room));
+
+        return StateManager.rooms;
     }
 
     // same as getRooms but for a single room

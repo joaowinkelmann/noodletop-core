@@ -34,7 +34,7 @@ Bun.serve<WebSocketData>({
         }
     },
     websocket: {
-        maxPayloadLength: 2048 * 1024, // 2 MiB
+        maxPayloadLength: 512 * 1024, // 512KB
         open(ws) {
             let state;
             if (ws.data.userId && ws.data.roomCode) {
@@ -61,10 +61,8 @@ Bun.serve<WebSocketData>({
         },
         close(ws, code, message) {
             StateManager.deleteState(ws);
-        },
-        ping(ws) {},
-        pong(ws) {}
+        }
     },
-    port: Number(process.env.APP_PORT || 3000),
+    port: Number(process.env.PORT || 3000)
 });
-console.log(`🚀 App avaliable on port ${shCss.green}${(process.env.APP_PORT || 3000)}${shCss.end}\n`);
+console.log(`🚀 App avaliable on port ${shCss.green}${(process.env.PORT || 3000)}${shCss.end}\n`);

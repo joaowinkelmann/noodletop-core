@@ -1,5 +1,3 @@
-import { MiddlewareHandler, Handler, Hono } from 'hono';
-import { createFactory } from 'hono/factory';
 import { shCss } from '~/utils/common';
 
 export type Methods = ['get', 'post', 'put', 'delete', 'options', 'patch'][number];
@@ -36,7 +34,7 @@ let routes: RouteInterface[];
  */
 export async function loadRoutes(): Promise<RouteInterface[]> {
     // console.warn("loadRoutes called")
-    global.log("Started loading routes...")
+    global.log('Started loading routes...');
     const routesDir = path.join(__dirname, '');
     const foundRoutes: RouteInterface[] = [];
 
@@ -75,7 +73,7 @@ export async function loadRoutes(): Promise<RouteInterface[]> {
         await loadDir(routesDir);
         routes = foundRoutes;
     }
-    global.log("Route loading finished!")
+    global.log('Route loading finished!');
     return routes;
 }
 

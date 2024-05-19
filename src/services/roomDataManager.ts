@@ -37,7 +37,7 @@ export class RoomDataManager {
 
     public static roomExportApi(roomCode: string) {
         // JSONify a room and return it
-        const room = StateManager.rooms.get(roomCode) as Room;
+        const room = StateManager.getRoom(roomCode) as Room;
         if (!room) return { error: 'Room not found' };
         // let cap = room.getCapacity();
         // global.log(cap);
