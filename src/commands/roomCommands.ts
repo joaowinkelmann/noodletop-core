@@ -3,7 +3,7 @@ import { StateManager } from '~/utils/stateManager';
 import { State } from '~/models/state';
 import { isAdmin } from '~/utils/common';
 
-export function roomCommands(state: State, message: string) {
+export async function roomCommands(state: State, message: string) {
     const [command , op, ...args] = message.split(' ');
     const room: Room = StateManager.getRoom(state.roomCode) as Room;
     if (!room) return;
@@ -39,11 +39,17 @@ export function roomCommands(state: State, message: string) {
             response = room.getTeam(argArr[0]);
             break;
         case 'save':
-            response = room.save();
+            response = await room.save();
+            console.log(response);
             break;
         default:
             response = 'Invalid operation';
             break;
+    }
+
+    //await for the response if it is a promise
+    if (response instanceof Promise) {
+        response = await response;
     }
 
     if (response) {

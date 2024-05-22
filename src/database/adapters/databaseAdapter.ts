@@ -5,8 +5,8 @@ export interface DatabaseAdapter {
 
 
     // Create
-    insOne(collection: string, document: object): Promise<any>;
-    insMany?(collection: string, documents: object[]): Promise<any>;
+    insOne(collection: string, document: object): Promise<boolean>;
+    insMany?(collection: string, documents: object[]): Promise<boolean>;
 
     // Read
     //                                         Promise<object | null>;
@@ -16,6 +16,10 @@ export interface DatabaseAdapter {
     // Update
     modOne(collection: string, query: object, update: object): Promise<any>;
     modMany?(collection: string, query: object, update: object[]): Promise<any>;
+
+    // Upsert
+    upsOne?(collection: string, query: object, update: object): Promise<boolean>;
+    upsMany?(collection: string, query: object, update: object[]): Promise<boolean>;
 
 
     // Delete

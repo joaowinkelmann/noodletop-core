@@ -5,7 +5,7 @@ import { StateManager } from '~/utils/stateManager';
 export class RoomDataManager {
     constructor(private db: Db) {}
 
-    static async saveRoom(room: Room) {
+    static async saveRoom(room: Room): Promise<boolean> {
         // Convert the room to a format suitable for saving...
         const roomDataToSave = this.convertRoomToData(room);
         const db = new Db();
@@ -13,7 +13,8 @@ export class RoomDataManager {
 
         // Save the room data...
         // await this.db.insert('rooms', roomDataToSave);
-        await db.insOne('rooms', roomDataToSave);
+        // return await db.insOne('rooms', roomDataToSave);
+        return await db.upsOne('rooms', { id: room.getSessionId() }, roomDataToSave);
     }
 
     async loadRoom(id: string) {

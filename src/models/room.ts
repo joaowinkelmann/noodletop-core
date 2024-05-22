@@ -287,13 +287,16 @@ export class Room {
         }
     }
 
-    async save(close: boolean = false): Promise<void> {
+    async save(close: boolean = false): Promise<string>{
         // @todo - save to storage
-        // new RoomDataManager(new Db()).saveRoom(this);
-        await RoomDataManager.saveRoom(this);
-
+        let ret = await RoomDataManager.saveRoom(this);
+        
         if (close) {
             this.status = 'closed';
+        }
+
+        if (ret) {
+            return JSON.stringify({ message: 'Room saved successfully' });
         }
     }
 }
