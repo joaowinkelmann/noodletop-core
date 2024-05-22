@@ -1,11 +1,11 @@
 import { Room } from '~/models/room';
-import { rooms } from '~/utils/stateManager';
+import { StateManager } from '~/utils/stateManager';
 import { State } from '~/models/state';
 import { isAdmin } from '~/utils/common';
 
-export function roomCommands(state: State, message: string) {
+export async function roomCommands(state: State, message: string) {
     const [command , op, ...args] = message.split(' ');
-    const room: Room = rooms.get(state.roomCode) as Room;
+    const room: Room = StateManager.getRoom(state.roomCode) as Room;
     if (!room) return;
 
     let response = null;
@@ -38,9 +38,18 @@ export function roomCommands(state: State, message: string) {
         case 'get':
             response = room.getTeam(argArr[0]);
             break;
+        case 'save':
+            response = await room.save();
+            console.log(response);
+            break;
         default:
             response = 'Invalid operation';
             break;
+    }
+
+    //await for the response if it is a promise
+    if (response instanceof Promise) {
+        response = await response;
     }
 
     if (response) {

@@ -1,5 +1,5 @@
 import { State } from '~/models/state';
-import { rooms } from '~/utils/stateManager';
+import { StateManager } from '~/utils/stateManager';
 import { Room } from '~/models/room';
 
 /**
@@ -11,7 +11,7 @@ import { Room } from '~/models/room';
 export function connectionCommands(state: State, message: string) {
     const [command , op, ...args] = message.split(' ');
 
-    const room: Room = rooms.get(state.roomCode); // get the room
+    const room: Room = StateManager.getRoom(state.roomCode); // get the room
 
     switch (command) {
         case '/quit':

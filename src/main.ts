@@ -1,39 +1,52 @@
-import { createState, getState, restoreState, deleteState, keepAlive } from './utils/stateManager';
-import { parseHeaders, WebSocketData } from './utils/common';
+import { StateManager } from './utils/stateManager';
+import { parseHeaders, shCss, WebSocketData } from './utils/common';
 import { commandHandlers } from './commands';
 
 global.log = (msg) => {
-    // console.log(msg); // Uncomment this line to enable logging
+    console.log(msg); // Uncomment this line to enable logging
 };
 
+import { loadRoutes } from './routes';
+const routes = await loadRoutes();
+
 Bun.serve<WebSocketData>({
-    fetch(req, server) {
-        const [user, room] = parseHeaders(req.headers);
-        const success = server.upgrade(req, {
-            data: {
-                roomCode: room,
-                userId: user
+    async fetch(req: Request, server) {
+        const { pathname } = new URL(req.url);
+
+        if (pathname.startsWith('/ws/')) {
+            const [user, room] = parseHeaders(req.headers);
+            server.upgrade(req, {
+                data: {
+                    roomCode: room,
+                    userId: user
+                }
+            });
+        } else if (pathname.startsWith('/api/')) {
+            const route = routes.find((route) => new RegExp(route.pathRegex).test(pathname));
+
+            if (route) {
+                return route.handler(req);
+            } else {
+                return new Response('Not Found', { status: 404 });
             }
-        });
-
-        if (success) return undefined;
-
-        return Response.redirect('/');
+        } else {
+            return new Response('Bad Request', { status: 400 });
+        }
     },
     websocket: {
-        maxPayloadLength: 2048 * 1024, // 2 MiB
+        maxPayloadLength: 512 * 1024, // 512KB
         open(ws) {
             let state;
             if (ws.data.userId && ws.data.roomCode) {
-                state = restoreState(ws, ws.data.userId, ws.data.roomCode);
+                state = StateManager.restoreState(ws, ws.data.userId, ws.data.roomCode);
             }
             if (!state) {
-                state = createState(ws);
+                state = StateManager.createState(ws);
             }
-            keepAlive(ws);
+            StateManager.keepAlive(ws);
         },
         message(ws, message) {
-            const state = getState(ws);
+            const state = StateManager.getState(ws);
             const command = message.toString().split(' ')[0];
             let handler = commandHandlers[command];
 
@@ -47,29 +60,9 @@ Bun.serve<WebSocketData>({
             handler(state, message.toString());
         },
         close(ws, code, message) {
-            // stateMap.delete(ws);
-            deleteState(ws);
-        },
-        ping(ws) {
-            // global.log('Ping');
-        },
-        pong(ws) {
-            // global.log('Pong');
+            StateManager.deleteState(ws);
         }
     },
-    port: Number(process.env.WS_PORT || 3000)
+    port: Number(process.env.PORT || 3000)
 });
-console.log('🔌 WebSocket avaliable on port ' + '\u001b[1;32m' + (process.env.WS_PORT || 3000) + '\x1b[0m');
-
-import { Hono } from 'hono';
-import { routes } from './routes';
-
-const app = new Hono().basePath('/api');
-routes.map((route) => app.on(route.method, route.path, ...route.handlers));
-
-export default {
-    port: Number(process.env.REST_PORT || 3001),
-    fetch: app.fetch
-};
-
-console.log('🔄 RESTful API avaliable on port ' + '\u001b[1;36m' + (process.env.REST_PORT || 3001) + '\x1b[0m');
+console.log(`🚀 App avaliable on port ${shCss.green}${(process.env.PORT || 3000)}${shCss.end}\n`);

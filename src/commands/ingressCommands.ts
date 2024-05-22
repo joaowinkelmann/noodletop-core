@@ -1,5 +1,5 @@
 import { State } from '~/models/state';
-import { rooms, createRoom } from '~/utils/stateManager';
+import { StateManager } from '~/utils/stateManager';
 import { Room } from '~/models/room';
 import { User } from '~/models/user';
 import { commandHandlers } from '.';
@@ -14,8 +14,22 @@ export function ingressCommands(state: State, message: string) {
     const [command , op, ...args] = message.split(' ');
 
     let response = null;
+    if (state.status === 'ACK') {
+        // user is answering a prompt to enter an ACK, so let's understand the sent message as the user id
+        const id = message.trim();
 
-    if (state.status === 'ROOM') {
+        if (id !== state.user.getId()) {
+            // @todo - Handle as error in the future.
+            // @todo - check for profanity, perhaps
+            state.user.getSocket().send('{err: "Invalid ACK, try again"}');
+            state.user.getSocket().send(`u ${state.user.getId()}`);
+            return; // ignore the request
+        } else {
+            state.status = 'ROOM'; // user is now being asked to enter a room code
+            response = '?room'; // ask the user to enter a room code
+        }
+
+    } else if (state.status === 'ROOM') {
         // user is answering a prompt to enter a room, so let's understand the sent message as the roomCode
         const roomCode = message.trim().toLowerCase();
 
@@ -28,11 +42,11 @@ export function ingressCommands(state: State, message: string) {
             return; // ignore the request
         }
 
-        if (!rooms.has(roomCode)) {
+        if (!StateManager.rooms.has(roomCode)) {
             // room does not exist, so let's create it
-            createRoom(roomCode, state.user);
+            StateManager.createRoom(roomCode, state.user);
         } else {
-            const room: Room = rooms.get(roomCode);
+            const room: Room = StateManager.getRoom(roomCode) as Room;
             if (!room.isAvaliable()) {
                 global.log('User wasn\'t able to join');
                 state.user.getSocket().send('Room isn\'t avaliable');
@@ -60,7 +74,7 @@ export function ingressCommands(state: State, message: string) {
 
         state.user.setUsername(username);
 
-        const room: Room = rooms.get(state.roomCode);
+        const room: Room = StateManager.getRoom(state.roomCode) as Room;
         const user: User = state.user;
 
         // try to add the user into the room
@@ -83,7 +97,7 @@ export function ingressCommands(state: State, message: string) {
         }
     } else {
         // return; // state.status has to be "OK" already for some reason, so just ignore the request
-        const handler = commandHandlers['/message']
+        const handler = commandHandlers['/message'];
         handler(state, message);
         return;
     }

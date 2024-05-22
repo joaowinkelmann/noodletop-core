@@ -5,14 +5,15 @@
   "author": "joaowinkelmann",
   "description": "Tabletop manager",
   "engines": {
-    "node": ">=20.12.2"
+    "node": ">=20.13.1"
   },
   "scripts": {
     "dev": "bun --watch ./src/main.ts",
     "dev:debug": "bun --watch --inspect ./src/main.ts",
+    "start": "bun run --bun ./src/main.ts",
     "build": "bun build --compile --minify --sourcemap ./src/main.ts --outfile ./dist/core",
+    "start-comp": "./dist/core",
     "build-arm": "bun build --compile --target=bun-linux-arm64 --minify --sourcemap ./src/main.ts --outfile ./dist/core",
-    "start": "./dist/core",
     "lint": "tslint --project tsconfig.json",
     "lint:fix": "tslint --project tsconfig.json --fix",
     "prepare": "husky"
@@ -23,8 +24,7 @@
     }
   },
   "dependencies": {
-    "bun": "^1.1.6",
-    "hono": "^4.3.2",
+    "bun": "^1.1.8",
     "mongodb": "^6.5.0"
   },
   "devDependencies": {

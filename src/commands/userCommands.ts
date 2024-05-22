@@ -1,11 +1,11 @@
 import { Room } from '~/models/room';
 import { User } from '~/models/user';
-import { rooms } from '~/utils/stateManager';
+import { StateManager } from '~/utils/stateManager';
 import { State } from '~/models/state';
 
 export function userCommands(state: State, message: string) {
     const [command , op, ...args] = message.split(' ');
-    const room: Room = rooms.get(state.roomCode) as Room;
+    const room: Room = StateManager.getRoom(state.roomCode) as Room;
     const user: User = state.user;
     if (!room) return;
 

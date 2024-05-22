@@ -42,3 +42,36 @@ export const parseHeaders = (headers: Headers): [string, string] | [null, null] 
 export const isAdmin = (user: User): boolean => {
     return user.getRole() === Role.Admin;
 };
+
+/**
+ * Styling helper for bash output.
+ */
+export const shCss = {
+    // Colors
+    red: '\u001b[1;31m',
+    green: '\u001b[1;32m',
+    yellow: '\u001b[1;33m',
+    blue: '\u001b[1;34m',
+    magenta: '\u001b[1;35m',
+    cyan: '\u001b[1;36m',
+    lgray: '\u001b[1;37m',
+    dgray: '\u001b[1;90m',
+    orange: '\u001b[1;91m',
+
+    // Text effects
+    end: '\x1b[0m', // resets the color
+    bold: '\u001b[1m',
+    underline: '\u001b[4m',
+    italic: '\u001b[3m'
+
+    // Background colors
+    // bgRed: '\u001b[41m',
+    // bgGreen: '\u001b[42m',
+    // bgYellow: '\u001b[43m',
+    // bgBlue: '\u001b[44m',
+    // bgMagenta: '\u001b[45m',
+    // bgCyan: '\u001b[46m',
+    // bgLgray: '\u001b[47m',
+    // bgDgray: '\u001b[100m',
+    // bgOrange: '\u001b[101m',
+};

@@ -1,11 +1,12 @@
 import { ServerWebSocket } from 'bun';
 import { Rand } from '~/utils/randomizer';
 import { UserStatus, UserCosmetics, Connection, Role } from '~/models/dto/userDTO';
+import { ObjectManager } from './object';
 
 export class User {
     socket: ServerWebSocket<unknown>;
     username: string;
-    id: string = Rand.id(24);
+    id: string = Rand.id(56);
     role: Role;
     status: UserStatus;
     cosmetics: UserCosmetics;
@@ -67,6 +68,10 @@ export class User {
 
     setSocket(socket: ServerWebSocket<unknown>): void {
         this.socket = socket;
+    }
+
+    setConnectionStatus(status: Connection): void {
+        this.status.connection = status;
     }
 
     getUsername(): string {

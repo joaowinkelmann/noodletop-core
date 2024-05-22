@@ -3,6 +3,7 @@ import { Rand } from '../utils/randomizer';
 export type rObject = {
     id: string;
     props: { [key: string]: any } | null;
+    owner?: string;
 };
 
 // Class instanced by a Room to manage objects within that room.
@@ -17,13 +18,15 @@ export class ObjectManager {
     /**
      * Creates an object and adds it to the manager's list of objects.
      * @param properties - If provided, a JSON object containing the properties of the object to be created. Ex: "{type: 'circle', radius: 5, color: 'red'}"
+     * @param creator - If provided, the id of the user who created the object -> User.id
      * @returns The created object as a JSON string
      */
-    create(type?: string, properties?: object | undefined): string {
+    create(type?: string, properties?: object, creator?: string): string {
         const id = Rand.id();
         const object: rObject = {
             id,
-            props: null
+            props: null,
+            owner: creator || undefined
         };
 
         // if properties are provided, add them to the object
@@ -82,5 +85,14 @@ export class ObjectManager {
      */
     delete(id: string): boolean {
         return this.objects.delete(id);
+    }
+
+    // Transfers all objects from an owner to another
+    yieldOwnership(oldOwner: string, newOwner: string): void {
+        this.objects.forEach((obj) => {
+            if (obj.owner === oldOwner) {
+                obj.owner = newOwner;
+            }
+        });
     }
 }
