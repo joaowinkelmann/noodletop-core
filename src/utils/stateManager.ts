@@ -13,7 +13,7 @@ export class StateManager {
 
     public static createState(socket: ServerWebSocket<unknown>): State {
         const state: State = {
-            status: 'ROOM',
+            status: 'ACK',
             roomCode: null,
             user: new User(socket)
         };

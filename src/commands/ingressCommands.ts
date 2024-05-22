@@ -14,8 +14,19 @@ export function ingressCommands(state: State, message: string) {
     const [command , op, ...args] = message.split(' ');
 
     let response = null;
+    if (state.status === 'ACK') {
+        // user is answering a prompt to enter an ACK, so let's understand the sent message as the user id
+        const id = message.trim();
 
-    if (state.status === 'ROOM') {
+        if (id !== state.user.getId()) {
+            // @todo - Handle as error in the future.
+            // @todo - check for profanity, perhaps
+            state.user.getSocket().send('Invalid user id');
+            state.user.getSocket().send(`u ${state.user.getId()}`);
+            return; // ignore the request
+        }
+
+    } else if (state.status === 'ROOM') {
         // user is answering a prompt to enter a room, so let's understand the sent message as the roomCode
         const roomCode = message.trim().toLowerCase();
 
