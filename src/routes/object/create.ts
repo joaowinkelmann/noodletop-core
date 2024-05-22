@@ -1,17 +1,9 @@
-// import { RouteInterface, factory } from '~/routes';
-
-// export const route: RouteInterface = {
-//     method: 'post',
-//     handlers: factory.createHandlers((c) => c.json({ bar: 'bar' }))
-// };
-
 import { Room } from '~/models/room';
 import { StateManager } from '~/utils/stateManager';
 import { RouteInterface } from '~/routes';
 
 export const route: RouteInterface = {
     pathRegex: 'api/object/create/\\w+',
-    // method: "post",
     method: 'put',
     handler: (req: Request) => {
         const roomCode = req.headers.get('roomCode');

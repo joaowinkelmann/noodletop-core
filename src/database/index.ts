@@ -34,8 +34,8 @@ export class Db {
     }
 
     // create
-    async insOne(collection: string, document: object) {
-        await this.adapter.insOne(collection, document);
+    async insOne(collection: string, document: object): Promise<boolean> {
+        return await this.adapter.insOne(collection, document);
     }
 
     // read
@@ -50,6 +50,11 @@ export class Db {
     // update
     async modOne(collection: string, query: object, update: object) {
         return this.adapter.modOne(collection, query, update);
+    }
+
+    // upsert
+    async upsOne(collection: string, query: object, update: object) {
+        return this.adapter.upsOne(collection, query, update);
     }
 
     // delete

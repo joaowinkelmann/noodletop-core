@@ -29,22 +29,21 @@ export class MongoDBAdapter implements DatabaseAdapter {
     }
 
     connect(): Promise<any> {
-        // throw new Error('Method not implemented.');
         console.log('Connecting to MongoDB...');
-        // console.log(this.client.connect());
         return this.client.connect().then(() => {
             console.log('Connected to MongoDB');
         }).catch((err) => {
             console.error(err);
         }
     );
-    console.log('Connected to MongoDB');
     }
     disconnect(): Promise<void> {
         // throw new Error('Method not implemented.');
         console.log('Disconnecting from MongoDB...');
         return this.client.close();
     }
+    
+    // Create
     insOne(collection: string, document: object): Promise<any> {
         // throw new Error('Method not implemented.');
         console.log('Inserting document into MongoDB...');
@@ -56,6 +55,19 @@ export class MongoDBAdapter implements DatabaseAdapter {
             console.error(err);
         });
     }
+
+    // Upsert
+    upsOne(collection: string, query: object, update: object): Promise<boolean> {
+        // throw new Error('Method not implemented.');
+        return this.client.db(this.database).collection(collection).updateOne(query, update, { upsert: true }).then((result) => {
+            return result.modifiedCount > 0;
+        }).catch((err) => {
+            console.error(err);
+            return false;
+        });
+    }
+
+
     getOne(collection: string, query: object): Promise<any> {
         // throw new Error('Method not implemented.');
         return this.client.db(this.database).collection(collection).findOne(query).then((result) => {
