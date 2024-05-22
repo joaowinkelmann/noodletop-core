@@ -21,7 +21,7 @@ export class StateManager {
         this.stateMap.set(socket, state);
 
         socket.send(`u ${state.user.getId()}`);
-        socket.send('?room');
+        socket.send('?ack');
         return state;
     }
 

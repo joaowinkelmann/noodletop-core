@@ -1,8 +1,10 @@
 import { User } from './user';
 
 export type State = {
-    // 1st: ACK -> User must send back the id it has received -> 2nd: ROOM -> User must enter a room code
-    // 3rd: NAME -> User must enter a username >> 4th: OK -> User is connected.
+    // 1st State: ACK  -> User must perform a handshake by sending back the received userId, confirming its integrity
+    // 2nd State: ROOM -> User must enter a room code
+    // 3rd State: NAME -> User must enter a username
+    // 4th State: OK   -> User is connected.
     status: 'ACK' |'ROOM' | 'NAME' | 'OK';
     roomCode: string;
     user: User;

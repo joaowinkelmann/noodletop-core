@@ -21,9 +21,12 @@ export function ingressCommands(state: State, message: string) {
         if (id !== state.user.getId()) {
             // @todo - Handle as error in the future.
             // @todo - check for profanity, perhaps
-            state.user.getSocket().send('Invalid user id');
+            state.user.getSocket().send('{err: "Invalid ACK, try again"}');
             state.user.getSocket().send(`u ${state.user.getId()}`);
             return; // ignore the request
+        } else {
+            state.status = 'ROOM'; // user is now being asked to enter a room code
+            response = '?room'; // ask the user to enter a room code
         }
 
     } else if (state.status === 'ROOM') {
