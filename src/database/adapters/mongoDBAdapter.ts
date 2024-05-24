@@ -42,7 +42,7 @@ export class MongoDBAdapter implements DatabaseAdapter {
         console.log('Disconnecting from MongoDB...');
         return this.client.close();
     }
-    
+
     // Create
     insOne(collection: string, document: object): Promise<any> {
         // throw new Error('Method not implemented.');

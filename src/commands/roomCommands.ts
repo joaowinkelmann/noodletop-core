@@ -47,7 +47,7 @@ export async function roomCommands(state: State, message: string) {
             break;
     }
 
-    //await for the response if it is a promise
+    // await for the response if it is a promise
     if (response instanceof Promise) {
         response = await response;
     }

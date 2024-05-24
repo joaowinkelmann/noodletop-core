@@ -9,10 +9,13 @@ export const route: RouteInterface = {
         const roomId = req.url.split('/').pop();
         // const room = StateManager.getRoom(roomId);
         const room = RoomDataManager.roomExportApi(roomId);
-        return new Response(JSON.stringify(room), {
-            headers: {
+        return new Response(
+            JSON.stringify(room),
+            {
+                headers: {
                 'content-type': 'application/json'
+                }
             }
-        });
+        );
     }
 };

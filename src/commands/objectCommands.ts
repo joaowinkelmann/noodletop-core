@@ -4,7 +4,7 @@ import { State } from '~/models/state';
 import { isJSON, isAdmin } from '~/utils/common';
 
 export function objectCommands(state: State, message: string) {
-    const [command , op, ...args] = message.split(' ');
+    const [command, op, ...args] = message.split(' ');
 
     const room: Room = StateManager.getRoom(state.roomCode) as Room;
     if (!room) return;
@@ -38,13 +38,38 @@ export function objectCommands(state: State, message: string) {
             break;
         case 'create':
         case 'c':
-            // Call the createObject method on the instance
-
-            const type = args.shift(); // get type as first argument
+            let type = null;
             let props = null;
 
-            if (isJSON(args.join(' '))) {
-                props = JSON.parse(args.join(' '));
+            // Valid cases:
+            // Case: /obj create type_without_props
+            // Case: /obj create {"key": "value"}
+            // Case: /obj create my_type {"key":"value"}
+
+            if (args.length === 1) {
+                type = args[0];
+            } else if (args.length === 2) {
+                type = args[0];
+                if (isJSON(args[1]) === false) {
+                    response = 'Invalid JSON properties';
+                    break;
+                } else {
+                    props = JSON.parse(args[1]);
+                }
+            } else if (args.length > 2) {
+                type = args[1];
+                // minify the json string after the type, because we could have something like "type" {"key": "value"}
+                const minifiedJson = args.slice(1).join(' ');
+                console.log(minifiedJson);
+                if (isJSON(minifiedJson) === false) {
+                    response = 'Invalid JSON properties';
+                    break;
+                } else {
+                    props = JSON.parse(minifiedJson);
+                }
+            } else {
+                response = 'Invalid operation';
+                break;
             }
 
             response = room.createObj(type, props, state.user);

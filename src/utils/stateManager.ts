@@ -103,7 +103,7 @@ export class StateManager {
         if (StateManager.rooms.size === 1) {
             Sweeper.sweepInactiveUsers();
         }
-        
+
         return room;
     }
 

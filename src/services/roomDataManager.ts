@@ -30,7 +30,7 @@ export class RoomDataManager {
         return {
             id: room.getSessionId(),
             code: room.getCode(),
-            users: Array.from(room.getUsers()).map(user => user.getId()),
+            users: Array.from(room.getUsers()).map(user => user.getUsername()),
             objects: room.getAllObj()
             // Other properties...
         };

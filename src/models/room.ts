@@ -289,8 +289,8 @@ export class Room {
 
     async save(close: boolean = false): Promise<string>{
         // @todo - save to storage
-        let ret = await RoomDataManager.saveRoom(this);
-        
+        const ret = await RoomDataManager.saveRoom(this);
+
         if (close) {
             this.status = 'closed';
         }
