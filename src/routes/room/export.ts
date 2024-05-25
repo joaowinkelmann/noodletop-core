@@ -1,6 +1,5 @@
 import { RouteInterface } from '~/routes';
 import { RoomDataManager } from '~/services/roomDataManager';
-import { StateManager } from '~/utils/stateManager';
 
 export const route: RouteInterface = {
     pathRegex: 'api/room/export/\\w+',

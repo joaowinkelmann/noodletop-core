@@ -70,6 +70,10 @@ export class User {
         this.socket = socket;
     }
 
+    getConnectionStatus(): Connection {
+        return this.status.connection;
+    }
+
     setConnectionStatus(status: Connection): void {
         this.status.connection = status;
     }

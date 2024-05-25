@@ -5,11 +5,11 @@ export const BASE36 = 'js2gmdoknufxzpwqcb45liy013vra7et968h';
 
 export class Rand {
     /**
-     * Generates a high entropy random integer.
+     * Generates a cryptographically secure random integer.
      *
      * @param min - The minimum value (inclusive).
      * @param max - The maximum value (inclusive).
-     * @returns A random integer between min (inclusive) and max (inclusive).
+     * @returns An integer between min (inclusive) and max (inclusive).
      */
     static int(min: number = 0, max: number): number {
         return (

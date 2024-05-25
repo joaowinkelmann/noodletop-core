@@ -3,7 +3,7 @@ import { TeamManager } from './team';
 import { ObjectManager } from './object';
 import { Rand } from '../utils/randomizer';
 import { RoomSettings } from './dto/roomDTO';
-import { Role } from './dto/userDTO';
+import { Connection, Role } from './dto/userDTO';
 
 import { RoomDataManager } from '~/services/roomDataManager';
 import { Db } from '~/database';
@@ -178,6 +178,12 @@ export class Room {
 
     getUsers(): Set<User> {
         return this.users;
+    }
+
+    getActiveUsers(): Set<User> {
+        // return new Set(Array.from(this.users).filter((user) => user.getConnectionStatus()));
+        // return new Set(Array.from(this.users).filter((user) => user.getConnectionStatus() === Connection.Active));
+        return new Set(Array.from(this.users).filter((user) => user.getConnectionStatus() != Connection.Exited));
     }
 
     countUsers(): number {
