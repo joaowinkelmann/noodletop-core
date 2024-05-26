@@ -75,6 +75,7 @@ export class User {
     }
 
     setConnectionStatus(status: Connection): void {
+        global.log("User connection status changed to " + status);
         this.status.connection = status;
     }
 
@@ -115,12 +116,12 @@ export class User {
     userLeaveRoom(): void {
         global.log(`User ${this.username} left the room at ${new Date().toISOString()}`);
         this.status.last_seen = Date.now(); // keep this value so that we can remove the user if they don't come back after a while
-        this.status.connection = Connection.Away;
+        this.setConnectionStatus(Connection.Away);
     }
 
     // User has effectively left the room, we can safely remove them
     quitRoom(): void {
-        this.status.connection = Connection.Exited;
+        this.setConnectionStatus(Connection.Exited);
     }
 
     /**
@@ -146,6 +147,19 @@ export class User {
         } else {
             // handle invalid keys (perhaps a message informing the user)
         }
+    }
+
+    // Avatar related methods
+    getAvatar(): string {
+        return this.cosmetics.avatar;
+    }
+
+    setAvatar(avatar: string): void {
+        this.cosmetics.avatar = avatar;
+    }
+
+    removeAvatar(): void {
+        delete this.cosmetics.avatar;
     }
 
 }

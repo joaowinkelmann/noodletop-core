@@ -1,17 +1,32 @@
 import { User } from '../models/user';
+import { Connection } from '~/models/dto/userDTO';
 import { Room } from '../models/room';
 import { State } from '../models/state';
-import { Sweeper } from './sweeper';
+import { RoomSweeper } from './sweeper';
 // import { ObservableMap } from './observableMap';
 import { ServerWebSocket } from 'bun';
+import { WebSocketData } from './common';
+import { Rand } from './randomizer';
 
 // Class to manage the state of the user, room, and socket connections
 export class StateManager {
+    private static instance: StateManager;
+    private static instanceId: string = Rand.id(1);
 
-    public static rooms: Map<string, Room> = new Map();
-    public static stateMap: Map<ServerWebSocket<unknown>, State> = new Map();
+    public rooms: Map<string, Room> = new Map();
+    public stateMap: Map<ServerWebSocket<unknown>, State> = new Map();
 
-    public static createState(socket: ServerWebSocket<unknown>): State {
+    private constructor() {}
+
+    public static getInstance(): StateManager {
+        if (!StateManager.instance) {
+            StateManager.instance = new StateManager();
+            global.log(`Created new StateManager: ${StateManager.instanceId}`);
+        }
+        return StateManager.instance;
+    }
+
+    private createState(socket: ServerWebSocket<unknown>): State {
         const state: State = {
             status: 'ACK',
             roomCode: null,
@@ -20,52 +35,69 @@ export class StateManager {
 
         this.stateMap.set(socket, state);
 
+        StateManager.keepAlive(state);
+
         socket.send(`u ${state.user.getId()}`);
         socket.send('?ack');
         return state;
     }
 
-    public static getState(socket: ServerWebSocket<unknown>): State | undefined {
+    public getState(socket: ServerWebSocket<unknown>): State | undefined {
         const state: State = this.stateMap.get(socket) ?? undefined;
         if (state && state.roomCode) {
-            const room: Room = StateManager.getRoom(state.roomCode) as Room;
+            const room: Room = this.getRoom(state.roomCode) as Room;
             room.heartbeat(state.user);
         }
         return state;
     }
 
-    public static restoreState(socket: ServerWebSocket<unknown>, userId: string, roomCode: string): State | null {
-        const room: Room = StateManager.getRoom(roomCode) as Room;
+    /**
+     * Initializes the state for the given socket. Either by restoring it, or creating a new one.
+     * 
+     * @param socket - The server WebSocket instance.
+     */
+    public initState(socket: ServerWebSocket<WebSocketData>): void {
+        if (!this.restoreState(socket, socket.data.userId, socket.data.roomCode)) {
+            this.createState(socket);
+        }
+    }
+
+    private restoreState(newSocket: ServerWebSocket<unknown>, userId: string, roomCode: string): State | false {
+        const room: Room = this.getRoom(roomCode) as Room;
         if (!room) {
-            return null;
+            return false;
         }
         const user = room.getUserById(userId);
 
         if (!user) {
             global.log(`User ${userId} not found in room ${roomCode}`);
-            return null;
+            return false;
         }
 
-        // disconnect the old socket
+        // reassign the socket
         if (user.getSocket().readyState === WebSocket.OPEN) {
             user.getSocket().close(4007, 'User reconnected');
         }
+        user.setSocket(newSocket);
 
-        user.setSocket(socket);
-        return {
+        const state: State = {
             status: 'OK',
             roomCode,
             user
         };
+
+        StateManager.keepAlive(state);
+
+        return state;
     }
 
-    public static deleteState(socket: ServerWebSocket<unknown>): boolean {
-        return StateManager.stateMap.delete(socket);
+    public deleteState(socket: ServerWebSocket<unknown>): boolean {
+        return this.stateMap.delete(socket);
     }
 
     // check if a state received from the client is valid
-    public static isValidState(userId: string, roomCode: string): boolean {
-        const room = StateManager.getRoom(roomCode);
+    public isValidState(userId: string, roomCode: string): boolean {
+        const room = this.getRoom(roomCode);
         if (!room) {
             return false;
         }
@@ -79,45 +111,47 @@ export class StateManager {
     /**
      * Keeps the WebSocket connection alive by sending periodic ping messages.
      * If the WebSocket connection is closed, the interval is cleared.
-     * @param socket - The WebSocket connection.
+     *
+     * @param state - The state object containing the user and the socket.
      * @param interval - The interval in seconds between each ping message. Default is 30 seconds.
      */
-    public static keepAlive(socket: ServerWebSocket<unknown>, interval: number = 30) {
+    public static keepAlive(state: State, interval: number = 30) {
         const intervalId = setInterval(() => {
-            if (socket.readyState === WebSocket.OPEN) {
-                socket.ping();
+            if (state.user.getSocket().readyState === WebSocket.OPEN) {
+                state.user.getSocket().ping();
             } else {
+                // websocket was closed
+                if (state.user.getConnectionStatus() === Connection.Active) {
+                    state.user.setConnectionStatus(Connection.Away);
+                }
                 clearInterval(intervalId);
             }
         }, interval * 1000);
     }
 
-    public static createRoom(roomCode: string, creator: User): Room {
+    public createRoom(roomCode: string, creator: User): Room {
         const room = new Room(roomCode);
-        StateManager.rooms.set(roomCode, room);
+        this.rooms.set(roomCode, room);
 
         // Promote the user(creator) to admin, as they're the first to enter the room
         room.promoteToAdmin(creator);
 
-        // initialize the sweeper if it's the first room
-        if (StateManager.rooms.size === 1) {
-            Sweeper.sweepInactiveUsers();
-        }
+        RoomSweeper.startSweeping(parseInt(process.env.SWEEP_THRESHOLD_MINS), parseInt(process.env.SWEEP_INTERVAL_MINS));
 
         return room;
     }
 
     // queries and returns the rooms map into a JSON object
-    public static getRooms(): Map<string, Room>{
+    public getRooms(): Map<string, Room>{
         // const rooms = Array.from(StateManager.rooms.values());
         // return rooms.map((room) => JSON.stringify(room));
 
-        return StateManager.rooms;
+        return this.rooms;
     }
 
     // same as getRooms but for a single room
-    public static getRoom(roomCode: string): Room | undefined {
-        const room = StateManager.rooms.get(roomCode);
+    public getRoom(roomCode: string): Room | undefined {
+        const room = this.rooms.get(roomCode);
         // if (!room) {
         //     return "Room not found";
         // }

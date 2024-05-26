@@ -12,6 +12,7 @@ export interface UserCosmetics {
     // The user's current cosmetics
     color: string; // hex color '#RRGGBB'
     team?: string; // team id
+    avatar?: string; // base64 encoded image
 }
 
 export enum Connection {

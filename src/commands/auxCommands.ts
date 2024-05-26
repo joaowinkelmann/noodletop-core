@@ -13,11 +13,11 @@ export function auxCommands(state: State, message: string) {
             break;
         case '/listrooms':
             // response = StateManager.rooms;
-            response = StateManager.getRooms();
+            response = StateManager.getInstance().getRooms();
             break;
         case '/listroom':
             // response = StateManager.rooms;
-            response = StateManager.getRoom(op);
+            response = StateManager.getInstance().getRoom(op);
             break;
         default:
             response = 'Invalid command';

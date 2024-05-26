@@ -36,17 +36,10 @@ Bun.serve<WebSocketData>({
     websocket: {
         maxPayloadLength: 512 * 1024, // 512KB
         open(ws) {
-            let state;
-            if (ws.data.userId && ws.data.roomCode) {
-                state = StateManager.restoreState(ws, ws.data.userId, ws.data.roomCode);
-            }
-            if (!state) {
-                state = StateManager.createState(ws);
-            }
-            StateManager.keepAlive(ws);
+            StateManager.getInstance().initState(ws);
         },
         message(ws, message) {
-            const state = StateManager.getState(ws);
+            const state = StateManager.getInstance().getState(ws);
             const command = message.toString().split(' ')[0];
             let handler = commandHandlers[command];
 
@@ -60,7 +53,7 @@ Bun.serve<WebSocketData>({
             handler(state, message.toString());
         },
         close(ws, code, message) {
-            StateManager.deleteState(ws);
+            StateManager.getInstance().deleteState(ws);
         }
     },
     port: Number(process.env.PORT || 3000)

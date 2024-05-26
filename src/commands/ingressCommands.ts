@@ -42,11 +42,11 @@ export function ingressCommands(state: State, message: string) {
             return; // ignore the request
         }
 
-        if (!StateManager.rooms.has(roomCode)) {
+        if (!StateManager.getInstance().getRooms().has(roomCode)) {
             // room does not exist, so let's create it
-            StateManager.createRoom(roomCode, state.user);
+            StateManager.getInstance().createRoom(roomCode, state.user);
         } else {
-            const room: Room = StateManager.getRoom(roomCode) as Room;
+            const room: Room = StateManager.getInstance().getRoom(roomCode) as Room;
             if (!room.isAvaliable()) {
                 global.log('User wasn\'t able to join');
                 state.user.getSocket().send('Room isn\'t avaliable');
@@ -74,7 +74,7 @@ export function ingressCommands(state: State, message: string) {
 
         state.user.setUsername(username);
 
-        const room: Room = StateManager.getRoom(state.roomCode) as Room;
+        const room: Room = StateManager.getInstance().getRoom(state.roomCode) as Room;
         const user: User = state.user;
 
         // try to add the user into the room

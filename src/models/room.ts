@@ -6,7 +6,6 @@ import { RoomSettings } from './dto/roomDTO';
 import { Connection, Role } from './dto/userDTO';
 
 import { RoomDataManager } from '~/services/roomDataManager';
-import { Db } from '~/database';
 
 /**
  * Class representing a room, containing a set of users and objects.
@@ -87,7 +86,8 @@ export class Room {
             sessionId: this.sessionId,
             settings: this.settings,
             code: this.code,
-            userCount: this.countUsers(),
+            // userCount: this.countUsers(),
+            currentPlayers: this.countActiveUsers(),
             users: Array.from(this.users).map((user) => user.getUsername()),
             objects: this.objects.getAll(),
             status: this.status
@@ -172,7 +172,7 @@ export class Room {
         }
     }
 
-    private removeUser(user: User) {
+    public deleteUser(user: User) {
         this.users.delete(user);
     }
 
@@ -186,8 +186,16 @@ export class Room {
         return new Set(Array.from(this.users).filter((user) => user.getConnectionStatus() != Connection.Exited));
     }
 
+    getAwayUsers(): Set<User> {
+        return new Set(Array.from(this.users).filter((user) => user.getConnectionStatus() === Connection.Away));
+    }
+
     countUsers(): number {
         return this.users.size;
+    }
+
+    countActiveUsers(): number {
+        return this.getActiveUsers().size;
     }
 
     // Method to get a single user by its ID, used for recconecting a user back to a room
@@ -293,7 +301,7 @@ export class Room {
         }
     }
 
-    async save(close: boolean = false): Promise<string>{
+    async save(close: boolean = false): Promise<boolean>{
         // @todo - save to storage
         const ret = await RoomDataManager.saveRoom(this);
 
@@ -301,8 +309,10 @@ export class Room {
             this.status = 'closed';
         }
 
-        if (ret) {
-            return JSON.stringify({ message: 'Room saved successfully' });
-        }
+        // if (ret) {
+        //     return JSON.stringify({ message: 'Room saved successfully' });
+        // }
+
+        return ret;
     }
 }

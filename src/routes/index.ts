@@ -34,7 +34,7 @@ let routes: RouteInterface[];
  */
 export async function loadRoutes(): Promise<RouteInterface[]> {
     // console.warn("loadRoutes called")
-    global.log('Started loading routes...');
+    global.log(`→ Started loading routes...`);
     const routesDir = path.join(__dirname, '');
     const foundRoutes: RouteInterface[] = [];
 
@@ -57,7 +57,7 @@ export async function loadRoutes(): Promise<RouteInterface[]> {
                         }
 
                         foundRoutes.push(route);
-                        global.log(`Loaded ${methodColors[route.method]}${route.method.toUpperCase()}${shCss.end} ${shCss.bold}${route.pathRegex}${shCss.end}`);
+                        global.log(`\tLoaded ${methodColors[route.method]}${route.method.toUpperCase()}${shCss.end} ${shCss.bold}${route.pathRegex}${shCss.end}`);
 
                     }).catch((error) => {
                         console.error(`Failed to import route from ${fullPath}: ${error} - ${error.stack}`);
@@ -73,7 +73,7 @@ export async function loadRoutes(): Promise<RouteInterface[]> {
         await loadDir(routesDir);
         routes = foundRoutes;
     }
-    global.log('Route loading finished!');
+    global.log(`→ Route loading finished!`);
     return routes;
 }
 
