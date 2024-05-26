@@ -13,10 +13,18 @@ export class StateManager {
     private static instance: StateManager;
     private static instanceId: string = Rand.id(1);
 
+    // array of suspicious ip addresses
+    // private static ipBlocklist: string[] = [];
+    // map of suspicious ip addresses and the date they were added
+    private static ipBlocklist: Map<string, Date> = new Map();
+
     public rooms: Map<string, Room> = new Map();
     public stateMap: Map<ServerWebSocket<unknown>, State> = new Map();
 
-    private constructor() {}
+    private constructor() {
+        // testing: adding localhost as a blocked ip
+        // StateManager.ipBlocklist.set("::ffff:127.0.0.1", new Date());
+    }
 
     public static getInstance(): StateManager {
         if (!StateManager.instance) {
@@ -57,6 +65,22 @@ export class StateManager {
      * @param socket - The server WebSocket instance.
      */
     public initState(socket: ServerWebSocket<WebSocketData>): void {
+        // check the received ip from WebSocketData
+        // const ip = socket.data.ip;
+        // if (!ip) {
+        //     global.log("IP not found");
+        // }
+
+        global.log(`Blocked IPs: ${JSON.stringify(StateManager.ipBlocklist.values())}`)
+        global.log(`IP: ${socket.data.ip}`);
+
+        // if (StateManager.ipBlocklist.includes(socket.data.ip)) {
+        if (StateManager.ipBlocklist.has(socket.data.ip)) {
+            global.log(`Blocked IP: ${socket.data.ip}`);
+            socket.close(4003, 'Blocked IP');
+            return;
+        }
+
         if (!this.restoreState(socket, socket.data.userId, socket.data.roomCode)) {
             this.createState(socket);
         }
@@ -161,5 +185,13 @@ export class StateManager {
             return undefined;
         }
         return room;
+    }
+
+    public authUser(roomCode: string, userId: string, password: string): boolean {
+        const room = this.getRoom(roomCode) as Room;
+        if (!room) {
+            return false;
+        }
+        return room.checkPassword(userId, password);
     }
 }

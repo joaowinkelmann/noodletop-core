@@ -5,7 +5,8 @@ export type State = {
     // 2nd State: ROOM -> User must enter a room code
     // 3rd State: NAME -> User must enter a username
     // 4th State: OK   -> User is connected.
-    status: 'ACK' |'ROOM' | 'NAME' | 'OK';
+    // Optional: RPWD  -> User must enter a room password
+    status: 'ACK' |'ROOM' | 'RPWD' | 'NAME' | 'OK';
     roomCode: string;
     user: User;
 };

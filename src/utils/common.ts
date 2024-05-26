@@ -16,10 +16,12 @@ export function isJSON(str: string): boolean {
  * Represents the data structure for WebSocket communication and reconnecting.
  * @roomCode - The room code.
  * @userId - The connected user's ID.
+ * @ip - The IP address of the connected user.
  */
 export type WebSocketData = {
     roomCode: string | null;
     userId: string | null;
+    ip: string;
 };
 
 /**

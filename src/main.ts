@@ -18,7 +18,8 @@ Bun.serve<WebSocketData>({
             server.upgrade(req, {
                 data: {
                     roomCode: room,
-                    userId: user
+                    userId: user,
+                    ip: this.requestIP(req).address
                 }
             });
         } else if (pathname.startsWith('/api/')) {
