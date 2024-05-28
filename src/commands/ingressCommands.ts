@@ -72,6 +72,26 @@ export function ingressCommands(state: State, message: string) {
             break;
         case "RPWD": // Room Password
 
+            // const room: Room = StateManager.getInstance().getRoom(roomCode) as Room;
+
+            // if (room.authenticate(state.user, message.trim())) {
+            //     state.status = 'NAME'; // user is now being asked to enter a username
+            //     response = '?name'; // ask the user to enter a username
+            // } else {
+            //     state.user.getSocket().send('Invalid password');
+            //     state.user.getSocket().send('?pass');
+            // }
+            if (StateManager.getInstance().authUser(state.roomCode, state, message.trim())) {
+                state.status = 'NAME'; // user is now being asked to enter a username
+                response = '?name'; // ask the user to enter a username
+            } else {
+                state.user.getSocket().send('{err: "Invalid password"}');
+                state.user.getSocket().send('?pass');
+            }
+
+
+            break;
+
 
         case 'NAME':
             // user is answering a prompt to enter a username, so let's understand the sent message as the username

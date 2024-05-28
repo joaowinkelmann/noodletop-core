@@ -317,6 +317,11 @@ export class Room {
         return ret;
     }
 
+    setPassword(password: string): void {
+        this.settings.password = password;
+        global.log(`Room ${this.code} is now password protected`);
+    }
+
     public isPasswordProtected(): boolean {
         return !!this.settings.password;
     }

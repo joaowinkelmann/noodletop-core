@@ -17,10 +17,19 @@ export class RoomSweeper {
 
     static isInitialized = false;
 
-    public static startSweeping(thresholdMins: number = 40, retaskMins: number = 30): void {
+    /**
+     * Starts the sweeping process to check for inactive rooms and perform necessary actions.
+     * @env SWEEP_THRESHOLD_MINS - The threshold in minutes to consider a user as inactive. Default is 40 minutes.
+     * @env SWEEP_INTERVAL_MINS - The interval in minutes to perform the sweeping. Default is 30 minutes.
+     */
+    public static startSweeping(): void {
         if (this.isInitialized) {
             return;
         }
+
+        // try to get from env, if it's not 0, otherwise use the default values
+        const thresholdMins: number = parseInt(process.env.SWEEP_THRESHOLD_MINS) || 40;
+        const retaskMins: number = parseInt(process.env.SWEEP_INTERVAL_MINS) || 30;
 
         this.checkUserActivity(thresholdMins, retaskMins);
         this.sweepInactiveRooms(thresholdMins, retaskMins);

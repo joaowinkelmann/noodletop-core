@@ -2,16 +2,17 @@ import { ServerWebSocket } from 'bun';
 import { Rand } from '~/utils/randomizer';
 import { UserStatus, UserCosmetics, Connection, Role } from '~/models/dto/userDTO';
 import { ObjectManager } from './object';
+import { WebSocketData } from '~/utils/common';
 
 export class User {
-    socket: ServerWebSocket<unknown>;
+    socket: ServerWebSocket<WebSocketData>;
     username: string;
     id: string = Rand.id(56);
     role: Role;
     status: UserStatus;
     cosmetics: UserCosmetics;
 
-    constructor(socket: ServerWebSocket<unknown>) {
+    constructor(socket: ServerWebSocket<WebSocketData>) {
         this.socket = socket;
         this.status = {
             connection: Connection.Active,
@@ -62,11 +63,11 @@ export class User {
         return this.status.last_seen;
     }
 
-    getSocket(): ServerWebSocket<unknown> {
+    getSocket(): ServerWebSocket<WebSocketData> {
         return this.socket;
     }
 
-    setSocket(socket: ServerWebSocket<unknown>): void {
+    setSocket(socket: ServerWebSocket<WebSocketData>): void {
         this.socket = socket;
     }
 

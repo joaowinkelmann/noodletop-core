@@ -16,10 +16,10 @@ export class StateManager {
     // array of suspicious ip addresses
     // private static ipBlocklist: string[] = [];
     // map of suspicious ip addresses and the date they were added
-    private static ipBlocklist: Map<string, Date> = new Map();
+    private static ipBlocklist: Map<string, [Date, number]> = new Map(); // Map<ip, [date, strikes]>
 
     public rooms: Map<string, Room> = new Map();
-    public stateMap: Map<ServerWebSocket<unknown>, State> = new Map();
+    public stateMap: Map<ServerWebSocket<WebSocketData>, State> = new Map();
 
     private constructor() {
         // testing: adding localhost as a blocked ip
@@ -34,7 +34,7 @@ export class StateManager {
         return StateManager.instance;
     }
 
-    private createState(socket: ServerWebSocket<unknown>): State {
+    private createState(socket: ServerWebSocket<WebSocketData>): State {
         const state: State = {
             status: 'ACK',
             roomCode: null,
@@ -50,7 +50,7 @@ export class StateManager {
         return state;
     }
 
-    public getState(socket: ServerWebSocket<unknown>): State | undefined {
+    public getState(socket: ServerWebSocket<WebSocketData>): State | undefined {
         const state: State = this.stateMap.get(socket) ?? undefined;
         if (state && state.roomCode) {
             const room: Room = this.getRoom(state.roomCode) as Room;
@@ -75,7 +75,7 @@ export class StateManager {
         global.log(`IP: ${socket.data.ip}`);
 
         // if (StateManager.ipBlocklist.includes(socket.data.ip)) {
-        if (StateManager.ipBlocklist.has(socket.data.ip)) {
+        if (StateManager.ipBlocklist.has(socket.data.ip) && StateManager.ipBlocklist.get(socket.data.ip)[0] > new Date(new Date().getTime() - 1000 * 60 * 60)) {
             global.log(`Blocked IP: ${socket.data.ip}`);
             socket.close(4003, 'Blocked IP');
             return;
@@ -86,7 +86,7 @@ export class StateManager {
         }
     }
 
-    private restoreState(newSocket: ServerWebSocket<unknown>, userId: string, roomCode: string): State | false {
+    private restoreState(newSocket: ServerWebSocket<WebSocketData>, userId: string, roomCode: string): State | false {
         const room: Room = this.getRoom(roomCode) as Room;
         if (!room) {
             return false;
@@ -115,7 +115,7 @@ export class StateManager {
         return state;
     }
 
-    public deleteState(socket: ServerWebSocket<unknown>): boolean {
+    public deleteState(socket: ServerWebSocket<WebSocketData>): boolean {
         return this.stateMap.delete(socket);
     }
 
@@ -159,8 +159,8 @@ export class StateManager {
 
         // Promote the user(creator) to admin, as they're the first to enter the room
         room.promoteToAdmin(creator);
-
-        RoomSweeper.startSweeping(parseInt(process.env.SWEEP_THRESHOLD_MINS), parseInt(process.env.SWEEP_INTERVAL_MINS));
+        
+        RoomSweeper.startSweeping();
 
         return room;
     }
@@ -187,11 +187,43 @@ export class StateManager {
         return room;
     }
 
-    public authUser(roomCode: string, userId: string, password: string): boolean {
+    public authUser(roomCode: string, state: State, password: string): boolean {
         const room = this.getRoom(roomCode) as Room;
+        const userId = state.user.getId();
         if (!room) {
             return false;
         }
-        return room.checkPassword(userId, password);
+        // return room.checkPassword(userId, password);
+
+        // check agains the room password, if it's not correct, add a strike to the ip
+        if (!room.checkPassword(password)) {
+            // const ip = socket.data.ip;
+            // if (!StateManager.ipBlocklist.includes(ip)) {
+            //     StateManager.ipBlocklist.push(ip);
+            // }
+            // StateManager.ipBlocklist.set(ip, new Date());
+            // return false;
+            const ip = state.user.getSocket().data.ip;
+            if (StateManager.ipBlocklist.has(ip)) {
+                const [date, strikes] = StateManager.ipBlocklist.get(ip);
+                StateManager.ipBlocklist.set(ip, [date, strikes + 1]);
+                global.log(`IP ${ip} has ${strikes + 1} strikes`);
+                // if (strikes + 1 >= 3) {
+                if (strikes + 1 >= (parseInt(process.env.ALLOWED_STRIKES) || 10)) {
+                    // che
+                    // set the date to the current date
+                    StateManager.ipBlocklist.set(ip, [new Date(), strikes]);
+                    global.log(`Blocked IP: ${ip}`);
+                    state.user.getSocket().close(4003, 'Blocked IP');
+                }
+            } else {
+                StateManager.ipBlocklist.set(ip, [new Date(), 1]);
+            }
+            return false;
+        } else {
+            // remove the ip from the blocklist
+            StateManager.ipBlocklist.delete(state.user.getSocket().data.ip);
+            return true;
+        }
     }
 }

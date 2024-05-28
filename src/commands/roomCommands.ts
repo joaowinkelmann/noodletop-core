@@ -42,6 +42,9 @@ export async function roomCommands(state: State, message: string) {
             response = await room.save();
             console.log(response);
             break;
+        case 'setpassword':
+            response = room.setPassword(argArr[0]);
+            break;
         default:
             response = 'Invalid operation';
             break;
