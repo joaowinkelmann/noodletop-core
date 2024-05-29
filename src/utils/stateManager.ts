@@ -188,42 +188,36 @@ export class StateManager {
     }
 
     public authUser(roomCode: string, state: State, password: string): boolean {
-        const room = this.getRoom(roomCode) as Room;
-        const userId = state.user.getId();
-        if (!room) {
-            return false;
-        }
-        // return room.checkPassword(userId, password);
-
-        // check agains the room password, if it's not correct, add a strike to the ip
-        if (!room.checkPassword(password)) {
-            // const ip = socket.data.ip;
-            // if (!StateManager.ipBlocklist.includes(ip)) {
-            //     StateManager.ipBlocklist.push(ip);
-            // }
-            // StateManager.ipBlocklist.set(ip, new Date());
-            // return false;
-            const ip = state.user.getSocket().data.ip;
-            if (StateManager.ipBlocklist.has(ip)) {
-                const [date, strikes] = StateManager.ipBlocklist.get(ip);
-                StateManager.ipBlocklist.set(ip, [date, strikes + 1]);
-                global.log(`IP ${ip} has ${strikes + 1} strikes`);
-                // if (strikes + 1 >= 3) {
-                if (strikes + 1 >= (parseInt(process.env.ALLOWED_STRIKES) || 10)) {
-                    // che
-                    // set the date to the current date
-                    StateManager.ipBlocklist.set(ip, [new Date(), strikes]);
-                    global.log(`Blocked IP: ${ip}`);
-                    state.user.getSocket().close(4003, 'Blocked IP');
-                }
-            } else {
-                StateManager.ipBlocklist.set(ip, [new Date(), 1]);
-            }
+        const room = this.getRoom(roomCode);
+        if (!room || !room.checkPassword(password)) {
+            this.blockIP(state);
             return false;
         } else {
-            // remove the ip from the blocklist
-            StateManager.ipBlocklist.delete(state.user.getSocket().data.ip);
+            this.unblockIP(state);
             return true;
         }
+    }
+    
+    private blockIP(state: State): void {
+        const lockoutMins = parseInt(process.env.LOCKOUT_DURATION) || 60;
+        const allowedStrikes = parseInt(process.env.ALLOWED_STRIKES) || 10;
+        const ipInfo = StateManager.ipBlocklist.get(state.user.getSocket().data.ip);
+        const [blockedAt, strikes] = ipInfo ? ipInfo : [null, 0];
+    
+        if (blockedAt && blockedAt > new Date(new Date().getTime() - 1000 * 60 * lockoutMins)) {
+            if (strikes + 1 >= allowedStrikes) {
+                state.user.getSocket().close(4003, 'Blocked IP');
+                global.log(`IP ${state.user.getSocket().data.ip} has been blocked. ${allowedStrikes} strikes reached.\nBlocked at: ${blockedAt}\nFree at: ${new Date(new Date().getTime() + 1000 * 60 * lockoutMins)}`);
+            } else {
+                StateManager.ipBlocklist.set(state.user.getSocket().data.ip, [blockedAt, strikes + 1]);
+                global.log(`IP ${state.user.getSocket().data.ip} has ${strikes + 1} strikes`);
+            }
+        } else {
+            StateManager.ipBlocklist.set(state.user.getSocket().data.ip, [new Date(), 1]);
+        }
+    }
+    
+    private unblockIP(state: State): void {
+        StateManager.ipBlocklist.delete(state.user.getSocket().data.ip);
     }
 }

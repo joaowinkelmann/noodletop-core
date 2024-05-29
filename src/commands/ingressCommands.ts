@@ -18,6 +18,9 @@ export function ingressCommands(state: State, message: string) {
         case 'ACK':
             // user is answering a prompt to enter an ACK, so let's understand the sent message as the user id
             const id = message.trim();
+            if (!id) {
+                return; // ignore the request
+            }
 
             if (id !== state.user.getId()) {
                 // @todo - Handle as error in the future.
