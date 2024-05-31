@@ -5,7 +5,7 @@ import { isAdmin } from '~/utils/common';
 
 export async function roomCommands(state: State, message: string) {
     const [command , op, ...args] = message.split(' ');
-    const room: Room = StateManager.getRoom(state.roomCode) as Room;
+    const room: Room = StateManager.getInstance().getRoom(state.roomCode) as Room;
     if (!room) return;
 
     let response = null;
@@ -41,6 +41,9 @@ export async function roomCommands(state: State, message: string) {
         case 'save':
             response = await room.save();
             console.log(response);
+            break;
+        case 'setpassword':
+            response = room.setPassword(argArr[0]);
             break;
         default:
             response = 'Invalid operation';

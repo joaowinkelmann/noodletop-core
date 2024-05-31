@@ -6,7 +6,7 @@ import { isAdmin } from '~/utils/common';
 export function teamCommands(state: State, message: string) {
     const [command , op, ...args] = message.split(' ');
 
-    const room: Room = StateManager.getRoom(state.roomCode) as Room;
+    const room: Room = StateManager.getInstance().getRoom(state.roomCode) as Room;
     if (!room) return;
 
     let response = null;

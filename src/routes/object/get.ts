@@ -14,11 +14,11 @@ export const route: RouteInterface = {
         }
 
         // check the provided state
-        if (!StateManager.isValidState(userId, roomCode)) {
+        if (!StateManager.getInstance().isValidState(userId, roomCode)) {
             return new Response('Invalid state', { status: 400 });
         }
 
-        const room = StateManager.getRoom(roomCode) as Room;
+        const room = StateManager.getInstance().getRoom(roomCode) as Room;
 
         if (!room) {
             return new Response('Room not found', { status: 404 });

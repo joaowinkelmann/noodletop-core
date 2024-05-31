@@ -11,7 +11,7 @@ import { Room } from '~/models/room';
 export function connectionCommands(state: State, message: string) {
     const [command , op, ...args] = message.split(' ');
 
-    const room: Room = StateManager.getRoom(state.roomCode); // get the room
+    const room: Room = StateManager.getInstance().getRoom(state.roomCode); // get the room
 
     switch (command) {
         case '/quit':
