@@ -19,6 +19,9 @@ export function auxCommands(state: State, message: string) {
             // response = StateManager.rooms;
             response = StateManager.getInstance().getRoom(op);
             break;
+        case '/ping':
+            response = 'pong';
+            break;
         default:
             response = 'Invalid command';
             break;
