@@ -15,13 +15,16 @@ Bun.serve<WebSocketData>({
 
         if (pathname.startsWith('/ws/')) {
             const [user, room] = parseHeaders(req.headers);
-            server.upgrade(req, {
+            const success = server.upgrade(req, {
                 data: {
                     roomCode: room,
                     userId: user,
                     ip: this.requestIP(req).address
                 }
             });
+            if (!success) {
+                return Response.redirect("/");
+            }
         } else if (pathname.startsWith('/api/')) {
             const route = routes.find((route) => new RegExp(route.pathRegex).test(pathname));
 
@@ -31,7 +34,7 @@ Bun.serve<WebSocketData>({
                 return new Response('Not Found', { status: 404 });
             }
         } else {
-            return new Response('Bad Request', { status: 400 });
+            return Response.redirect("/");
         }
     },
     websocket: {
