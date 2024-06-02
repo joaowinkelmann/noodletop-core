@@ -2,14 +2,25 @@ import { State } from '~/models/state';
 import { StateManager } from '~/utils/stateManager';
 import { Room } from '~/models/room';
 
+export const listeners = [
+    '/quit',
+    '/leave'
+];
+
+export const helpString = [
+    '/quit - Willingly disconnect from the room.',
+    '/leave - Leave the room temporarily, simulating the loss of connection.',
+    '/ping - Pong! Used to test latency while using a client.'
+];
+
 /**
  * Manages an already established connection.
  * @param state
  * @param message
  * @returns
  */
-export function connectionCommands(state: State, message: string) {
-    const [command , op, ...args] = message.split(' ');
+export default function connection(state: State, input: string) {
+    const [command , op, ...args] = input.split(' ');
 
     const room: Room = StateManager.getInstance().getRoom(state.roomCode); // get the room
 
@@ -20,6 +31,9 @@ export function connectionCommands(state: State, message: string) {
         case '/leave':
             state.user.userLeaveRoom(); // set away status
             room.disconnectUser(state.user, false, 4100, '/leave');
+            break;
+        case '/ping':
+            state.user.getSocket().send('pong');
             break;
         default:
             break;

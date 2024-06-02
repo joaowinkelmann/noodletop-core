@@ -1,8 +1,12 @@
 import { State } from '~/models/state';
 import { Rand } from '~/utils/randomizer';
 
-export function debugCommands(state: State, message: string) {
-    const [command , op, ...args] = message.split(' ');
+export const listeners = [
+    '/debug'
+];
+
+export default function debug(state: State, input: string) {
+    const [command , op, ...args] = input.split(' ');
 
     let response = null;
 
@@ -10,6 +14,7 @@ export function debugCommands(state: State, message: string) {
         case 'dateFromId':
             const idString = args[0];
             response = String(Rand.dateFromId(idString));
+            response += `\nUnix: ${Rand.dateFromId(idString).getTime()}`;
             break;
         case 'getId':
             const length = parseInt(args[0], 10);

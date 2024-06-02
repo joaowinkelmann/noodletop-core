@@ -1,10 +1,12 @@
 import { StateManager } from './utils/stateManager';
 import { parseHeaders, shCss, WebSocketData } from './utils/common';
-import { commandHandlers } from './commands';
 
 global.log = (msg) => {
     console.log(msg); // Uncomment this line to enable logging
 };
+
+import { loadCommandHandlers } from './commands';
+const commandHandlers = await loadCommandHandlers();
 
 import { loadRoutes } from './routes';
 const routes = await loadRoutes();
@@ -62,4 +64,4 @@ Bun.serve<WebSocketData>({
     },
     port: Number(process.env.PORT || 3000)
 });
-console.log(`🚀 App avaliable on port ${shCss.green}${(process.env.PORT || 3000)}${shCss.end}\n`);
+console.log(`\n🚀 App avaliable on port ${shCss.cyan}${shCss.underline}${(process.env.PORT || 3000)}${shCss.end}\n`);

@@ -2,7 +2,17 @@ import { State } from '~/models/state';
 import { StateManager } from '~/utils/stateManager';
 import { Room } from '~/models/room';
 import { User } from '~/models/user';
-import { commandHandlers } from '.';
+// import { commandHandlers } from '.'; // todo, check if this wont break if we load the commands dynamically
+// import'./messageCmd';
+// import the default export from messageCmd.ts
+import message from './messageCmd';
+
+export const listeners = [
+    '/ingress'
+];
+
+// export const helpString = '/ingress - Manages a newly formed incoming connection, with the objetive of getting a state into the "OK" status.';
+export const helpString = false; // ingress is an internally managed command, so there's no need to expose it to the user
 
 /**
  * Manages a newly formed incoming connection, with the objetive of getting a state into the "OK" status.
@@ -10,14 +20,14 @@ import { commandHandlers } from '.';
  * @param message
  * @returns
  */
-export function ingressCommands(state: State, message: string) {
-    const [command , op, ...args] = message.split(' ');
+export default function ingress(state: State, input: string) {
+    const [command , op, ...args] = input.split(' ');
 
     let response = null;
     switch (state.status) {
         case 'ACK':
             // user is answering a prompt to enter an ACK, so let's understand the sent message as the user id
-            const id = message.trim();
+            const id = input.trim();
             if (!id) {
                 return; // ignore the request
             }
@@ -36,7 +46,7 @@ export function ingressCommands(state: State, message: string) {
 
         case 'ROOM':
             // user is answering a prompt to enter a room, so let's understand the sent message as the roomCode
-            const roomCode = message.trim().toLowerCase();
+            const roomCode = input.trim().toLowerCase();
 
             // roomCode validation
             if (roomCode.length < 3) {
@@ -84,7 +94,7 @@ export function ingressCommands(state: State, message: string) {
             //     state.user.getSocket().send('Invalid password');
             //     state.user.getSocket().send('?pass');
             // }
-            if (StateManager.getInstance().authUser(state.roomCode, state, message.trim())) {
+            if (StateManager.getInstance().authUser(state.roomCode, state, input.trim())) {
                 state.status = 'NAME'; // user is now being asked to enter a username
                 response = '?name'; // ask the user to enter a username
             } else {
@@ -98,7 +108,7 @@ export function ingressCommands(state: State, message: string) {
 
         case 'NAME':
             // user is answering a prompt to enter a username, so let's understand the sent message as the username
-            const username = message.trim();
+            const username = input.trim();
 
             // username validation
             if (username.length < 5) {
@@ -135,8 +145,9 @@ export function ingressCommands(state: State, message: string) {
             break;
         
         case 'OK':
-            const handler = commandHandlers['/message'];
-            handler(state, message);
+            // const handler = commandHandlers['/message'];
+            // handler(state, message);
+            message(state, input);
         default:
             // state.status = 'ACK'; // user is being asked to enter an ACK
             state.user.getSocket().close(4003, 'Invalid state');

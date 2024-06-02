@@ -3,8 +3,14 @@ import { StateManager } from '~/utils/stateManager';
 import { State } from '~/models/state';
 import { isAdmin } from '~/utils/common';
 
-export function teamCommands(state: State, message: string) {
-    const [command , op, ...args] = message.split(' ');
+export const listeners = [
+    '/team'
+];
+
+export const helpString = '/team - Perform operations with teams. Usage: /team [create|join|leave|list] [teamName]';
+
+export default function team(state: State, input: string) {
+    const [command , op, ...args] = input.split(' ');
 
     const room: Room = StateManager.getInstance().getRoom(state.roomCode) as Room;
     if (!room) return;

@@ -1,6 +1,7 @@
 import { Room } from '~/models/room';
 import { StateManager } from './stateManager';
 import { Connection } from '~/models/dto/userDTO';
+import { shCss } from './common';
 
 // Class containing tasks to remove inactive instances
 export class RoomSweeper {
@@ -43,7 +44,7 @@ export class RoomSweeper {
      * @param retaskMins - The interval in minutes to perform the sweeping. Default is 30 minutes.
      */
     private static checkUserActivity(thresholdMins: number = 40, retaskMins: number = 30): void {
-        global.log(`→ Active Task → Checking user activity every ${retaskMins} minutes. Threshold: ${thresholdMins} minutes.`);
+        global.log(`${shCss.magenta}→ Active Task → Checking user activity every ${retaskMins} minutes. Threshold: ${thresholdMins} minutes.${shCss.end}`);
         setInterval(() => {
             const rooms: Map<string, Room> = StateManager.getInstance().getRooms();
             const now = Date.now();
@@ -72,7 +73,7 @@ export class RoomSweeper {
 
     // task que verifica se os usuarios ja estão fora da sala por um tempo consideravel e so tem exited. nesse caso, salvamos o que restou da sala e passamos o fumo
     private static sweepInactiveRooms(thresholdMins: number = 40, retaskMins: number = 30): void {
-        global.log(`→ Active Task → Sweeping inactive rooms every ${retaskMins} minutes. Threshold: ${thresholdMins} minutes.`);
+        global.log(`${shCss.magenta}→ Active Task → Sweeping inactive rooms every ${retaskMins} minutes. Threshold: ${thresholdMins} minutes.${shCss.end}`);
         setInterval(() => {
             const rooms: Map<string, Room> = StateManager.getInstance().getRooms();
             const now = Date.now();

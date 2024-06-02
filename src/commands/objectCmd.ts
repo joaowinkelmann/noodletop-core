@@ -3,8 +3,14 @@ import { StateManager } from '~/utils/stateManager';
 import { State } from '~/models/state';
 import { isJSON, isAdmin } from '~/utils/common';
 
-export function objectCommands(state: State, message: string) {
-    const [command, op, ...args] = message.split(' ');
+export const listeners = [
+    '/obj'
+];
+
+export const helpString = '/obj - Manages objects in the room.';
+
+export default function object(state: State, input: string) {
+    const [command, op, ...args] = input.split(' ');
 
     const room: Room = StateManager.getInstance().getRoom(state.roomCode) as Room;
     if (!room) return;
@@ -60,7 +66,7 @@ export function objectCommands(state: State, message: string) {
                 type = args[1];
                 // minify the json string after the type, because we could have something like "type" {"key": "value"}
                 const minifiedJson = args.slice(1).join(' ');
-                console.log(minifiedJson);
+                // console.log(minifiedJson);
                 if (isJSON(minifiedJson) === false) {
                     response = 'Invalid JSON properties';
                     break;

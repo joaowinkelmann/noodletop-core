@@ -1,37 +1,35 @@
-import { roomCommands } from './roomCommands';
-import { userCommands } from './userCommands';
-import { connectionCommands } from './connectionCommands';
-import { messageCommands } from './messageCommands';
-import { ingressCommands } from './ingressCommands';
-import { objectCommands } from './objectCommands';
-import { teamCommands } from './teamCommands';
-import { debugCommands } from './debugCommands';
-import { helpCommands } from './helpCommands';
-import { auxCommands } from './auxCommands';
+import { shCss } from "~/utils/common";
 
 export interface CommandHandler {
-    [key: string]: (state: any, message: string) => void;
+    [command: string]: (state: any, message: string) => void;
 }
 
 /**
- * Handles commands sent in by the user.
- * @parms {object} state - The current state of the user.
- * @parms {string} message - The raw given input.
+ * Loads the command handlers from the commands directory.
+ * @returns A promise that resolves to an object containing the loaded command handlers.
  */
-export const commandHandlers: CommandHandler = {
-    '/room': roomCommands,
-    '/user': userCommands,
-    '/obj': objectCommands,
-    '/team': teamCommands,
-    '/ingress': ingressCommands,
-    '/message': messageCommands,
-    '/quit': connectionCommands,
-    '/leave': connectionCommands,
-    '/debug': debugCommands,
-    '/help': helpCommands,
-    '/roll': auxCommands,
-    '/listroom': auxCommands,
-    '/listrooms': auxCommands,
-    '/ping': auxCommands,
-    // map other command handlers here...
-};
+export async function loadCommandHandlers(): Promise<CommandHandler> {
+    const commandHandlers: CommandHandler = {};
+    const fs = require('fs');
+    const path = require('path');
+    const commandsDir = path.join(__dirname, './');
+    const files = fs.readdirSync(commandsDir);
+
+    global.log(`→ Started loading command handlers...`);
+    for (const file of files) {
+        if (file !== 'index.ts') {
+            const module = await import(`./${file}`);
+            const { listeners, default: mainHandler } = module;
+            if (listeners && mainHandler) {
+                for (const listener of listeners) {
+                    // listener -> '/message' = handler -> 'function message()'
+                    commandHandlers[listener] = mainHandler;
+                }
+                global.log(`\tLoaded ${listeners.map((l) => `${shCss.cyan}${l}${shCss.end}`).join(', ')} @ ${shCss.bold}${file}${shCss.end}`);
+            }
+        }
+    }
+    global.log(`${shCss.green}→ Finished loading command handlers!${shCss.end}`);
+
+    return commandHandlers;
+}

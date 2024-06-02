@@ -3,8 +3,14 @@ import { StateManager } from '~/utils/stateManager';
 import { State } from '~/models/state';
 import { isAdmin } from '~/utils/common';
 
-export async function roomCommands(state: State, message: string) {
-    const [command , op, ...args] = message.split(' ');
+export const listeners = [
+    '/room'
+];
+
+export const helpString = '/room - Perform operations within the room. Usage: /room [set|close|info|list|kick] [username]';
+
+export default async function room(state: State, input: string) {
+    const [command , op, ...args] = input.split(' ');
     const room: Room = StateManager.getInstance().getRoom(state.roomCode) as Room;
     if (!room) return;
 

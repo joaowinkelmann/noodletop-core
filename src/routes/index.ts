@@ -73,7 +73,7 @@ export async function loadRoutes(): Promise<RouteInterface[]> {
         await loadDir(routesDir);
         routes = foundRoutes;
     }
-    global.log(`→ Route loading finished!`);
+    global.log(`${shCss.green}→ Route loading finished!${shCss.end}`);
     return routes;
 }
 
