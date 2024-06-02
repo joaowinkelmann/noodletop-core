@@ -8,7 +8,7 @@ export interface CommandHandler {
  * Loads the command handlers from the commands directory.
  * @returns A promise that resolves to an object containing the loaded command handlers.
  */
-export async function loadCommandHandlers(): Promise<CommandHandler> {
+export async function loadCommands(): Promise<CommandHandler> {
     const commandHandlers: CommandHandler = {};
     const fs = require('fs');
     const path = require('path');

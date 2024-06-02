@@ -5,8 +5,8 @@ global.log = (msg) => {
     console.log(msg); // Uncomment this line to enable logging
 };
 
-import { loadCommandHandlers } from './commands';
-const commandHandlers = await loadCommandHandlers();
+import { loadCommands } from './commands';
+const commands = await loadCommands();
 
 import { loadRoutes } from './routes';
 const routes = await loadRoutes();
@@ -47,13 +47,13 @@ Bun.serve<WebSocketData>({
         message(ws, message) {
             const state = StateManager.getInstance().getState(ws);
             const command = message.toString().split(' ')[0];
-            let handler = commandHandlers[command];
+            let handler = commands[command];
 
             if (state.status !== 'OK' && command !== '/ping') {
-                handler = commandHandlers['/ingress'];
+                handler = commands['/ingress'];
             } else {
                 if (!handler) {
-                    handler = commandHandlers['/message'];
+                    handler = commands['/message'];
                 }
             }
             handler(state, message.toString());
