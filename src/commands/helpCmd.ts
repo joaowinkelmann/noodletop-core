@@ -15,7 +15,7 @@ export default async function help(state: State, input: string) {
     const files = fs.readdirSync(commandsDir);
 
     for (const file of files) {
-        if (file.endsWith('Commands.ts') && file !== 'index.ts') {
+        if (file !== 'index.ts') {
             const { helpString } = await import(`./${file}`);
             if (helpString) {
                 if (Array.isArray(helpString)) {
