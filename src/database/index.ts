@@ -26,11 +26,11 @@ export class Db {
     }
 
     async connect() {
-        await this.adapter.connect();
+        await await this.adapter.connect();
     }
 
     async disconnect() {
-        await this.adapter.disconnect();
+        await await this.adapter.disconnect();
     }
 
     // create
@@ -40,26 +40,26 @@ export class Db {
 
     // read
     async getOne(collection: string, query: object) {
-        return this.adapter.getOne(collection, query);
+        return await this.adapter.getOne(collection, query);
     }
 
     async getMany(collection: string, query: object) {
-        return this.adapter.getMany(collection, query);
+        return await this.adapter.getMany(collection, query);
     }
 
     // update
     async modOne(collection: string, query: object, update: object) {
-        return this.adapter.modOne(collection, query, update);
+        return await this.adapter.modOne(collection, query, update);
     }
 
     // upsert
     async upsOne(collection: string, query: object, update: object) {
-        return this.adapter.upsOne(collection, query, update);
+        return await this.adapter.upsOne(collection, query, update);
     }
 
     // delete
     async remOne(collection: string, query: object) {
-        return this.adapter.remOne(collection, query);
+        return await this.adapter.remOne(collection, query);
     }
 
     // Expose other methods as needed...

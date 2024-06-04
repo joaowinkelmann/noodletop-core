@@ -4,7 +4,8 @@ import { Room } from '~/models/room';
 
 export const listeners = [
     '/quit',
-    '/leave'
+    '/leave',
+    '/ping'
 ];
 
 export const helpString = [

@@ -71,8 +71,8 @@ export class StateManager {
         //     global.log("IP not found");
         // }
 
-        global.log(`Blocked IPs: ${JSON.stringify(StateManager.ipBlocklist.values())}`)
-        global.log(`IP: ${socket.data.ip}`);
+        // global.log(`Blocked IPs: ${JSON.stringify(StateManager.ipBlocklist.values())}`)
+        // global.log(`IP: ${socket.data.ip}`);
 
         // if (StateManager.ipBlocklist.includes(socket.data.ip)) {
         if (StateManager.ipBlocklist.has(socket.data.ip) && StateManager.ipBlocklist.get(socket.data.ip)[0] > new Date(new Date().getTime() - 1000 * 60 * 60)) {

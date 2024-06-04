@@ -53,7 +53,7 @@ Bun.serve<WebSocketData>({
                 handler = commands['/ingress'];
             } else {
                 if (!handler) {
-                    handler = commands['/message'];
+                    handler = commands['/msg'];
                 }
             }
             handler(state, message.toString());

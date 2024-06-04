@@ -58,9 +58,10 @@ export class MongoDBAdapter implements DatabaseAdapter {
 
     // Upsert
     upsOne(collection: string, query: object, update: object): Promise<boolean> {
-        // throw new Error('Method not implemented.');
-        return this.client.db(this.database).collection(collection).updateOne(query, update, { upsert: true }).then((result) => {
-            return result.modifiedCount > 0;
+        return this.client.db(this.database).collection(collection).updateOne(query, { $set: update }, { upsert: true }).then((result) => {
+            // return result.modifiedCount > 0;
+            // se adicionou ou modificou algo, retorna true
+            return result.modifiedCount > 0 || result.upsertedCount > 0;
         }).catch((err) => {
             console.error(err);
             return false;

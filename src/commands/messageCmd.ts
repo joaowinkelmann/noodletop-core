@@ -4,7 +4,7 @@ import { StateManager } from '~/utils/stateManager';
 import { Room } from '~/models/room';
 
 export const listeners = [
-    '/message'
+    '/msg'
 ];
 
 export const helpString = false;

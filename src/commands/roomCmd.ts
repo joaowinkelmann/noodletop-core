@@ -46,7 +46,12 @@ export default async function room(state: State, input: string) {
             break;
         case 'save':
             response = await room.save();
-            console.log(response);
+            // console.log(response);
+            if (response) {
+                response = 'Room saved';
+            } else {
+                response = 'Error saving room';
+            }
             break;
         case 'setpassword':
             response = room.setPassword(argArr[0]);

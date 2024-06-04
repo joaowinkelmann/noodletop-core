@@ -2,17 +2,11 @@ import { State } from '~/models/state';
 import { StateManager } from '~/utils/stateManager';
 import { Room } from '~/models/room';
 import { User } from '~/models/user';
-// import { commandHandlers } from '.'; // todo, check if this wont break if we load the commands dynamically
-// import'./messageCmd';
-// import the default export from messageCmd.ts
 import message from './messageCmd';
 
 export const listeners = [
     '/ingress'
 ];
-
-// export const helpString = '/ingress - Manages a newly formed incoming connection, with the objetive of getting a state into the "OK" status.';
-export const helpString = false; // ingress is an internally managed command, so there's no need to expose it to the user
 
 /**
  * Manages a newly formed incoming connection, with the objetive of getting a state into the "OK" status.
@@ -145,11 +139,8 @@ export default function ingress(state: State, input: string) {
             break;
         
         case 'OK':
-            // const handler = commandHandlers['/message'];
-            // handler(state, message);
             message(state, input);
         default:
-            // state.status = 'ACK'; // user is being asked to enter an ACK
             state.user.getSocket().close(4003, 'Invalid state');
             return;
     }
