@@ -13,3 +13,6 @@ bun.lockb
 
 # IDE files
 /.vscode/
+
+# Local script files
+/.scripts/

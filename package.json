@@ -5,7 +5,7 @@
   "author": "joaowinkelmann",
   "description": "Tabletop manager",
   "engines": {
-    "node": ">=20.13.1"
+    "node": ">=20.14.0"
   },
   "scripts": {
     "dev": "bun --watch ./src/main.ts",
@@ -29,7 +29,7 @@
   },
   "devDependencies": {
     "@types/bun": "^1.1.3",
-    "@types/node": "^20.13.0",
+    "@types/node": "^20.14.1",
     "husky": "^9.0.11",
     "tslint": "^6.1.3",
     "typescript": "^5.4.5"
