@@ -25,6 +25,7 @@
   },
   "dependencies": {
     "bun": "^1.1.12",
+    "groq-sdk": "^0.4.0",
     "mongodb": "^6.7.0"
   },
   "devDependencies": {
