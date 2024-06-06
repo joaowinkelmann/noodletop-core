@@ -32,6 +32,13 @@ export class ObjectManager {
         // if properties are provided, add them to the object
         if (properties) {
             object.props = properties;
+        } else {
+            object.props = {};
+        }
+
+        // add type to props (idk if this is the best approrach)
+        if (type) {
+            object.props = { ...object.props, type };
         }
 
         this.objects.set(id, object);

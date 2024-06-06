@@ -3,6 +3,7 @@ import { Rand } from '~/utils/randomizer';
 import { UserStatus, UserCosmetics, Connection, Role } from '~/models/dto/userDTO';
 import { ObjectManager } from './object';
 import { WebSocketData } from '~/utils/common';
+import { Deck } from './deck';
 
 export class User {
     socket: ServerWebSocket<WebSocketData>;
@@ -11,6 +12,8 @@ export class User {
     role: Role;
     status: UserStatus;
     cosmetics: UserCosmetics;
+    // private deck: Deck = new Deck();
+    deck: Deck = new Deck();
 
     constructor(socket: ServerWebSocket<WebSocketData>) {
         this.socket = socket;
