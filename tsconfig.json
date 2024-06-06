@@ -9,6 +9,6 @@
     "paths": { "~/*": ["./src/*"] },
     "target": "ESNext"
   },
-  "include": ["src/**/*.ts", "src/**/*.d.ts", "src/commands/index.ts"],
-  "exclude": ["node_modules", "dist/*"]
+  "include": ["src/**/*.ts", "src/**/*.d.ts"],
+  "exclude": ["node_modules/**, dist/**"]
 }

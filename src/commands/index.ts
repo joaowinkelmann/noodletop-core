@@ -1,4 +1,4 @@
-import { shCss } from "~/utils/common";
+import { shCss } from '~/utils/common';
 
 export interface CommandHandler {
     [command: string]: (state: any, message: string) => void;

@@ -79,7 +79,7 @@ export class User {
     }
 
     setConnectionStatus(status: Connection): void {
-        global.log("User connection status changed to " + status);
+        global.log('User connection status changed to ' + status);
         this.status.connection = status;
     }
 

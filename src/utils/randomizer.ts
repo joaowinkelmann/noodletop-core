@@ -128,25 +128,25 @@ export class Rand {
         return `#${rgb.map((c) => c.toString(16).padStart(2, '0')).join('')}`;
     }
 
-    static toBase62(number, minLength: number = 0): string {
+    static toBase62(num: number, minLength: number = 0): string {
         let result = '';
-        
-        while (number > 0) {
-          result = BASE62[number % 62] + result;
-          number = Math.floor(number / 62);
+
+        while (num > 0) {
+          result = BASE62[num % 62] + result;
+          num = Math.floor(num / 62);
         }
-      
+
         while (result.length < minLength) {
           result = BASE62_PAD + result;
         }
-      
+
         return result;
     }
 
     static fromBase62(base62: string): number {
         // Remove the padding characters
         const trimmedBase62 = base62.replace(new RegExp(`^${BASE62_PAD}+`), '');
-    
+
         return trimmedBase62.split('').reverse().reduce((acc, char, index) => {
           return acc + BASE62.indexOf(char) * Math.pow(62, index);
         }, 0);

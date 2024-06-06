@@ -184,7 +184,7 @@ export class Room {
     getActiveUsers(): Set<User> {
         // return new Set(Array.from(this.users).filter((user) => user.getConnectionStatus()));
         // return new Set(Array.from(this.users).filter((user) => user.getConnectionStatus() === Connection.Active));
-        return new Set(Array.from(this.users).filter((user) => user.getConnectionStatus() != Connection.Exited));
+        return new Set(Array.from(this.users).filter((user) => user.getConnectionStatus() !== Connection.Exited));
     }
 
     getAwayUsers(): Set<User> {

@@ -29,12 +29,11 @@ export class RoomSweeper {
         }
 
         // try to get from env, if it's not 0, otherwise use the default values
-        const thresholdMins: number = parseInt(process.env.SWEEP_THRESHOLD_MINS) || 40;
-        const retaskMins: number = parseInt(process.env.SWEEP_INTERVAL_MINS) || 30;
+        const thresholdMins: number = parseInt(process.env.SWEEP_THRESHOLD_MINS, 10) || 40;
+        const retaskMins: number = parseInt(process.env.SWEEP_INTERVAL_MINS, 10) || 30;
 
         this.checkUserActivity(thresholdMins, retaskMins);
         this.sweepInactiveRooms(thresholdMins, retaskMins);
-    
         this.isInitialized = true;
     }
 
@@ -82,7 +81,7 @@ export class RoomSweeper {
                 if (room.countActiveUsers() === 0) {
                     if (now - room.getLastSeen() > thresholdMins * 60 * 1000) {
                         global.log(`Room ${room.getCode()} is inactive and is being archived...`);
-                        let saved: boolean = await room.save();
+                        const saved: boolean = await room.save();
                         if (saved) {
                             global.log(`Sucessfully archived room ${room.getCode()}. Now closing...`);
                             rooms.delete(room.getCode());

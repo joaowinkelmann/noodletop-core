@@ -1,4 +1,4 @@
-const Groq = require("groq-sdk");
+import Groq from 'groq-sdk';
 
 export class GroqService {
     private groq: any;
@@ -15,26 +15,26 @@ export class GroqService {
 
     public getModels = async ()=> {
         return await this.groq.models.list();
-    };
+    }
 
     /**
-     * 
+     *
      * @doc - https://console.groq.com/docs/libraries
-     * @param prompt 
-     * @returns 
+     * @param prompt
+     * @returns
      */
     public async getResponse(prompt: string): Promise<string> {
-        var response = await this.groq.chat.completions.create({
+        const response = await this.groq.chat.completions.create({
             messages: [
                 {
-                    role: "user",
+                    role: 'user',
                     content: prompt
                 }
             ],
-            model: "llama3-8b-8192"
+            model: 'llama3-8b-8192'
         });
-         
-        return response.choices[0]?.message?.content || "";
+
+        return response.choices[0]?.message?.content || '';
 
     }
 }

@@ -25,12 +25,12 @@ export default function debug(state: State, input: string) {
             response = Rand.id(length);
             break;
         case 'toBase62':
-            const number = parseInt(args[0], 10);
-            if (isNaN(number)) {
+            const num = parseInt(args[0], 10);
+            if (isNaN(num)) {
                 response = `I'm afraid I can't do that, Dave.`;
                 break;
             }
-            response = Rand.toBase62(number);
+            response = Rand.toBase62(num);
             break;
         case 'fromBase62':
             const base62 = args[0];

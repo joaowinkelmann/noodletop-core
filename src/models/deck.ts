@@ -1,5 +1,5 @@
-import { ObjectManager } from "./object";
-import { User } from "./user";
+import { ObjectManager } from './object';
+import { User } from './user';
 
 export class Deck {
     private objects: ObjectManager = new ObjectManager();

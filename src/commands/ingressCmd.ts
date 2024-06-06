@@ -77,7 +77,7 @@ export default function ingress(state: State, input: string) {
 
             response = '?name'; // ask the user to enter a username
             break;
-        case "RPWD": // Room Password
+        case 'RPWD': // Room Password
 
             // const room: Room = StateManager.getInstance().getRoom(roomCode) as Room;
 
@@ -137,7 +137,6 @@ export default function ingress(state: State, input: string) {
                 // {err: "Username is already taken. Please enter a new one." response: "?name"} or something like that.
             }
             break;
-        
         case 'OK':
             message(state, input);
         default:

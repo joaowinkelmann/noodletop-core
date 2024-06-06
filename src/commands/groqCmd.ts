@@ -11,7 +11,7 @@ export default async function chat(state: State, input: string) {
     const [command, ...args] = input.split(' ');
     // args = args.join(' ');
     // join args into a single string
-    var argString = args.join(' ');
+    const argString = args.join(' ');
 
     let response = '';
     const groqService = new GroqService();

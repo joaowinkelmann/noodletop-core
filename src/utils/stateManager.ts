@@ -61,7 +61,7 @@ export class StateManager {
 
     /**
      * Initializes the state for the given socket. Either by restoring it, or creating a new one.
-     * 
+     *
      * @param socket - The server WebSocket instance.
      */
     public initState(socket: ServerWebSocket<WebSocketData>): void {
@@ -159,7 +159,6 @@ export class StateManager {
 
         // Promote the user(creator) to admin, as they're the first to enter the room
         room.promoteToAdmin(creator);
-        
         RoomSweeper.startSweeping();
 
         return room;
@@ -197,13 +196,13 @@ export class StateManager {
             return true;
         }
     }
-    
+
     private blockIP(state: State): void {
-        const lockoutMins = parseInt(process.env.LOCKOUT_DURATION) || 60;
-        const allowedStrikes = parseInt(process.env.ALLOWED_STRIKES) || 10;
+        const lockoutMins = parseInt(process.env.LOCKOUT_DURATION, 10) || 60;
+        const allowedStrikes = parseInt(process.env.ALLOWED_STRIKES, 10) || 10;
         const ipInfo = StateManager.ipBlocklist.get(state.user.getSocket().data.ip);
         const [blockedAt, strikes] = ipInfo ? ipInfo : [null, 0];
-    
+
         if (blockedAt && blockedAt > new Date(new Date().getTime() - 1000 * 60 * lockoutMins)) {
             if (strikes + 1 >= allowedStrikes) {
                 state.user.getSocket().close(4003, 'Blocked IP');
@@ -216,7 +215,7 @@ export class StateManager {
             StateManager.ipBlocklist.set(state.user.getSocket().data.ip, [new Date(), 1]);
         }
     }
-    
+
     private unblockIP(state: State): void {
         StateManager.ipBlocklist.delete(state.user.getSocket().data.ip);
     }
