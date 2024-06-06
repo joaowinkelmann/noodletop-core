@@ -1,7 +1,8 @@
 import { webcrypto } from 'crypto';
 
 export const BASE36 = 'js2gmdoknufxzpwqcb45liy013vra7et968h';
-// export const BASE62 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+export const BASE62 = "0123456789abcdefghijklmno_qrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"; // save the character 'p' for padding, exchanging it to '_'
+export const BASE62_PAD = 'p';
 
 export class Rand {
     /**
@@ -69,47 +70,31 @@ export class Rand {
     /**
      * Generates a random alphanumeric ID of a given length.
      *
-     * @todo This will break around the year 2059, when the timestamp will be 9 characters long.
-     *
      * @param length The length of the ID string. Default is 8. (Collision probability is 1 in 62^length within the same millisecond)
-     * @param includeTimestamp Adds a base36 encoded string of milliseconds since epoch at the start of the ID. Default is true.
+     * @param includeTimestamp Adds a base62 encoded string of milliseconds since epoch at the start of the ID. Default is true.
      * @returns The generated ID string.
      */
     static id(length: number = 8, includeTimestamp: boolean = true): string {
-        let result = '';
-        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-        const charactersLength = characters.length;
-        for (let i = 0; i < length; i++) {
-            result += characters.charAt(this.int(0, charactersLength - 1));
-        }
+        let id = '';
         if (includeTimestamp) {
-            let timestampString = Date.now().toString(36); // 8 characters representing the timestamp
-            const scrambledBase36 = BASE36.slice(length % 36) + BASE36.slice(0, length % 36);
-            timestampString = timestampString.split('').map((char) => {
-                const index = BASE36.indexOf(char);
-                return scrambledBase36[index];
-            }).join('');
-            result = timestampString + result;
+            const timestamp = Date.now();
+            id += this.toBase62(timestamp); // gets the timestamp, and pads it to 10 chars
         }
-        return result;
+        while (id.length < length) {
+            id += this.toBase62(this.int(0, 61), 1);
+        }
+        return id;
     }
 
     /**
      * Converts an ID string into a Date object.
-     * Assumes that the timestamp takes up 8 characters in the given string.
+     * Assumes that the timestamp takes up 10 characters in the given string.
      * @param id - The ID string to convert.
      * @returns 'Sat Apr 20 2024 10:14:41 GMT-0300 (Brasilia Standard Time)' - A Date object representing the timestamp encoded in the ID.
      */
     static dateFromId(id: string): Date {
-        const length = id.length - 8; // retrieve the length from the id, assuming that the timestamp takes up 8 characters in the given string
-        let timestampString = id.slice(0, 8); // gets the first 8 characters from the id
-
-        const scrambledBase36 = BASE36.slice(length % 36) + BASE36.slice(0, length % 36);
-        timestampString = timestampString.split('').map((char) => {
-            const index = scrambledBase36.indexOf(char);
-            return BASE36[index];
-        }).join('');
-        const timestamp = parseInt(timestampString, 36);
+        const timestampBase62 = id.slice(0, 10); // we're now using 10 chars to store the timestamp
+        const timestamp = this.fromBase62(timestampBase62);
         return new Date(timestamp);
     }
 
@@ -142,4 +127,29 @@ export class Rand {
         }
         return `#${rgb.map((c) => c.toString(16).padStart(2, '0')).join('')}`;
     }
+
+    static toBase62(number, minLength = 10) {
+        const characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        let result = '';
+        
+        while (number > 0) {
+          result = characters[number % 62] + result;
+          number = Math.floor(number / 62);
+        }
+      
+        while (result.length < minLength) {
+          result = BASE62_PAD + result;
+        }
+      
+        return result;
+    }
+
+    static fromBase62(base62) {
+        // Remove the padding characters
+        const trimmedBase62 = base62.replace(new RegExp(`^${BASE62_PAD}+`), '');
+    
+        return trimmedBase62.split('').reverse().reduce((acc, char, index) => {
+          return acc + BASE62.indexOf(char) * Math.pow(62, index);
+        }, 0);
+      }
 }
