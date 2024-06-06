@@ -1,8 +1,8 @@
 import { webcrypto } from 'crypto';
 
-export const BASE36 = 'js2gmdoknufxzpwqcb45liy013vra7et968h';
-export const BASE62 = "0123456789abcdefghijklmno_qrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"; // save the character 'p' for padding, exchanging it to '_'
-export const BASE62_PAD = 'p';
+// save the character 'n' for padding, exchanging it to '_'
+export const BASE62 = '0123456789abcdefghijklm_opqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+export const BASE62_PAD = 'n';
 
 export class Rand {
     /**
@@ -70,7 +70,7 @@ export class Rand {
     /**
      * Generates a random alphanumeric ID of a given length.
      *
-     * @param length The length of the ID string. Default is 8. (Collision probability is 1 in 62^length within the same millisecond)
+     * @param length The length of the ID string. Default is 8. (Collision probability is 1 in 62^length within the same millisecond, assuming includeTimestamp is true.)
      * @param includeTimestamp Adds a base62 encoded string of milliseconds since epoch at the start of the ID. Default is true.
      * @returns The generated ID string.
      */
@@ -78,9 +78,9 @@ export class Rand {
         let id = '';
         if (includeTimestamp) {
             const timestamp = Date.now();
-            id += this.toBase62(timestamp); // gets the timestamp, and pads it to 10 chars
+            id += this.toBase62(timestamp, 10); // gets the timestamp, and pads it to 10 chars
         }
-        while (id.length < length) {
+        while (id.length < length + (includeTimestamp ? 10 : 0)) { // account for 10 chars if timestamp is included
             id += this.toBase62(this.int(0, 61), 1);
         }
         return id;
@@ -128,12 +128,11 @@ export class Rand {
         return `#${rgb.map((c) => c.toString(16).padStart(2, '0')).join('')}`;
     }
 
-    static toBase62(number, minLength = 10) {
-        const characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    static toBase62(number, minLength: number = 0): string {
         let result = '';
         
         while (number > 0) {
-          result = characters[number % 62] + result;
+          result = BASE62[number % 62] + result;
           number = Math.floor(number / 62);
         }
       
@@ -144,7 +143,7 @@ export class Rand {
         return result;
     }
 
-    static fromBase62(base62) {
+    static fromBase62(base62: string): number {
         // Remove the padding characters
         const trimmedBase62 = base62.replace(new RegExp(`^${BASE62_PAD}+`), '');
     
