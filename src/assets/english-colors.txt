@@ -10,8 +10,6 @@ navy
 mint
 aqua
 green
-brown
-black
 white
 olive
 peach

@@ -124,7 +124,6 @@ soft
 some
 sore
 sour
-spry
 tall
 tame
 tart
@@ -531,7 +530,6 @@ stingy
 stormy
 strict
 strong
-stupid
 sturdy
 subtle
 sudden
@@ -560,7 +558,6 @@ warped
 weekly
 wicked
 wiggly
-wilted
 winged
 wobbly
 wooden
@@ -572,3 +569,5 @@ juliet
 quebec
 sierra
 victor
+daily
+mister
