@@ -36,6 +36,10 @@ export default function debug(state: State, input: string) {
             const base62 = args[0];
             response = String(Rand.fromBase62(base62));
             break;
+        case 'roomCode':
+            const generatedRoomCode = Rand.roomCode();
+            response = `Generated room code: ${generatedRoomCode}`;
+            break;
         default:
             response = `Invalid operation`;
             break;

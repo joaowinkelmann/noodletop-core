@@ -154,5 +154,48 @@ export class Rand {
         return trimmedBase62.split('').reverse().reduce((acc, char, index) => {
           return acc + BASE62.indexOf(char) * Math.pow(62, index);
         }, 0);
-      }
+    }
+
+    /**
+     * Generates a easyly readable and pronounceable room code. E.g. "blue-space-dust"
+     */
+    static roomCode(chunks: number = 3, separator: string = '-'): string {
+        // read from /assets/english-adjectives.txt and /assets/english-nouns.txt
+        const fs = require('fs');
+        const path = require('path');
+        const assetsDir = path.join(__dirname, '../assets/');
+
+        const adjectives = fs.readFileSync(path.join(assetsDir, 'english-adjectives.txt'), 'utf8').split('\n');
+        const words = fs.readFileSync(path.join(assetsDir, 'english-nouns.txt'), 'utf8').split('\n');
+        const colors = fs.readFileSync(path.join(assetsDir, 'english-colors.txt'), 'utf8').split('\n');
+
+        // go over the files ending in .txt, and remove elements that are over 10 characters long. then, rewrite the files
+        // files.forEach(file => {
+        //     if (file.endsWith('.txt')) {
+        //         const filePath = path.join(assetsDir, file);
+        //         let words = fs.readFileSync(filePath, 'utf8').split('\n');
+        //         words = words.filter(word => word.length <= 8);
+        //         fs.writeFileSync(filePath, words.join('\n'));
+        //     }
+        // });
+
+        // // // now, order the words by length
+        // files.forEach(file => {
+        //     if (file.endsWith('.txt')) {
+        //         const filePath = path.join(assetsDir, file);
+        //         let words = fs.readFileSync(filePath, 'utf8').split('\n');
+        //         words = words.sort((a, b) => a.length - b.length);
+        //         fs.writeFileSync(filePath, words.join('\n'));
+        //     }
+        // });
+
+        let code = '';
+
+        // adjective + color + noun
+        code += adjectives[this.int(0, adjectives.length - 1)];
+        code += separator + colors[this.int(0, colors.length - 1)];
+        code += separator + words[this.int(0, words.length - 1)];
+
+        return code;
+    }
 }
