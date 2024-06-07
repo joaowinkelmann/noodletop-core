@@ -1,6 +1,6 @@
-import { Room } from '~/models/room';
+import { Room } from '../models/room';
 import { StateManager } from './stateManager';
-import { Connection } from '~/models/dto/userDTO';
+import { Connection } from '../models/dto/userDTO';
 import { shCss } from './common';
 
 // Class containing tasks to remove inactive instances
@@ -29,8 +29,8 @@ export class RoomSweeper {
         }
 
         // try to get from env, if it's not 0, otherwise use the default values
-        const thresholdMins: number = parseInt(process.env.SWEEP_THRESHOLD_MINS, 10) || 40;
-        const retaskMins: number = parseInt(process.env.SWEEP_INTERVAL_MINS, 10) || 30;
+        const thresholdMins: number = parseInt(process.env.SWEEP_THRESHOLD_MINS || "40", 10);
+        const retaskMins: number = parseInt(process.env.SWEEP_INTERVAL_MINS || "30", 10);
 
         this.checkUserActivity(thresholdMins, retaskMins);
         this.sweepInactiveRooms(thresholdMins, retaskMins);

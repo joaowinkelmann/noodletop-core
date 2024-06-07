@@ -1,6 +1,6 @@
-import { Room } from '~/models/room';
-import { StateManager } from '~/utils/stateManager';
-import { RouteInterface } from '~/routes';
+import { Room } from '../../models/room';
+import { StateManager } from '../../utils/stateManager';
+import { RouteInterface } from '../../routes';
 
 export const route: RouteInterface = {
     pathRegex: 'api/object/get/\\w+',

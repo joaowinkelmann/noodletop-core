@@ -4,7 +4,7 @@ import { User } from './user';
 export class Deck {
     private objects: ObjectManager = new ObjectManager();
 
-    addToDeck(creator: User['id'], type?: string, props?: object): void {
+    addToDeck(creator: User['id'], type?: string, props?: Record<string, any>): void {
         this.objects.create(type, props, creator);
     }
 

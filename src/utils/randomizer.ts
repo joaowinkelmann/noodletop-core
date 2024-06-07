@@ -29,11 +29,15 @@ export class Rand {
      */
     static roll(diceNotation: string, showRolls: boolean, diceLimit: number = 100): string | number {
         // Check if the dice notation is valid
+        // @todo - Check if this regex test is necessary, given we're also checking in 'matches'
         if (!/^(\d*d\d+)([-+]\d+)*$/.test(diceNotation)) {
-            return 'Invalid dice notation';
+            return '{"err": "Invalid dice notation"}'
         }
 
         const matches = diceNotation.match(/(\d*)d(\d+)([-+]\d+)*/);
+        if (!matches) {
+            return '{"err": "Invalid dice notation"}'
+        }
 
         const numDice = parseInt(matches[1], 10) || 1;
         const diceSides = parseInt(matches[2], 10);

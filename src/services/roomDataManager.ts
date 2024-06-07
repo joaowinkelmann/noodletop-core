@@ -1,6 +1,6 @@
-import { Db } from '~/database';
+import { Db } from '../database';
 import { Room } from '../models/room';
-import { StateManager } from '~/utils/stateManager';
+import { StateManager } from '../utils/stateManager';
 
 export class RoomDataManager {
     constructor(private db: Db) {}
@@ -25,7 +25,7 @@ export class RoomDataManager {
         return this.convertDataToRoom(roomDataToLoad);
     }
 
-    private static convertRoomToData(room: Room): object {
+    private static convertRoomToData(room: Room): Record<string, any> {
         // Convert the room to a format suitable for saving...
         return {
             id: room.getSessionId(),

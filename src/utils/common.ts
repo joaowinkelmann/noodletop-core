@@ -1,7 +1,7 @@
 // Common utility functions
 
-import { User } from '~/models/user';
-import { Role } from '~/models/dto/userDTO';
+import { User } from '../models/user';
+import { Role } from '../models/dto/userDTO';
 
 export function isJSON(str: string): boolean {
     try {
@@ -30,7 +30,7 @@ export type WebSocketData = {
  * @param headers - The headers object containing the userId and roomCode.
  * @returns An array containing the userId and roomCode, or [null, null] if an error occurs.
  */
-export const parseHeaders = (headers: Headers): [string, string] | [null, null] => {
+export const parseHeaders = (headers: Headers): [string | null, string | null] => {
     try {
         const userId = headers.get('userId');
         const roomCode = headers.get('roomCode');

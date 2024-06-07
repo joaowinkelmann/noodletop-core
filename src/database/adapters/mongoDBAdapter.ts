@@ -44,7 +44,7 @@ export class MongoDBAdapter implements DatabaseAdapter {
     }
 
     // Create
-    insOne(collection: string, document: object): Promise<any> {
+    insOne(collection: string, document: Record<string, any>): Promise<any> {
         // throw new Error('Method not implemented.');
         console.log('Inserting document into MongoDB...');
         // return this.client.db().collection(collection).insertOne(document);
@@ -57,7 +57,7 @@ export class MongoDBAdapter implements DatabaseAdapter {
     }
 
     // Upsert
-    upsOne(collection: string, query: object, update: object): Promise<boolean> {
+    upsOne(collection: string, query: Record<string, any>, update: Record<string, any>): Promise<boolean> {
         return this.client.db(this.database).collection(collection).updateOne(query, { $set: update }, { upsert: true }).then((result) => {
             // return result.modifiedCount > 0;
             // se adicionou ou modificou algo, retorna true
@@ -67,9 +67,17 @@ export class MongoDBAdapter implements DatabaseAdapter {
             return false;
         });
     }
+    upsMany(collection: string, query: Record<string, any>, update: Record<string, any>[]): Promise<boolean> {
+        return this.client.db(this.database).collection(collection).updateMany(query, { $set: update }, { upsert: true }).then((result) => {
+            return result.modifiedCount > 0 || result.upsertedCount > 0;
+        }).catch((err) => {
+            console.error(err);
+            return false;
+        });
+    }
 
 
-    getOne(collection: string, query: object): Promise<any> {
+    getOne(collection: string, query: Record<string, any>): Promise<any> {
         // throw new Error('Method not implemented.');
         return this.client.db(this.database).collection(collection).findOne(query).then((result) => {
             return result;
@@ -78,7 +86,7 @@ export class MongoDBAdapter implements DatabaseAdapter {
         });
     }
 
-    getMany(collection: string, query: object): Promise<any> {
+    getMany(collection: string, query: Record<string, any>): Promise<any> {
         // throw new Error('Method not implemented.');
         return this.client.db(this.database).collection(collection).find(query).toArray().then((result) => {
             return result;
@@ -90,7 +98,7 @@ export class MongoDBAdapter implements DatabaseAdapter {
 
     // Update
     // example db.modOne('test', { name: 'test3' }, { $set: { name: 'test4' } });
-    modOne(collection: string, query: object, update: object): Promise<any> {
+    modOne(collection: string, query: Record<string, any>, update: Record<string, any>): Promise<any> {
         return this.client.db(this.database).collection(collection).updateOne(query, update).then
         ((result) => {
             return result;
@@ -99,7 +107,7 @@ export class MongoDBAdapter implements DatabaseAdapter {
         });
     }
 
-    modMany(collection: string, query: object, update: object): Promise<any> {
+    modMany(collection: string, query: Record<string, any>, update: Record<string, any>): Promise<any> {
         return this.client.db(this.database).collection(collection).updateMany(query, update).then
         ((result) => {
             return result;
@@ -108,7 +116,7 @@ export class MongoDBAdapter implements DatabaseAdapter {
         });
     }
 
-    remOne(collection: string, query: object): Promise<any> {
+    remOne(collection: string, query: Record<string, any>): Promise<any> {
         return this.client.db(this.database).collection(collection).deleteOne(query).then
         ((result) => {
             return result;
@@ -117,7 +125,7 @@ export class MongoDBAdapter implements DatabaseAdapter {
         });
     }
 
-    remMany(collection: string, query: object): Promise<any> {
+    remMany(collection: string, query: Record<string, any>): Promise<any> {
         return this.client.db(this.database).collection(collection).deleteMany(query).then
         ((result) => {
             return result;

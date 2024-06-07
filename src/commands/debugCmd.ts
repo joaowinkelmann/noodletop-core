@@ -1,5 +1,5 @@
-import { State } from '~/models/state';
-import { Rand } from '~/utils/randomizer';
+import { State } from '../models/state';
+import { Rand } from '../utils/randomizer';
 
 export const listeners = [
     '/debug'
@@ -8,7 +8,7 @@ export const listeners = [
 export default function debug(state: State, input: string) {
     const [command , op, ...args] = input.split(' ');
 
-    let response = null;
+    let response: string;
 
     switch (op) {
         case 'dateFromId':
@@ -34,7 +34,7 @@ export default function debug(state: State, input: string) {
             break;
         case 'fromBase62':
             const base62 = args[0];
-            response = Rand.fromBase62(base62);
+            response = String(Rand.fromBase62(base62));
             break;
         default:
             response = `Invalid operation`;

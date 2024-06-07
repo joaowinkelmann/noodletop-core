@@ -1,6 +1,5 @@
-import { Rand } from '~/utils/randomizer';
-import { State } from '~/models/state';
-import { StateManager } from '~/utils/stateManager';
+import { Rand } from '../utils/randomizer';
+import { State } from '../models/state'
 
 export const listeners = [
     '/roll'
@@ -13,7 +12,7 @@ export const helpString = [
 export default function aux(state: State, input: string) {
     const [command , op, ...args] = input.split(' ');
 
-    let response = null;
+    let response: string;
 
     switch (command) {
         case '/roll':

@@ -1,7 +1,7 @@
-import { Room } from '~/models/room';
-import { StateManager } from '~/utils/stateManager';
-import { State } from '~/models/state';
-import { isJSON, isAdmin } from '~/utils/common';
+import { Room } from '../models/room';
+import { StateManager } from '../utils/stateManager';
+import { State } from '../models/state';
+import { isJSON, isAdmin } from '../utils/common';
 
 export const listeners = [
     '/deck'
@@ -15,15 +15,14 @@ export default function deck(state: State, input: string) {
     const room: Room = StateManager.getInstance().getRoom(state.roomCode) as Room;
     if (!room) return;
 
-    let response = null;
-
+    let response: string;
 
     const deck = state.user.deck;
 
     switch (op) {
         case 'add':
             // deck.addToDeck(args[0]);
-            let props = null;
+            let props: Record<string, any> = {};
             if (args.length > 1 && isJSON(args[1])) {
                 props = JSON.parse(args[1]);
             }

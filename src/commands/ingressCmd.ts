@@ -1,7 +1,7 @@
-import { State } from '~/models/state';
-import { StateManager } from '~/utils/stateManager';
-import { Room } from '~/models/room';
-import { User } from '~/models/user';
+import { State } from '../models/state';
+import { StateManager } from '../utils/stateManager';
+import { Room } from '../models/room';
+import { User } from '../models/user';
 import message from './messageCmd';
 
 export const listeners = [
@@ -17,7 +17,7 @@ export const listeners = [
 export default function ingress(state: State, input: string) {
     const [command , op, ...args] = input.split(' ');
 
-    let response = null;
+    let response: string | undefined;
     switch (state.status) {
         case 'ACK':
             // user is answering a prompt to enter an ACK, so let's understand the sent message as the user id

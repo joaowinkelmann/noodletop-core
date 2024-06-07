@@ -1,7 +1,7 @@
-import { Room } from '~/models/room';
-import { StateManager } from '~/utils/stateManager';
-import { State } from '~/models/state';
-import { isAdmin } from '~/utils/common';
+import { Room } from '../models/room';
+import { StateManager } from '../utils/stateManager';
+import { State } from '../models/state';
+import { isAdmin } from '../utils/common';
 
 export const listeners = [
     '/team'
@@ -15,7 +15,7 @@ export default function team(state: State, input: string) {
     const room: Room = StateManager.getInstance().getRoom(state.roomCode) as Room;
     if (!room) return;
 
-    let response = null;
+    let response: string;
 
     switch (op) {
         case 'create':
@@ -26,11 +26,11 @@ export default function team(state: State, input: string) {
             response = room.joinTeam(args[0], state.user);
             break;
         case 'leave':
-            response = room.leaveTeam(state.user);
+            response = String(room.leaveTeam(state.user));
             break;
         case 'delete':
             if (!isAdmin(state.user)) return;
-            response = room.deleteTeam(args[0], state.user);
+            response = String(room.deleteTeam(args[0], state.user));
             break;
         case 'list':
             response = room.listTeams();

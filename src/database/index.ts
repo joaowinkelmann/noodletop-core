@@ -34,31 +34,31 @@ export class Db {
     }
 
     // create
-    async insOne(collection: string, document: object): Promise<boolean> {
+    async insOne(collection: string, document: Record<string, any>): Promise<boolean> {
         return await this.adapter.insOne(collection, document);
     }
 
     // read
-    async getOne(collection: string, query: object) {
+    async getOne(collection: string, query: Record<string, any>) {
         return await this.adapter.getOne(collection, query);
     }
 
-    async getMany(collection: string, query: object) {
+    async getMany(collection: string, query: Record<string, any>) {
         return await this.adapter.getMany(collection, query);
     }
 
     // update
-    async modOne(collection: string, query: object, update: object) {
+    async modOne(collection: string, query: Record<string, any>, update: Record<string, any>) {
         return await this.adapter.modOne(collection, query, update);
     }
 
     // upsert
-    async upsOne(collection: string, query: object, update: object) {
+    async upsOne(collection: string, query: Record<string, any>, update: Record<string, any>) {
         return await this.adapter.upsOne(collection, query, update);
     }
 
     // delete
-    async remOne(collection: string, query: object) {
+    async remOne(collection: string, query: Record<string, any>) {
         return await this.adapter.remOne(collection, query);
     }
 

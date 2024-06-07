@@ -14,8 +14,7 @@
     "build": "bun build --compile --minify --sourcemap ./src/main.ts --outfile ./dist/core",
     "start-comp": "./dist/core",
     "build-arm": "bun build --compile --target=bun-linux-arm64 --minify --sourcemap ./src/main.ts --outfile ./dist/core",
-    "lint": "tslint --project tsconfig.json",
-    "lint:fix": "tslint --project tsconfig.json --fix",
+    "lint": "eslint -c eslint.config.js",
     "prepare": "husky"
   },
   "husky": {
@@ -29,10 +28,12 @@
     "mongodb": "^6.7.0"
   },
   "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^7.12.0",
+    "@typescript-eslint/parser": "^7.12.0",
+    "eslint": "^9.4.0",
     "@types/bun": "^1.1.3",
     "@types/node": "^20.14.1",
     "husky": "^9.0.11",
-    "tslint": "^6.1.3",
     "typescript": "^5.4.5"
   }
 }

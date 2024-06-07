@@ -1,4 +1,4 @@
-import { shCss } from '~/utils/common';
+import { shCss } from '../utils/common';
 
 export type Methods = ['get', 'post', 'put', 'delete', 'options', 'patch'][number];
 
@@ -12,7 +12,7 @@ const methodColors = {
 };
 
 export interface RouteInterface {
-    pathRegex?: string;
+    pathRegex: string;
     method: Methods;
     handler: (Request) => Response;
 }

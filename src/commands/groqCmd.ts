@@ -1,5 +1,5 @@
-import { State } from '~/models/state';
-import { GroqService } from '~/services/groqService';
+import { State } from '../models/state';
+import { GroqService } from '../services/groqService';
 
 export const listeners = [
     '/groq'
@@ -13,7 +13,7 @@ export default async function chat(state: State, input: string) {
     // join args into a single string
     const argString = args.join(' ');
 
-    let response = '';
+    let response: string = '';
     const groqService = new GroqService();
 
     // const models = await groqService.getModels();

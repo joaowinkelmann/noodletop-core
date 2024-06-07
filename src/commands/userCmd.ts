@@ -1,7 +1,7 @@
-import { Room } from '~/models/room';
-import { User } from '~/models/user';
-import { StateManager } from '~/utils/stateManager';
-import { State } from '~/models/state';
+import { Room } from '../models/room';
+import { User } from '../models/user';
+import { StateManager } from '../utils/stateManager';
+import { State } from '../models/state';
 
 export const listeners = [
     '/user'
@@ -15,15 +15,20 @@ export default function user(state: State, input: string) {
     const user: User = state.user;
     if (!room) return;
 
-    let response = null;
+    let response: string;
 
     const argArr = args.map((arg) => arg.trim());
     switch (op) {
         case 'set':
-            response = user.setUserData(argArr[0], argArr[1]);
+            response = String(user.setUserData(argArr[0], argArr[1]));
             break;
         case 'setUsername':
-            response = state.user.setUsername(args[0]);
+            let username = argArr[0];
+            if (username.length > 0) {
+                response = state.user.setUsername(args[0]);
+            } else {
+                response = 'Invalid username';
+            }
             break;
         case 'info':
             response = state.user.getInfo();
