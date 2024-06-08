@@ -24,8 +24,8 @@ export class TeamManager {
         return team;
     }
 
-    get(id: Team['id']): Team | undefined {
-        return this.teams.get(id);
+    get(id: Team['id']): Team | null {
+        return this.teams.get(id) || null;
     }
 
     // retruns team id and name from the room
@@ -39,11 +39,13 @@ export class TeamManager {
      * @param teamId - The ID of the team.
      * @param userId - The ID of the user.
      */
-    join(teamId: Team['id'], userId: User['id']) {
+    join(teamId: Team['id'], userId: User['id']): boolean {
         const team = this.teams.get(teamId);
         if (team) {
             team.members.push(userId);
+            return true;
         }
+        return false;
     }
 
     /**
@@ -51,12 +53,15 @@ export class TeamManager {
      *
      * @param userId - The ID of the user.
      * @param teamId - The ID of the team.
+     * @returns true if the user was successfully removed from the team
      */
-    leave(teamId: Team['id'], userId: User['id']) {
+    leave(teamId: Team['id'], userId: User['id']): boolean {
         const team = this.teams.get(teamId);
         if (team) {
             team.members = team.members.filter((id) => id !== userId);
+            return true;
         }
+        return false;
     }
 
     /**

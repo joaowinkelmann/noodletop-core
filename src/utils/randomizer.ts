@@ -1,7 +1,14 @@
 import { webcrypto } from 'crypto';
+import * as fs from 'fs';
+import * as path from 'path';
 
-export const BASE36 = 'js2gmdoknufxzpwqcb45liy013vra7et968h';
-// export const BASE62 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+export const BASE62 = '0123456789abcdefghijklm_opqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+export const BASE62_PAD = 'n';
+
+const assetsDir = path.join(__dirname, '../assets/');
+const adjectives = fs.readFileSync(path.join(assetsDir, 'english-adjectives.txt'), 'utf8').split('\n');
+const colors = fs.readFileSync(path.join(assetsDir, 'english-colors.txt'), 'utf8').split('\n');
+const nouns = fs.readFileSync(path.join(assetsDir, 'english-nouns.txt'), 'utf8').split('\n');
 
 export class Rand {
     /**
@@ -18,6 +25,14 @@ export class Rand {
     }
 
     /**
+     * Generates a random boolean value.
+     * @returns A random boolean value.
+     */
+    static bool(): boolean {
+        return this.int(0, 1) === 1;
+    }
+
+    /**
      * Rolls dice based on the given dice notation and returns the result.
      *
      * @param diceNotation - The dice notation (e.g. "2d6+3", "d8-3" or "d8") string representing the number and sides of the dice, along with optional modifiers.
@@ -28,11 +43,15 @@ export class Rand {
      */
     static roll(diceNotation: string, showRolls: boolean, diceLimit: number = 100): string | number {
         // Check if the dice notation is valid
+        // @todo - Check if this regex test is necessary, given we're also checking in 'matches'
         if (!/^(\d*d\d+)([-+]\d+)*$/.test(diceNotation)) {
-            return 'Invalid dice notation';
+            return '{"err": "Invalid dice notation"}'
         }
 
         const matches = diceNotation.match(/(\d*)d(\d+)([-+]\d+)*/);
+        if (!matches) {
+            return '{"err": "Invalid dice notation"}'
+        }
 
         const numDice = parseInt(matches[1], 10) || 1;
         const diceSides = parseInt(matches[2], 10);
@@ -69,47 +88,31 @@ export class Rand {
     /**
      * Generates a random alphanumeric ID of a given length.
      *
-     * @todo This will break around the year 2059, when the timestamp will be 9 characters long.
-     *
-     * @param length The length of the ID string. Default is 8. (Collision probability is 1 in 62^length within the same millisecond)
-     * @param includeTimestamp Adds a base36 encoded string of milliseconds since epoch at the start of the ID. Default is true.
+     * @param length The length of the ID string. Default is 8. (Collision probability is 1 in 62^length within the same millisecond, assuming includeTimestamp is true.)
+     * @param includeTimestamp Adds a base62 encoded string of milliseconds since epoch at the start of the ID. Default is true.
      * @returns The generated ID string.
      */
     static id(length: number = 8, includeTimestamp: boolean = true): string {
-        let result = '';
-        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-        const charactersLength = characters.length;
-        for (let i = 0; i < length; i++) {
-            result += characters.charAt(this.int(0, charactersLength - 1));
-        }
+        let id = '';
         if (includeTimestamp) {
-            let timestampString = Date.now().toString(36); // 8 characters representing the timestamp
-            const scrambledBase36 = BASE36.slice(length % 36) + BASE36.slice(0, length % 36);
-            timestampString = timestampString.split('').map((char) => {
-                const index = BASE36.indexOf(char);
-                return scrambledBase36[index];
-            }).join('');
-            result = timestampString + result;
+            const timestamp = Date.now();
+            id += this.toBase62(timestamp, 10); // gets the timestamp, and pads it to 10 chars
         }
-        return result;
+        while (id.length < length + (includeTimestamp ? 10 : 0)) { // account for 10 chars if timestamp is included
+            id += this.toBase62(this.int(0, 61), 1);
+        }
+        return id;
     }
 
     /**
      * Converts an ID string into a Date object.
-     * Assumes that the timestamp takes up 8 characters in the given string.
+     * Assumes that the timestamp takes up 10 characters in the given string.
      * @param id - The ID string to convert.
      * @returns 'Sat Apr 20 2024 10:14:41 GMT-0300 (Brasilia Standard Time)' - A Date object representing the timestamp encoded in the ID.
      */
     static dateFromId(id: string): Date {
-        const length = id.length - 8; // retrieve the length from the id, assuming that the timestamp takes up 8 characters in the given string
-        let timestampString = id.slice(0, 8); // gets the first 8 characters from the id
-
-        const scrambledBase36 = BASE36.slice(length % 36) + BASE36.slice(0, length % 36);
-        timestampString = timestampString.split('').map((char) => {
-            const index = scrambledBase36.indexOf(char);
-            return BASE36[index];
-        }).join('');
-        const timestamp = parseInt(timestampString, 36);
+        const timestampBase62 = id.slice(0, 10); // we're now using 10 chars to store the timestamp
+        const timestamp = this.fromBase62(timestampBase62);
         return new Date(timestamp);
     }
 
@@ -142,4 +145,97 @@ export class Rand {
         }
         return `#${rgb.map((c) => c.toString(16).padStart(2, '0')).join('')}`;
     }
+
+    static toBase62(num: number, minLength: number = 0): string {
+        let result = '';
+
+        while (num > 0) {
+          result = BASE62[num % 62] + result;
+          num = Math.floor(num / 62);
+        }
+
+        while (result.length < minLength) {
+          result = BASE62_PAD + result;
+        }
+
+        return result;
+    }
+
+    static fromBase62(base62: string): number {
+        // Remove the padding characters
+        const trimmedBase62 = base62.replace(new RegExp(`^${BASE62_PAD}+`), '');
+
+        return trimmedBase62.split('').reverse().reduce((acc, char, index) => {
+          return acc + BASE62.indexOf(char) * Math.pow(62, index);
+        }, 0);
+    }
+
+    /**
+     * Generates a random name based on the specified pattern.
+     * 
+     * @param chunks The number of chunks to include in the name. Default is 3.
+     * @param separator The separator to use between chunks. Default is '-'.
+     * @param camelcase Indicates whether to use camel case for the name. Default is false.
+     * @param pattern The pattern to generate the name. Default is 'acn'.
+     *                'a' -> adjective || 'c' -> color || 'n' -> noun.
+     * 
+     * @returns The generated random name.
+     * 
+     * @throws Error if an invalid pattern character is provided.
+     */
+    static getName(chunks: number = 3, separator: string = '-', camelcase: boolean = false, pattern: string = 'acn'): string {
+        let name = '';
+        let wordsArray: string[] = [];
+        // Generate words based on pattern
+
+        for (const char of pattern) {
+            switch (char) {
+                case 'a':
+                    wordsArray.push(adjectives[this.int(0, adjectives.length - 1)]);
+                    break;
+                case 'c':
+                    wordsArray.push(colors[this.int(0, colors.length - 1)]);
+                    break;
+                case 'n':
+                    wordsArray.push(nouns[this.int(0, nouns.length - 1)]);
+                    break;
+                default:
+                    throw new Error('Invalid pattern character');
+            }
+        }
+        // Ensure only the required number of chunks are used
+        wordsArray = wordsArray.slice(0, chunks);
+    
+        if (camelcase) {
+            name = wordsArray[0];
+            // get the words after the first and capitalize the first letter
+            for (let i = 1; i < wordsArray.length; i++) {
+                name += wordsArray[i][0].toUpperCase() + wordsArray[i].slice(1);
+            }
+        } else {
+            name = wordsArray.join(separator);
+        }
+    
+        return name;
+    }
 }
+
+// go over the files ending in .txt, and remove elements that are over 10 characters long. then, rewrite the files
+// files.forEach(file => {
+//     if (file.endsWith('.txt')) {
+//         const filePath = path.join(assetsDir, file);
+//         let words = fs.readFileSync(filePath, 'utf8').split('\n');
+//         words = words.filter(word => word.length <= 8);
+//         fs.writeFileSync(filePath, words.join('\n'));
+//     }
+// });
+
+// // // now, order the words by length
+// files.forEach(file => {
+//     if (file.endsWith('.txt')) {
+//         const filePath = path.join(assetsDir, file);
+//         let words = fs.readFileSync(filePath, 'utf8').split('\n');
+//         words = words.sort((a, b) => a.length - b.length);
+//         fs.writeFileSync(filePath, words.join('\n'));
+//     }
+// });

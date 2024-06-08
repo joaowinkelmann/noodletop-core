@@ -3,7 +3,7 @@ import { Rand } from '../utils/randomizer';
 export type rObject = {
     id: string;
     props: { [key: string]: any } | null;
-    owner?: string;
+    owner: string | null; // null if there's no owner
 };
 
 // Class instanced by a Room to manage objects within that room.
@@ -21,17 +21,24 @@ export class ObjectManager {
      * @param creator - If provided, the id of the user who created the object -> User.id
      * @returns The created object as a JSON string
      */
-    create(type?: string, properties?: object, creator?: string): string {
+    create(type?: string, properties?: Record<string, any>, creator?: string): string {
         const id = Rand.id();
         const object: rObject = {
             id,
             props: null,
-            owner: creator || undefined
+            owner: creator || null
         };
 
         // if properties are provided, add them to the object
         if (properties) {
             object.props = properties;
+        } else {
+            object.props = {};
+        }
+
+        // add type to props (idk if this is the best approrach)
+        if (type) {
+            object.props = { ...object.props, type };
         }
 
         this.objects.set(id, object);
@@ -60,7 +67,7 @@ export class ObjectManager {
      * @param properties - A JSON object containing the properties to be updated. Ex: "{radius: 10, color: 'blue'}"
      * @returns The object, with the updated properties.
      */
-    update(id: string, properties: object): string {
+    update(id: string, properties: Record<string, any>): string {
         // try to get the object
         const object = this.objects.get(id);
 
@@ -88,7 +95,7 @@ export class ObjectManager {
     }
 
     // Transfers all objects from an owner to another
-    yieldOwnership(oldOwner: string, newOwner: string): void {
+    yieldOwnership(oldOwner: string, newOwner: string | null): void {
         this.objects.forEach((obj) => {
             if (obj.owner === oldOwner) {
                 obj.owner = newOwner;

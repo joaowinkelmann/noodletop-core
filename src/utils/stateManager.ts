@@ -1,9 +1,8 @@
 import { User } from '../models/user';
-import { Connection } from '~/models/dto/userDTO';
+import { Connection } from '../models/dto/userDTO';
 import { Room } from '../models/room';
 import { State } from '../models/state';
 import { RoomSweeper } from './sweeper';
-// import { ObservableMap } from './observableMap';
 import { ServerWebSocket } from 'bun';
 import { WebSocketData } from './common';
 import { Rand } from './randomizer';
@@ -37,7 +36,7 @@ export class StateManager {
     private createState(socket: ServerWebSocket<WebSocketData>): State {
         const state: State = {
             status: 'ACK',
-            roomCode: null,
+            roomCode: '',
             user: new User(socket)
         };
 
@@ -51,7 +50,7 @@ export class StateManager {
     }
 
     public getState(socket: ServerWebSocket<WebSocketData>): State | undefined {
-        const state: State = this.stateMap.get(socket) ?? undefined;
+        const state: State | undefined = this.stateMap.get(socket) ?? undefined;
         if (state && state.roomCode) {
             const room: Room = this.getRoom(state.roomCode) as Room;
             room.heartbeat(state.user);
@@ -61,7 +60,7 @@ export class StateManager {
 
     /**
      * Initializes the state for the given socket. Either by restoring it, or creating a new one.
-     * 
+     *
      * @param socket - The server WebSocket instance.
      */
     public initState(socket: ServerWebSocket<WebSocketData>): void {
@@ -75,7 +74,12 @@ export class StateManager {
         // global.log(`IP: ${socket.data.ip}`);
 
         // if (StateManager.ipBlocklist.includes(socket.data.ip)) {
-        if (StateManager.ipBlocklist.has(socket.data.ip) && StateManager.ipBlocklist.get(socket.data.ip)[0] > new Date(new Date().getTime() - 1000 * 60 * 60)) {
+
+        const stateIp: [Date, number] | undefined = StateManager.ipBlocklist.get(socket.data.ip);
+
+
+        // if (StateManager.ipBlocklist.has(socket.data.ip) && StateManager.ipBlocklist.get(socket.data.ip)[0] > new Date(new Date().getTime() - 1000 * 60 * 60)) {
+        if (stateIp && stateIp[0] > new Date(new Date().getTime() - 1000 * 60 * 60)) {
             global.log(`Blocked IP: ${socket.data.ip}`);
             socket.close(4003, 'Blocked IP');
             return;
@@ -86,9 +90,9 @@ export class StateManager {
         }
     }
 
-    private restoreState(newSocket: ServerWebSocket<WebSocketData>, userId: string, roomCode: string): State | false {
-        const room: Room = this.getRoom(roomCode) as Room;
-        if (!room) {
+    private restoreState(newSocket: ServerWebSocket<WebSocketData>, userId: string | null, roomCode: string | null): State | false {
+        const room: Room | null = this.getRoom(roomCode);
+        if (!userId || !roomCode || !room) {
             return false;
         }
         const user = room.getUserById(userId);
@@ -159,7 +163,6 @@ export class StateManager {
 
         // Promote the user(creator) to admin, as they're the first to enter the room
         room.promoteToAdmin(creator);
-        
         RoomSweeper.startSweeping();
 
         return room;
@@ -174,7 +177,10 @@ export class StateManager {
     }
 
     // same as getRooms but for a single room
-    public getRoom(roomCode: string): Room | undefined {
+    public getRoom(roomCode: string | null): Room | null {
+        if (!roomCode) {
+            return null;
+        }
         const room = this.rooms.get(roomCode);
         // if (!room) {
         //     return "Room not found";
@@ -182,9 +188,13 @@ export class StateManager {
         // return room.getRoomInfo();
         if (!room) {
             // throw new Error('Room not found');
-            return undefined;
+            return null;
         }
         return room;
+    }
+
+    public isRoomCodeAvaliable(roomCode: string): boolean {
+        return !this.rooms.has(roomCode);
     }
 
     public authUser(roomCode: string, state: State, password: string): boolean {
@@ -197,13 +207,13 @@ export class StateManager {
             return true;
         }
     }
-    
+
     private blockIP(state: State): void {
-        const lockoutMins = parseInt(process.env.LOCKOUT_DURATION) || 60;
-        const allowedStrikes = parseInt(process.env.ALLOWED_STRIKES) || 10;
+        const lockoutMins = parseInt(process.env.LOCKOUT_DURATION || "60", 10);
+        const allowedStrikes = parseInt(process.env.ALLOWED_STRIKES || "10", 10);
         const ipInfo = StateManager.ipBlocklist.get(state.user.getSocket().data.ip);
         const [blockedAt, strikes] = ipInfo ? ipInfo : [null, 0];
-    
+
         if (blockedAt && blockedAt > new Date(new Date().getTime() - 1000 * 60 * lockoutMins)) {
             if (strikes + 1 >= allowedStrikes) {
                 state.user.getSocket().close(4003, 'Blocked IP');
@@ -216,7 +226,7 @@ export class StateManager {
             StateManager.ipBlocklist.set(state.user.getSocket().data.ip, [new Date(), 1]);
         }
     }
-    
+
     private unblockIP(state: State): void {
         StateManager.ipBlocklist.delete(state.user.getSocket().data.ip);
     }

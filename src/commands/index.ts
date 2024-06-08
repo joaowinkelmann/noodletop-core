@@ -1,4 +1,6 @@
-import { shCss } from "~/utils/common";
+import { shCss } from '../utils/common';
+import fs from 'fs';
+import path from 'path';
 
 export interface CommandHandler {
     [command: string]: (state: any, message: string) => void;
@@ -10,8 +12,6 @@ export interface CommandHandler {
  */
 export async function loadCommands(): Promise<CommandHandler> {
     const commandHandlers: CommandHandler = {};
-    const fs = require('fs');
-    const path = require('path');
     const commandsDir = path.join(__dirname, './');
     const files = fs.readdirSync(commandsDir);
 

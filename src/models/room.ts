@@ -5,7 +5,7 @@ import { Rand } from '../utils/randomizer';
 import { RoomSettings } from './dto/roomDTO';
 import { Connection, Role } from './dto/userDTO';
 
-import { RoomDataManager } from '~/services/roomDataManager';
+import { RoomDataManager } from '../services/roomDataManager';
 
 /**
  * Class representing a room, containing a set of users and objects.
@@ -17,7 +17,7 @@ export class Room {
     private code: string;
     private sessionId: string;
     private status: string = 'active'; // active, inactive, closed
-    private lastSeen: number;
+    private lastSeen: number; // timestamp
     private settings: RoomSettings;
 
     /**
@@ -66,7 +66,11 @@ export class Room {
     }
 
     isFull(): boolean {
-        return this.settings.capacity && this.countUsers() >= this.settings.capacity;
+        if (this.settings.capacity && this.countUsers() >= this.settings.capacity) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     isEmpty(): boolean {
@@ -103,19 +107,22 @@ export class Room {
      * @param key - The key of the setting to be updated.
      * @param value - The new value for the setting.
      */
-    setRoomData(key: string, value: any): void {
+    setRoomData(key: string, value: any): boolean {
         // check if the key is valid
         if (key in this.settings) {
             // this.settings[key] = value;
             const method = `set${key.charAt(0).toUpperCase() + key.slice(1)}`;
             if (typeof this[method] === 'function') {
-                return this[method](value);
+                // return this[method](value);
+                this[method](value);
+                return true;
             } else {
                 // this.settings[key] = value;
             }
         } else {
             // handle invalid keys (perhaps a message informing the user)
         }
+        return false;
     }
 
     // CRUD operations for users
@@ -127,6 +134,10 @@ export class Room {
         }
         this.users.add(user);
         return true;
+    }
+
+    isUsernameAvaliable(username: string): boolean {
+        return !Array.from(this.users).find((user) => user.getUsername() === username);
     }
 
     promoteToAdmin(user: User): boolean {
@@ -184,7 +195,7 @@ export class Room {
     getActiveUsers(): Set<User> {
         // return new Set(Array.from(this.users).filter((user) => user.getConnectionStatus()));
         // return new Set(Array.from(this.users).filter((user) => user.getConnectionStatus() === Connection.Active));
-        return new Set(Array.from(this.users).filter((user) => user.getConnectionStatus() != Connection.Exited));
+        return new Set(Array.from(this.users).filter((user) => user.getConnectionStatus() !== Connection.Exited));
     }
 
     getAwayUsers(): Set<User> {
@@ -218,6 +229,9 @@ export class Room {
         user.setTeam(teamId);
 
         const team = this.teams.get(teamId);
+        if (!team) {
+            return JSON.stringify({ err: 'Team not found' });
+        }
 
         // change the User.id from inside each team member to be their current username.
         team.members = team.members.map((member) => {
@@ -228,14 +242,14 @@ export class Room {
         return JSON.stringify(team);
     }
 
-    leaveTeam(user: User): string {
+    leaveTeam(user: User): boolean {
         const teamId = user.getTeam();
         if (!teamId) {
-            return;
+            return false;
         }
         this.teams.leave(teamId, user.getId());
         user.setTeam(null);
-        return JSON.stringify(this.teams.get(teamId));
+        return true;
     }
 
     /**
@@ -246,7 +260,7 @@ export class Room {
     deleteTeam(teamId: string, user: User): boolean {
         if (!this.isAdmin(user)) {
             // throw new Error('User does not have permission to delete teams');
-            return;
+            return false;
         }
         return this.teams.delete(teamId);
     }
@@ -256,8 +270,8 @@ export class Room {
     }
 
     // CRUD operations for objects
-    createObj(type?: string, properties?: object, creator?: User): string {
-        return this.objects.create(type, properties, creator.id);
+    createObj(type?: string, properties?: Record<string, any>, creator?: User): string {
+        return this.objects.create(type, properties, creator?.id);
     }
 
     getObj(id: string): string | undefined {
@@ -268,7 +282,7 @@ export class Room {
         return this.objects.getAll();
     }
 
-    updateObj(id: string, properties?: object): string {
+    updateObj(id: string, properties: Record<string, any>): string {
         return this.objects.update(id, properties);
     }
 
@@ -295,6 +309,10 @@ export class Room {
         return this.lastSeen;
     }
 
+    getLastSeenDate(): Date {
+        return new Date(this.lastSeen);
+    }
+
     checkEmpty(): void {
         if (this.isEmpty()) {
             this.status = 'inactive';
@@ -317,9 +335,10 @@ export class Room {
         return ret;
     }
 
-    setPassword(password: string): void {
+    setPassword(password: string): boolean {
         this.settings.password = password;
         global.log(`Room ${this.code} is now password protected`);
+        return true;
     }
 
     public isPasswordProtected(): boolean {

@@ -1,5 +1,5 @@
-import { State } from '~/models/state';
-import { Rand } from '~/utils/randomizer';
+import { State } from '../models/state';
+import { Rand } from '../utils/randomizer';
 
 export const listeners = [
     '/debug'
@@ -8,7 +8,7 @@ export const listeners = [
 export default function debug(state: State, input: string) {
     const [command , op, ...args] = input.split(' ');
 
-    let response = null;
+    let response: string;
 
     switch (op) {
         case 'dateFromId':
@@ -23,6 +23,22 @@ export default function debug(state: State, input: string) {
                 break;
             }
             response = Rand.id(length);
+            break;
+        case 'toBase62':
+            const num = parseInt(args[0], 10);
+            if (isNaN(num)) {
+                response = `I'm afraid I can't do that, Dave.`;
+                break;
+            }
+            response = Rand.toBase62(num);
+            break;
+        case 'fromBase62':
+            const base62 = args[0];
+            response = String(Rand.fromBase62(base62));
+            break;
+        case 'getName':
+            const name = Rand.getName();
+            response = `Generated name: ${name}`;
             break;
         default:
             response = `Invalid operation`;

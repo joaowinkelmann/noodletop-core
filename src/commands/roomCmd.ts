@@ -1,7 +1,7 @@
-import { Room } from '~/models/room';
-import { StateManager } from '~/utils/stateManager';
-import { State } from '~/models/state';
-import { isAdmin } from '~/utils/common';
+import { Room } from '../models/room';
+import { StateManager } from '../utils/stateManager';
+import { State } from '../models/state';
+import { isAdmin } from '../utils/common';
 
 export const listeners = [
     '/room'
@@ -14,12 +14,12 @@ export default async function room(state: State, input: string) {
     const room: Room = StateManager.getInstance().getRoom(state.roomCode) as Room;
     if (!room) return;
 
-    let response = null;
+    let response: string;
 
     const argArr = args.map((arg) => arg.trim());
     switch (op) {
         case 'set':
-            response = room.setRoomData(argArr[0], argArr[1]);
+            response = String(room.setRoomData(argArr[0], argArr[1]));
             break;
         case 'info':
             response = room.getRoomInfo();
@@ -32,11 +32,11 @@ export default async function room(state: State, input: string) {
             response = room.joinTeam(argArr[0], state.user);
             break;
         case 'leave':
-            response = room.leaveTeam(state.user);
+            response = String(room.leaveTeam(state.user));
             break;
         case 'delete':
             if (!isAdmin(state.user)) return;
-            response = room.deleteTeam(argArr[0], state.user);
+            response = String(room.deleteTeam(argArr[0], state.user));
             break;
         case 'list':
             response = room.listTeams();
@@ -45,16 +45,15 @@ export default async function room(state: State, input: string) {
             response = room.getTeam(argArr[0]);
             break;
         case 'save':
-            response = await room.save();
-            // console.log(response);
-            if (response) {
+            response = String(await room.save());
+            if (response === 'true') {
                 response = 'Room saved';
             } else {
                 response = 'Error saving room';
             }
             break;
         case 'setpassword':
-            response = room.setPassword(argArr[0]);
+            response = String(room.setPassword(argArr[0]));
             break;
         default:
             response = 'Invalid operation';
@@ -62,7 +61,7 @@ export default async function room(state: State, input: string) {
     }
 
     // await for the response if it is a promise
-    if (response instanceof Promise) {
+    if (response as any instanceof Promise) {
         response = await response;
     }
 

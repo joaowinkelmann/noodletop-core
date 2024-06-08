@@ -1,8 +1,8 @@
 import { ServerWebSocket } from 'bun';
-import { Rand } from '~/utils/randomizer';
-import { UserStatus, UserCosmetics, Connection, Role } from '~/models/dto/userDTO';
-import { ObjectManager } from './object';
-import { WebSocketData } from '~/utils/common';
+import { Rand } from '../utils/randomizer';
+import { UserStatus, UserCosmetics, Connection, Role } from '../models/dto/userDTO';
+import { WebSocketData } from '../utils/common';
+import { Deck } from './deck';
 
 export class User {
     socket: ServerWebSocket<WebSocketData>;
@@ -11,6 +11,8 @@ export class User {
     role: Role;
     status: UserStatus;
     cosmetics: UserCosmetics;
+    // private deck: Deck = new Deck();
+    deck: Deck = new Deck();
 
     constructor(socket: ServerWebSocket<WebSocketData>) {
         this.socket = socket;
@@ -19,7 +21,9 @@ export class User {
             last_seen: Date.now()
         };
         this.cosmetics = {
-            color: Rand.color()
+            color: Rand.color(),
+            avatar: null,
+            team: null
         };
         this.role = Role.Player;
     }
@@ -76,7 +80,7 @@ export class User {
     }
 
     setConnectionStatus(status: Connection): void {
-        global.log("User connection status changed to " + status);
+        global.log('User connection status changed to ' + Connection[status]);
         this.status.connection = status;
     }
 
@@ -85,9 +89,6 @@ export class User {
     }
 
     setUsername(newUsername: string): string {
-        if (!newUsername) {
-            return;
-        }
         const currentUsername = this.username;
         this.username = newUsername;
         return `Username changed from ${currentUsername} to ${newUsername}`;
@@ -134,33 +135,37 @@ export class User {
      *
      * @param key - The key of the user data to set.
      * @param value - The value to set for the specified key.
+     * @returns True if the key is valid and the value was set, false otherwise.
      */
-    setUserData(key: string, value: any): void {
+    setUserData(key: string, value: any): boolean {
         // check if the key is valid
         if (key in this) {
             // this.settings[key] = value;
             const method = `set${key.charAt(0).toUpperCase() + key.slice(1)}`;
             if (typeof this[method] === 'function') {
-                return this[method](value);
+                this[method](value);
+                return true;
             } else {
                 // this.settings[key] = value;
             }
         } else {
             // handle invalid keys (perhaps a message informing the user)
         }
+        return false;
     }
 
     // Avatar related methods
-    getAvatar(): string {
+    getAvatar(): string | null {
         return this.cosmetics.avatar;
     }
 
-    setAvatar(avatar: string): void {
+    setAvatar(avatar: string): boolean {
         this.cosmetics.avatar = avatar;
+        return true;
     }
 
     removeAvatar(): void {
-        delete this.cosmetics.avatar;
+        this.cosmetics.avatar = null;
     }
 
 }

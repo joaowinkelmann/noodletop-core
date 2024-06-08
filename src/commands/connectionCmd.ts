@@ -1,6 +1,6 @@
-import { State } from '~/models/state';
-import { StateManager } from '~/utils/stateManager';
-import { Room } from '~/models/room';
+import { State } from '../models/state';
+import { StateManager } from '../utils/stateManager';
+import { Room } from '../models/room';
 
 export const listeners = [
     '/quit',
@@ -22,8 +22,16 @@ export const helpString = [
  */
 export default function connection(state: State, input: string) {
     const [command , op, ...args] = input.split(' ');
-
-    const room: Room = StateManager.getInstance().getRoom(state.roomCode); // get the room
+    if (!state.roomCode) {
+        return;
+    }
+    let room: Room | null;
+    
+    room = StateManager.getInstance().getRoom(state.roomCode);
+    if (!room) {
+        state.user.getSocket().send('{"err": "Room not found"}');
+        return;
+    }
 
     switch (command) {
         case '/quit':

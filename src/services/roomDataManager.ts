@@ -1,6 +1,7 @@
-import { Db } from '~/database';
+import { Db } from '../database';
 import { Room } from '../models/room';
-import { StateManager } from '~/utils/stateManager';
+import { Rand } from '../utils/randomizer';
+import { StateManager } from '../utils/stateManager';
 
 export class RoomDataManager {
     constructor(private db: Db) {}
@@ -9,11 +10,13 @@ export class RoomDataManager {
         // Convert the room to a format suitable for saving...
         const roomDataToSave = this.convertRoomToData(room);
         const db = new Db();
-        await db.connect();
+        const connected = await db.connect();
+
+        if (!connected) {
+            return false;
+        }
 
         // Save the room data...
-        // await this.db.insert('rooms', roomDataToSave);
-        // return await db.insOne('rooms', roomDataToSave);
         return await db.upsOne('rooms', { id: room.getSessionId() }, roomDataToSave);
     }
 
@@ -25,11 +28,13 @@ export class RoomDataManager {
         return this.convertDataToRoom(roomDataToLoad);
     }
 
-    private static convertRoomToData(room: Room): object {
+    private static convertRoomToData(room: Room): Record<string, any> {
         // Convert the room to a format suitable for saving...
         return {
             id: room.getSessionId(),
             code: room.getCode(),
+            date_ins: Rand.dateFromId(room.getSessionId()),
+            date_upd: room.getLastSeenDate(),
             users: Array.from(room.getUsers()).map(user => user.getUsername()),
             objects: room.getAllObj()
             // Other properties...

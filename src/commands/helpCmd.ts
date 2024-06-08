@@ -1,4 +1,6 @@
-import { State } from '~/models/state';
+import { State } from '../models/state';
+import fs from 'fs';
+import path from 'path';
 
 export const listeners = [
     '/help'
@@ -8,9 +10,6 @@ export const helpString = '/help - Displays this help message.';
 
 export default async function help(state: State, input: string) {
     let response = `Available commands:\r\n`;
-
-    const fs = require('fs');
-    const path = require('path');
     const commandsDir = path.join(__dirname, './');
     const files = fs.readdirSync(commandsDir);
 

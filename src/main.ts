@@ -21,11 +21,11 @@ Bun.serve<WebSocketData>({
                 data: {
                     roomCode: room,
                     userId: user,
-                    ip: this.requestIP(req).address
+                    ip: this.requestIP(req)?.address
                 }
             });
             if (!success) {
-                return Response.redirect("/");
+                return Response.redirect('/');
             }
         } else if (pathname.startsWith('/api/')) {
             const route = routes.find((route) => new RegExp(route.pathRegex).test(pathname));
@@ -36,7 +36,7 @@ Bun.serve<WebSocketData>({
                 return new Response('Not Found', { status: 404 });
             }
         } else {
-            return Response.redirect("/");
+            return Response.redirect('/');
         }
     },
     websocket: {
@@ -49,7 +49,11 @@ Bun.serve<WebSocketData>({
             const command = message.toString().split(' ')[0];
             let handler = commands[command];
 
-            if (state.status !== 'OK' && command !== '/ping') {
+            if (!state) {
+                return;
+            }
+
+            if (state?.status !== 'OK' && command !== '/ping') {
                 handler = commands['/ingress'];
             } else {
                 if (!handler) {
