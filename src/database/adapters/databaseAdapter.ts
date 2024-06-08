@@ -1,7 +1,7 @@
 export interface DatabaseAdapter {
     // Connection methods
-    connect(): Promise<any>;
-    disconnect(): Promise<any>;
+    connect(): Promise<boolean>;
+    disconnect(): Promise<boolean>;
 
 
     // Create
@@ -27,5 +27,5 @@ export interface DatabaseAdapter {
 
 
     // Misc
-    setup?(): void;
+    setup?(): Promise<boolean>;
 }

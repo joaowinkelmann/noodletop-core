@@ -86,7 +86,7 @@ export class RoomSweeper {
                             global.log(`Sucessfully archived room ${room.getCode()}. Now closing...`);
                             rooms.delete(room.getCode());
                         } else {
-                            global.log(`Failed to archive room ${room.getCode()}.`);
+                            global.log(`${shCss.red}Failed to archive room ${room.getCode()}.${shCss.end}`);
                         }
                     }
                 }

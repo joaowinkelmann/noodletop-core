@@ -9,7 +9,11 @@ export class RoomDataManager {
         // Convert the room to a format suitable for saving...
         const roomDataToSave = this.convertRoomToData(room);
         const db = new Db();
-        await db.connect();
+        const connected = await db.connect();
+
+        if (!connected) {
+            return false;
+        }
 
         // Save the room data...
         // await this.db.insert('rooms', roomDataToSave);

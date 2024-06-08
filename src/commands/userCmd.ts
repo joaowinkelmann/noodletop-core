@@ -23,7 +23,7 @@ export default function user(state: State, input: string) {
             response = String(user.setUserData(argArr[0], argArr[1]));
             break;
         case 'setUsername':
-            let username = argArr[0];
+            const username = argArr[0];
             if (username.length > 0) {
                 response = state.user.setUsername(args[0]);
             } else {

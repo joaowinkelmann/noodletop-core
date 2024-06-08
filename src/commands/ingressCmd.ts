@@ -3,6 +3,7 @@ import { StateManager } from '../utils/stateManager';
 import { Room } from '../models/room';
 import { User } from '../models/user';
 import message from './messageCmd';
+import { Rand } from '../utils/randomizer';
 
 export const listeners = [
     '/ingress'
@@ -15,7 +16,7 @@ export const listeners = [
  * @returns
  */
 export default function ingress(state: State, input: string) {
-    const [command , op, ...args] = input.split(' ');
+    // const [command , op, ...args] = input.split(' ');
 
     let response: string | undefined;
     switch (state.status) {
@@ -40,7 +41,17 @@ export default function ingress(state: State, input: string) {
 
         case 'ROOM':
             // user is answering a prompt to enter a room, so let's understand the sent message as the roomCode
-            const roomCode = input.trim().toLowerCase();
+            let roomCode = input.trim().toLowerCase();
+
+            // user hasn't informed a room, so let's get one from Rand.roomCode()
+            if (roomCode.length === 0) {
+                const pattern = Rand.bool() ? 'acn' : 'can';
+                roomCode = Rand.getName(3, '-', false, pattern);
+                while (!StateManager.getInstance().isRoomCodeAvaliable(roomCode)) {
+                    roomCode = Rand.getName(3, '-', false, pattern);
+                }
+            }
+
 
             // roomCode validation
             if (roomCode.length < 3) {
@@ -62,8 +73,8 @@ export default function ingress(state: State, input: string) {
                     // @todo - inform the user that the room is not avaliable/handle an error
                     return; // if the room is not avaliable, ignore the request
                 }
+
                 // check for room password
-                // room.authenticate(state.user);
                 if (room.isPasswordProtected()) {
                     state.status = 'RPWD'; // user is being asked to enter a password
                     state.roomCode = roomCode;
@@ -102,7 +113,21 @@ export default function ingress(state: State, input: string) {
 
         case 'NAME':
             // user is answering a prompt to enter a username, so let's understand the sent message as the username
-            const username = input.trim();
+            let username = input.trim();
+            const room: Room = StateManager.getInstance().getRoom(state.roomCode) as Room;
+
+            if (!room) {
+                state.user.getSocket().close(4003, 'Invalid state');
+                return;
+            }
+
+            // if the user hasn't informed a username, generate a random one
+            if (username.length === 0) {
+                username = Rand.getName(2, '', true, 'cn');
+                while (!room.isUsernameAvaliable(username)) {
+                    username = Rand.getName(2, '', true);
+                }
+            }
 
             // username validation
             if (username.length < 5) {
@@ -114,8 +139,6 @@ export default function ingress(state: State, input: string) {
             }
 
             state.user.setUsername(username);
-
-            const room: Room = StateManager.getInstance().getRoom(state.roomCode) as Room;
             const user: User = state.user;
 
             // try to add the user into the room
@@ -127,7 +150,7 @@ export default function ingress(state: State, input: string) {
                 user.getSocket().send(room.getRoomInfo());
             } else {
                 // user could not join the room, because it was full (or some other reason in the future). For now, we only handle duplicate usernames
-                global.log(JSON.stringify(state));
+                // global.log(JSON.stringify(state));
 
                 // inform the user that his name is already taken, prompt him to enter a new one
                 state.user.getSocket().send('Username is already taken.');
@@ -139,6 +162,7 @@ export default function ingress(state: State, input: string) {
             break;
         case 'OK':
             message(state, input);
+            break;
         default:
             state.user.getSocket().close(4003, 'Invalid state');
             return;

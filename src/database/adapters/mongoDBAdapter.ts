@@ -1,5 +1,7 @@
 import { MongoClient } from 'mongodb';
 import { DatabaseAdapter } from './databaseAdapter';
+import { $ } from 'bun';
+import { shCss } from '../../utils/common';
 
 export class MongoDBAdapter implements DatabaseAdapter {
 
@@ -12,7 +14,7 @@ export class MongoDBAdapter implements DatabaseAdapter {
     }
 
     // create the database and the collection if needed
-    setup() {
+    // async setup(): Promise<any> {
         // console.log('Setting up MongoDB...');
         // this.client.connect().
         //     then(() => {
@@ -26,21 +28,39 @@ export class MongoDBAdapter implements DatabaseAdapter {
         //     ).catch((err) => {
         //         console.error(err);
         //     });
-    }
+    // }
 
-    connect(): Promise<any> {
+    async connect(): Promise<boolean> {
+        // if (!(await this.isMongodRunning())) {
+        //     return;
+        // }
+        // console.log('Connecting to MongoDB...');
+        // return this.client.connect().then(() => {
+        //     console.log('Connected to MongoDB');
+
+        // }).catch((err) => {
+        //     console.error(err);
+        // }
+
+        if (!(await this.isMongodRunning())) {
+            return false;
+        }
         console.log('Connecting to MongoDB...');
         return this.client.connect().then(() => {
             console.log('Connected to MongoDB');
+            return true;
         }).catch((err) => {
             console.error(err);
+            return false;
         }
     );
     }
-    disconnect(): Promise<void> {
+
+    disconnect(): Promise<boolean> {
         // throw new Error('Method not implemented.');
         console.log('Disconnecting from MongoDB...');
-        return this.client.close();
+        this.client.close();
+        return Promise.resolve(true);
     }
 
     // Create
@@ -132,5 +152,18 @@ export class MongoDBAdapter implements DatabaseAdapter {
         }).catch((err) => {
             console.error(err);
         });
+    }
+
+    private async isMongodRunning(): Promise<boolean> {
+        // check if mongod is running
+        const check = $`ps aux | grep mongod | grep -v grep`;
+        let shRet = '';
+        shRet = await check.text();
+
+        if (shRet === '') {
+            global.log(`${shCss.red}${shCss.bold}CRITICAL: Loaded DB manager MongoDB (service mongod) is not running. Read/write operations will remain pending.${shCss.end}`);
+            return false;
+        }
+        return true;
     }
 }

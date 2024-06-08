@@ -136,6 +136,10 @@ export class Room {
         return true;
     }
 
+    isUsernameAvaliable(username: string): boolean {
+        return !Array.from(this.users).find((user) => user.getUsername() === username);
+    }
+
     promoteToAdmin(user: User): boolean {
         user.setRole(Role.Admin);
         return true;

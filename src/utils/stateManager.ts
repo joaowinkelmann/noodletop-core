@@ -3,7 +3,6 @@ import { Connection } from '../models/dto/userDTO';
 import { Room } from '../models/room';
 import { State } from '../models/state';
 import { RoomSweeper } from './sweeper';
-// import { ObservableMap } from './observableMap';
 import { ServerWebSocket } from 'bun';
 import { WebSocketData } from './common';
 import { Rand } from './randomizer';
@@ -192,6 +191,10 @@ export class StateManager {
             return null;
         }
         return room;
+    }
+
+    public isRoomCodeAvaliable(roomCode: string): boolean {
+        return !this.rooms.has(roomCode);
     }
 
     public authUser(roomCode: string, state: State, password: string): boolean {

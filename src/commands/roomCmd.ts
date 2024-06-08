@@ -46,8 +46,8 @@ export default async function room(state: State, input: string) {
             break;
         case 'save':
             response = String(await room.save());
-            // console.log(response);
-            if (response) {
+            console.log(response);
+            if (response === 'true') {
                 response = 'Room saved';
             } else {
                 response = 'Error saving room';

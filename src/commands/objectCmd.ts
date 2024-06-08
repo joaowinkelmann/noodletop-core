@@ -20,7 +20,7 @@ export default function object(state: State, input: string) {
     switch (op) {
         case 'read':
         case 'r':
-            let obj = room.getObj(args[0]);
+            const obj = room.getObj(args[0]);
             if (obj) {
                 response = JSON.stringify(obj);
             } else {
@@ -28,7 +28,7 @@ export default function object(state: State, input: string) {
             }
             break;
         case 'readall':
-            let objs = room.getAllObj();
+            const objs = room.getAllObj();
             if (objs) {
                 response = JSON.stringify(objs);
             } else {

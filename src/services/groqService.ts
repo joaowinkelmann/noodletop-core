@@ -1,7 +1,7 @@
 import Groq from 'groq-sdk';
 
 export class GroqService {
-    private groq: any;
+    private groq: Groq;
     private model: string;
 
     constructor(model?: string) {

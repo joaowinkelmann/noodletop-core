@@ -24,7 +24,6 @@ fun
 oil
 age
 tax
-man
 act
 car
 dog
@@ -432,7 +431,6 @@ event
 phone
 scene
 death
-woman
 skill
 depth
 heart
@@ -675,7 +673,6 @@ slide
 strip
 march
 smell
-adult
 brief
 crazy
 prior
@@ -966,7 +963,6 @@ outlet
 balloon
 control
 ocarina
-release
 mystery
 fairy
 bracelet
@@ -981,3 +977,18 @@ creature
 sword
 shield
 gem
+tacos
+burrito
+chocolate
+sushi
+barcelona
+paris
+berlin
+mousepad
+keyboard
+monitor
+laptop
+console
+cafe
+samba
+prince

@@ -1,8 +1,14 @@
 import { webcrypto } from 'crypto';
+import * as fs from 'fs';
+import * as path from 'path';
 
-// save the character 'n' for padding, exchanging it to '_'
 export const BASE62 = '0123456789abcdefghijklm_opqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
 export const BASE62_PAD = 'n';
+
+const assetsDir = path.join(__dirname, '../assets/');
+const adjectives = fs.readFileSync(path.join(assetsDir, 'english-adjectives.txt'), 'utf8').split('\n');
+const colors = fs.readFileSync(path.join(assetsDir, 'english-colors.txt'), 'utf8').split('\n');
+const nouns = fs.readFileSync(path.join(assetsDir, 'english-nouns.txt'), 'utf8').split('\n');
 
 export class Rand {
     /**
@@ -16,6 +22,14 @@ export class Rand {
         return (
             webcrypto.getRandomValues(new Uint32Array(1))[0] % (max - min + 1) + min
         );
+    }
+
+    /**
+     * Generates a random boolean value.
+     * @returns A random boolean value.
+     */
+    static bool(): boolean {
+        return this.int(0, 1) === 1;
     }
 
     /**
@@ -157,45 +171,71 @@ export class Rand {
     }
 
     /**
-     * Generates a easyly readable and pronounceable room code. E.g. "blue-space-dust"
+     * Generates a random name based on the specified pattern.
+     * 
+     * @param chunks The number of chunks to include in the name. Default is 3.
+     * @param separator The separator to use between chunks. Default is '-'.
+     * @param camelcase Indicates whether to use camel case for the name. Default is false.
+     * @param pattern The pattern to generate the name. Default is 'acn'.
+     *                'a' -> adjective || 'c' -> color || 'n' -> noun.
+     * 
+     * @returns The generated random name.
+     * 
+     * @throws Error if an invalid pattern character is provided.
      */
-    static roomCode(chunks: number = 3, separator: string = '-'): string {
-        // read from /assets/english-adjectives.txt and /assets/english-nouns.txt
-        const fs = require('fs');
-        const path = require('path');
-        const assetsDir = path.join(__dirname, '../assets/');
+    static getName(chunks: number = 3, separator: string = '-', camelcase: boolean = false, pattern: string = 'acn'): string {
+        let name = '';
+        let wordsArray: string[] = [];
+        // Generate words based on pattern
 
-        const adjectives = fs.readFileSync(path.join(assetsDir, 'english-adjectives.txt'), 'utf8').split('\n');
-        const words = fs.readFileSync(path.join(assetsDir, 'english-nouns.txt'), 'utf8').split('\n');
-        const colors = fs.readFileSync(path.join(assetsDir, 'english-colors.txt'), 'utf8').split('\n');
-
-        // go over the files ending in .txt, and remove elements that are over 10 characters long. then, rewrite the files
-        // files.forEach(file => {
-        //     if (file.endsWith('.txt')) {
-        //         const filePath = path.join(assetsDir, file);
-        //         let words = fs.readFileSync(filePath, 'utf8').split('\n');
-        //         words = words.filter(word => word.length <= 8);
-        //         fs.writeFileSync(filePath, words.join('\n'));
-        //     }
-        // });
-
-        // // // now, order the words by length
-        // files.forEach(file => {
-        //     if (file.endsWith('.txt')) {
-        //         const filePath = path.join(assetsDir, file);
-        //         let words = fs.readFileSync(filePath, 'utf8').split('\n');
-        //         words = words.sort((a, b) => a.length - b.length);
-        //         fs.writeFileSync(filePath, words.join('\n'));
-        //     }
-        // });
-
-        let code = '';
-
-        // adjective + color + noun
-        code += adjectives[this.int(0, adjectives.length - 1)];
-        code += separator + colors[this.int(0, colors.length - 1)];
-        code += separator + words[this.int(0, words.length - 1)];
-
-        return code;
+        for (const char of pattern) {
+            switch (char) {
+                case 'a':
+                    wordsArray.push(adjectives[this.int(0, adjectives.length - 1)]);
+                    break;
+                case 'c':
+                    wordsArray.push(colors[this.int(0, colors.length - 1)]);
+                    break;
+                case 'n':
+                    wordsArray.push(nouns[this.int(0, nouns.length - 1)]);
+                    break;
+                default:
+                    throw new Error('Invalid pattern character');
+            }
+        }
+        // Ensure only the required number of chunks are used
+        wordsArray = wordsArray.slice(0, chunks);
+    
+        if (camelcase) {
+            name = wordsArray[0];
+            // get the words after the first and capitalize the first letter
+            for (let i = 1; i < wordsArray.length; i++) {
+                name += wordsArray[i][0].toUpperCase() + wordsArray[i].slice(1);
+            }
+        } else {
+            name = wordsArray.join(separator);
+        }
+    
+        return name;
     }
 }
+
+// go over the files ending in .txt, and remove elements that are over 10 characters long. then, rewrite the files
+// files.forEach(file => {
+//     if (file.endsWith('.txt')) {
+//         const filePath = path.join(assetsDir, file);
+//         let words = fs.readFileSync(filePath, 'utf8').split('\n');
+//         words = words.filter(word => word.length <= 8);
+//         fs.writeFileSync(filePath, words.join('\n'));
+//     }
+// });
+
+// // // now, order the words by length
+// files.forEach(file => {
+//     if (file.endsWith('.txt')) {
+//         const filePath = path.join(assetsDir, file);
+//         let words = fs.readFileSync(filePath, 'utf8').split('\n');
+//         words = words.sort((a, b) => a.length - b.length);
+//         fs.writeFileSync(filePath, words.join('\n'));
+//     }
+// });

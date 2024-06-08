@@ -46,6 +46,7 @@ export const isAdmin = (user: User): boolean => {
 };
 
 /**
+ * Shell CSS
  * Styling helper for bash output.
  */
 export const shCss = {

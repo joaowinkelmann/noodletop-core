@@ -25,12 +25,12 @@ export class Db {
         }
     }
 
-    async connect() {
-        await await this.adapter.connect();
+    async connect(): Promise<boolean> {
+        return await this.adapter.connect();
     }
 
-    async disconnect() {
-        await await this.adapter.disconnect();
+    async disconnect(): Promise<boolean> {
+        return await this.adapter.disconnect();
     }
 
     // create
