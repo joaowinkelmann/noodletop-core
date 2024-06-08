@@ -1,8 +1,7 @@
-export interface DatabaseAdapter {
+export interface DatabaseAdapterInterface {
     // Connection methods
     connect(): Promise<boolean>;
     disconnect(): Promise<boolean>;
-
 
     // Create
     insOne(collection: string, document: Record<string, any>): Promise<boolean>;
@@ -24,7 +23,6 @@ export interface DatabaseAdapter {
     // Delete
     remOne(collection: string, query: Record<string, any>): Promise<any>;
     remMany(collection: string, query: Record<string, any>[]): Promise<any>;
-
 
     // Misc
     setup?(): Promise<boolean>;

@@ -72,7 +72,6 @@ toe
 one
 use
 few
-she
 put
 set
 big
@@ -146,7 +145,6 @@ menu
 beer
 dirt
 gene
-lady
 poet
 tale
 time
@@ -833,7 +831,6 @@ factor
 master
 muscle
 appeal
-mother
 season
 signal
 spirit
@@ -842,7 +839,6 @@ status
 ticket
 degree
 doctor
-father
 stable
 detail
 shower
@@ -992,3 +988,22 @@ console
 cafe
 samba
 prince
+rabbit
+penguin
+panda
+koala
+hippo
+like
+hug
+hospital
+universe
+galaxy
+cluster
+planet
+comet
+asteroid
+astro
+nebula
+quasar
+supernova
+rotor

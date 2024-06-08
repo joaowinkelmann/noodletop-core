@@ -1,7 +1,7 @@
 import { Room } from '../models/room';
 import { StateManager } from '../utils/stateManager';
 import { State } from '../models/state';
-import { isJSON, isAdmin } from '../utils/common';
+import { isJSON } from '../utils/common';
 
 export const listeners = [
     '/deck'

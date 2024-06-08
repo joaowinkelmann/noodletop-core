@@ -1,9 +1,9 @@
 import { MongoClient } from 'mongodb';
-import { DatabaseAdapter } from './databaseAdapter';
+import { DatabaseAdapterInterface } from './databaseAdapterInterface';
 import { $ } from 'bun';
 import { shCss } from '../../utils/common';
 
-export class MongoDBAdapter implements DatabaseAdapter {
+export class MongoDBAdapter implements DatabaseAdapterInterface {
 
     private client: MongoClient;
     private database: string;
@@ -47,7 +47,6 @@ export class MongoDBAdapter implements DatabaseAdapter {
         }
         console.log('Connecting to MongoDB...');
         return this.client.connect().then(() => {
-            console.log('Connected to MongoDB');
             return true;
         }).catch((err) => {
             console.error(err);

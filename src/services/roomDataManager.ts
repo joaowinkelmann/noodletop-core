@@ -1,5 +1,6 @@
 import { Db } from '../database';
 import { Room } from '../models/room';
+import { Rand } from '../utils/randomizer';
 import { StateManager } from '../utils/stateManager';
 
 export class RoomDataManager {
@@ -16,8 +17,6 @@ export class RoomDataManager {
         }
 
         // Save the room data...
-        // await this.db.insert('rooms', roomDataToSave);
-        // return await db.insOne('rooms', roomDataToSave);
         return await db.upsOne('rooms', { id: room.getSessionId() }, roomDataToSave);
     }
 
@@ -34,6 +33,8 @@ export class RoomDataManager {
         return {
             id: room.getSessionId(),
             code: room.getCode(),
+            date_ins: Rand.dateFromId(room.getSessionId()),
+            date_upd: room.getLastSeenDate(),
             users: Array.from(room.getUsers()).map(user => user.getUsername()),
             objects: room.getAllObj()
             // Other properties...

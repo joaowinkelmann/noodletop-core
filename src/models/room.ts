@@ -17,7 +17,7 @@ export class Room {
     private code: string;
     private sessionId: string;
     private status: string = 'active'; // active, inactive, closed
-    private lastSeen: number;
+    private lastSeen: number; // timestamp
     private settings: RoomSettings;
 
     /**
@@ -307,6 +307,10 @@ export class Room {
 
     getLastSeen(): number {
         return this.lastSeen;
+    }
+
+    getLastSeenDate(): Date {
+        return new Date(this.lastSeen);
     }
 
     checkEmpty(): void {

@@ -1,11 +1,11 @@
-import { DatabaseAdapter } from './adapters/databaseAdapter';
+import { DatabaseAdapterInterface } from './adapters/databaseAdapterInterface';
 import { MongoDBAdapter } from './adapters/mongoDBAdapter';
 
 /**
  * Exposes the database to the rest of the application.
  */
 export class Db {
-    private adapter: DatabaseAdapter;
+    private adapter: DatabaseAdapterInterface;
 
     constructor() {
         switch (process.env.DB_SYSTEM || 'mongodb') {

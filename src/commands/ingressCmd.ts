@@ -145,7 +145,7 @@ export default function ingress(state: State, input: string) {
             if (room.addUser(user)) {
                 // user joined the room successfully
                 state.status = 'OK'; // user is all set
-                room.announce(`${user.username} joined the room`);
+                room.announce(`${user.username} joined the room ${room.getCode()}`);
 
                 user.getSocket().send(room.getRoomInfo());
             } else {
