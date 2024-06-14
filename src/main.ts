@@ -1,5 +1,6 @@
 import { StateManager } from './utils/stateManager';
 import { parseHeaders, shCss, WebSocketData } from './utils/common';
+import { Router } from './routes';
 
 global.log = (msg) => {
     console.log(msg); // Uncomment this line to enable logging
@@ -8,8 +9,8 @@ global.log = (msg) => {
 import { loadCommands } from './commands';
 const commands = await loadCommands();
 
-import { loadRoutes } from './routes';
-const routes = await loadRoutes();
+const router = new Router();
+await router.loadRoutes();
 
 Bun.serve<WebSocketData>({
     async fetch(req: Request, server) {
@@ -27,16 +28,8 @@ Bun.serve<WebSocketData>({
             if (!success) {
                 return Response.redirect('/');
             }
-        } else if (pathname.startsWith('/api/')) {
-            const route = routes.find((route) => new RegExp(route.pathRegex).test(pathname));
-
-            if (route) {
-                return route.handler(req);
-            } else {
-                return new Response('Not Found', { status: 404 });
-            }
         } else {
-            return Response.redirect('/');
+            return router.route(req);
         }
     },
     websocket: {
@@ -46,12 +39,9 @@ Bun.serve<WebSocketData>({
         },
         message(ws, message) {
             const state = StateManager.getInstance().getState(ws);
+            if (!state) return;
             const command = message.toString().split(' ')[0];
             let handler = commands[command];
-
-            if (!state) {
-                return;
-            }
 
             if (state?.status !== 'OK' && command !== '/ping') {
                 handler = commands['/ingress'];

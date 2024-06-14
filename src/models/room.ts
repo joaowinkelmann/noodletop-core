@@ -4,6 +4,7 @@ import { ObjectManager } from './object';
 import { Rand } from '../utils/randomizer';
 import { RoomSettings } from './dto/roomDTO';
 import { Connection, Role } from './dto/userDTO';
+import { Table } from './table';
 
 import { RoomDataManager } from '../services/roomDataManager';
 
@@ -14,6 +15,7 @@ export class Room {
     private users: Set<User>;
     private objects: ObjectManager = new ObjectManager();
     private teams: TeamManager = new TeamManager();
+    private table: Table = new Table(100, 100);
     private code: string;
     private sessionId: string;
     private status: string = 'active'; // active, inactive, closed
@@ -85,6 +87,11 @@ export class Room {
         return this.code;
     }
 
+
+    getRoomTable(): Record<string, any> {
+        return this.table.getTable();
+    }
+
     getRoomInfo(): string {
         return JSON.stringify({
             sessionId: this.sessionId,
@@ -93,7 +100,9 @@ export class Room {
             // userCount: this.countUsers(),
             currentPlayers: this.countActiveUsers(),
             users: Array.from(this.users).map((user) => user.getUsername()),
-            objects: this.objects.getAll(),
+            // objects: this.objects.getAll(),
+            // table: this.table,
+            table: this.getRoomTable(),
             status: this.status
         });
     }

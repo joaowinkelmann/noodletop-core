@@ -8,7 +8,8 @@ import { RoomDataManager } from '../../services/roomDataManager';
 // const routeManager = RouteManager.getInstance();
 
 export const route: RouteInterface = {
-    pathRegex: 'api/room/export/\\w+',
+    // pathRegex: 'api/room/export/\\w+',
+    pathRegex: /api\/room\/export\/\w+/,
     method: 'get',
     handler: (req: Request) => {
         const roomId = req.url.split('/').pop();
