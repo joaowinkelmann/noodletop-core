@@ -3,7 +3,8 @@ import { StateManager } from '../../utils/stateManager';
 import { RouteInterface } from '../../routes';
 
 export const route: RouteInterface = {
-    pathRegex: 'api/object/get/\\w+',
+    // pathRegex: 'api/object/get/\\w+',
+    pathRegex: /api\/object\/get\/\w+/,
     method: 'get',
     handler: (req: Request) => {
         const roomCode = req.headers.get('roomCode');

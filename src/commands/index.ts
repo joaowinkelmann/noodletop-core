@@ -1,9 +1,10 @@
 import { shCss } from '../utils/common';
 import fs from 'fs';
 import path from 'path';
+import { State } from '../models/state';
 
 export interface CommandHandler {
-    [command: string]: (state: any, message: string) => void;
+    [command: string]: (state: State, message: string) => void;
 }
 
 /**

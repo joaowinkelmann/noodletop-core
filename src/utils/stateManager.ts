@@ -57,6 +57,7 @@ export class StateManager {
         socket.send('?ack');
     }
 
+    // public getState(socket: ServerWebSocket<WebSocketData>): State | undefined {
     public getState(socket: ServerWebSocket<WebSocketData>): State | undefined {
         const state: State | undefined = this.stateMap.get(socket) ?? undefined;
         if (state && state.roomCode) {
