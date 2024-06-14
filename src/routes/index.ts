@@ -78,3 +78,23 @@ export async function loadRoutes(): Promise<RouteInterface[]> {
 }
 
 export { routes };
+
+// handles a path and returns a response, after loading all the routes from the routes folder. if the path is not found, it returns a constant default response
+export async function mainRouter(req: Request): Promise<Response> {
+    // const routes = await loadRoutes(); // get all routes
+
+    // try to find a route that matches the request path, if not, return a default response
+    const route = routes.find((route) => new RegExp(route.pathRegex).test(new URL(req.url).pathname));
+    // return route ? route.handler(req) : Response.json({
+    //     "version": "1.0.0",
+    //     "name": "Bun",
+    // });
+    // return Response.json({
+    //     "version": "1.0.0",
+    //     "name": "Bun",
+    // });
+    return Promise.resolve(Response.json({
+        "version": "1.0.0",
+        "name": "Bun",
+    }));
+}

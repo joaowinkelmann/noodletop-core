@@ -33,20 +33,28 @@ export class StateManager {
         return StateManager.instance;
     }
 
-    private createState(socket: ServerWebSocket<WebSocketData>): State {
-        const state: State = {
-            status: 'ACK',
-            roomCode: '',
-            user: new User(socket)
-        };
+    // private createState(socket: ServerWebSocket<WebSocketData>): State {
+    //     const state: State = {
+    //         status: 'ACK',
+    //         roomCode: '',
+    //         user: new User(socket)
+    //     };
 
+    //     this.stateMap.set(socket, state);
+
+    //     StateManager.keepAlive(state);
+
+    //     socket.send(`u ${state.user.getId()}`);
+    //     socket.send('?ack');
+    //     return state;
+    // }
+
+    private createState(socket: ServerWebSocket<WebSocketData>): void {
+        const state = State.createState(socket);
         this.stateMap.set(socket, state);
-
         StateManager.keepAlive(state);
-
         socket.send(`u ${state.user.getId()}`);
         socket.send('?ack');
-        return state;
     }
 
     public getState(socket: ServerWebSocket<WebSocketData>): State | undefined {

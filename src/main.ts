@@ -11,6 +11,8 @@ const commands = await loadCommands();
 import { loadRoutes } from './routes';
 const routes = await loadRoutes();
 
+import { mainRouter } from './routes';
+
 Bun.serve<WebSocketData>({
     async fetch(req: Request, server) {
         const { pathname } = new URL(req.url);
@@ -27,16 +29,21 @@ Bun.serve<WebSocketData>({
             if (!success) {
                 return Response.redirect('/');
             }
-        } else if (pathname.startsWith('/api/')) {
-            const route = routes.find((route) => new RegExp(route.pathRegex).test(pathname));
-
-            if (route) {
-                return route.handler(req);
-            } else {
-                return new Response('Not Found', { status: 404 });
-            }
         } else {
-            return Response.redirect('/');
+            // const route = routes.find((route) => new RegExp(route.pathRegex).test(pathname));
+
+            // if (route) {
+            //     return route.handler(req);
+            // } else {
+            //     // return Response.redirect('/');
+            //     // return a homepage / info page
+            //     return Response.json({
+            //         "version": "1.0.0",
+            //         "name": "Bun",
+            //     });
+            // }
+            const teste = mainRouter(req);
+            console.log(teste);
         }
     },
     websocket: {
