@@ -4,14 +4,12 @@ import { Room } from '../models/room';
 
 export const listeners = [
     '/quit',
-    '/leave',
-    '/ping'
+    '/leave'
 ];
 
 export const helpString = [
     '/quit - Willingly disconnect from the room.',
-    '/leave - Leave the room temporarily, simulating the loss of connection.',
-    '/ping - Pong! Used to test latency while using a client.'
+    '/leave - Leave the room temporarily, simulating the loss of connection.'
 ];
 
 /**
@@ -40,9 +38,6 @@ export default function connection(state: State, input: string) {
         case '/leave':
             state.user.userLeaveRoom(); // set away status
             room.disconnectUser(state.user, false, 4100, '/leave');
-            break;
-        case '/ping':
-            state.user.getSocket().send('pong');
             break;
         default:
             break;

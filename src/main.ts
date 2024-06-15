@@ -43,7 +43,7 @@ Bun.serve<WebSocketData>({
             const command = message.toString().split(' ')[0];
             let handler = commands[command];
 
-            if (state?.status !== 'OK' && command !== '/ping') {
+            if (state.status !== 'OK' && command !== '/ping') {
                 handler = commands['/ingress'];
             } else {
                 if (!handler) {
