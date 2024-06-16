@@ -96,7 +96,6 @@ export class StateManager {
         }
 
         if (!this.restoreState(socket, socket.data.userId, socket.data.roomCode)) {
-            console.log("restore state failed, creating new state")
             this.createState(socket);
         }
     }
@@ -109,11 +108,10 @@ export class StateManager {
         const user = room.getUserById(userId);
 
         if (!user) {
-            global.log(`User ${userId} not found in room ${roomCode}`);
+            // global.log(`User ${userId} not found in room ${roomCode}`);
             return false;
         }
 
-        console.log(`Found user ${user.getUsername()} in room ${roomCode}`);
         // reassign the socket
         if (user.getSocket().readyState === WebSocket.OPEN) {
             this.stateMap.delete(user.getSocket());

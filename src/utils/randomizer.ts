@@ -96,9 +96,15 @@ export class Rand {
         let id = '';
         if (includeTimestamp) {
             const timestamp = Date.now();
-            id += this.toBase62(timestamp, 10); // gets the timestamp, and pads it to 10 chars
+            // const timestampMicro = process.hrtime()[1];
+            const timestampMicro = process.hrtime.bigint();
+            const paddedTimestamp = this.toBase62(timestamp, 10) + this.toBase62(timestampMicro, 7);
+            // console.log(`Timestamp: ${timestamp}\nTimestampMicro: ${timestampMicro}`)
+            // console.log(`Base62 timestamp: ${this.toBase62(timestamp, 10)}\nBase62 timestampMicro: ${this.toBase62(timestampMicro, 7)}\nBase62 padded: ${paddedTimestamp}`)
+            // id += this.toBase62(timestamp, 10); // gets the timestamp, and pads it to 10 chars
+            id += paddedTimestamp;
         }
-        while (id.length < length + (includeTimestamp ? 10 : 0)) { // account for 10 chars if timestamp is included
+        while (id.length < length + (includeTimestamp ? 17 : 0)) { // account for 17 chars if timestamp is included
             id += this.toBase62(this.int(0, 61), 1);
         }
         return id;
@@ -108,11 +114,19 @@ export class Rand {
      * Converts an ID string into a Date object.
      * Assumes that the timestamp takes up 10 characters in the given string.
      * @param id - The ID string to convert.
+     * @param getMicro - A boolean indicating whether to include the microtime in the output. Default is false.
      * @returns 'Sat Apr 20 2024 10:14:41 GMT-0300 (Brasilia Standard Time)' - A Date object representing the timestamp encoded in the ID.
      */
-    static dateFromId(id: string): Date {
+    static dateFromId(id: string, getMicro: boolean = false): Date | string {
         const timestampBase62 = id.slice(0, 10); // we're now using 10 chars to store the timestamp
         const timestamp = this.fromBase62(timestampBase62);
+        if (getMicro) {
+            // get the 7 characters after the timestamp, which is the microtime
+            const microtimeBase62 = id.slice(10, 17);
+            const microtime = this.fromBase62(microtimeBase62);
+            // return new Date(timestamp).toISOString() + microtime.toString();
+            return new Date(timestamp).toISOString() + ' Microtime:' + microtime.toString();
+        }
         return new Date(timestamp);
     }
 
@@ -146,18 +160,23 @@ export class Rand {
         return `#${rgb.map((c) => c.toString(16).padStart(2, '0')).join('')}`;
     }
 
-    static toBase62(num: number, minLength: number = 0): string {
+    static toBase62(value: number | bigint | string, minLength: number = 0): string {
+        let num: bigint;
         let result = '';
 
+        // convert to integer
+        num = BigInt(value);
+
+        // convert to base62
         while (num > 0) {
-          result = BASE62[num % 62] + result;
-          num = Math.floor(num / 62);
+            result = BASE62[Number(num % 62n)] + result;
+            num = num / 62n;
         }
 
+        // padding
         while (result.length < minLength) {
-          result = BASE62_PAD + result;
+            result = BASE62_PAD + result;
         }
-
         return result;
     }
 

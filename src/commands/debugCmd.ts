@@ -13,8 +13,16 @@ export default function debug(state: State, input: string) {
     switch (op) {
         case 'dateFromId':
             const idString = args[0];
-            response = String(Rand.dateFromId(idString));
-            response += `\nUnix: ${Rand.dateFromId(idString).getTime()}`;
+            const getMicro = args[1] === 'true' ? true : false;
+            const date = Rand.dateFromId(idString, getMicro);
+
+            if (date instanceof Date && !getMicro) {
+                response  = `Date: ${date.toISOString()}`;
+                response += `\nUnix: ${date.getTime()}`;
+            } else {
+                response = `Date: ${date}`;
+            }
+
             break;
         case 'getId':
             const length = parseInt(args[0], 10);

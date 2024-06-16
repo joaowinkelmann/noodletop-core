@@ -19,7 +19,7 @@ export default async function chat(state: State, input: string) {
     // const models = await groqService.getModels();
 
     const models = await groqService.getModels();
-    console.log(models);
+    // console.log(models);
 
     // response += `Models:\r\n`;
     // response += models.join('\r\n
