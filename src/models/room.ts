@@ -100,7 +100,7 @@ export class Room {
             // userCount: this.countUsers(),
             currentPlayers: this.countActiveUsers(),
             users: Array.from(this.users).map((user) => user.getUsername()),
-            // objects: this.objects.getAll(),
+            objects: this.objects.getAll(),
             // table: this.table,
             table: this.getRoomTable(),
             status: this.status
@@ -136,17 +136,27 @@ export class Room {
 
     // CRUD operations for users
     addUser(user: User): boolean {
-        // check if the user with the same name is already in the room
-        if (Array.from(this.users).find((u) => u.getUsername() === user.getUsername())) {
-            global.log(`User ${user.getUsername()} is already in the room`);
+        // check username
+        if (!this.isUsernameAvaliable(user.getUsername())) {
             return false;
         }
+
         this.users.add(user);
         return true;
     }
 
     isUsernameAvaliable(username: string): boolean {
         return !Array.from(this.users).find((user) => user.getUsername() === username);
+    }
+
+    getAvailableUsername(): string {
+        let username = '';
+        let pattern = Rand.bool() ? 'cn' : 'nn';
+        username = Rand.getName(2, '', true, pattern);
+        while (!this.isUsernameAvaliable(username)) {
+            this.getAvailableUsername();
+        }
+        return username;
     }
 
     promoteToAdmin(user: User): boolean {

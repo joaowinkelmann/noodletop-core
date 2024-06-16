@@ -69,6 +69,7 @@ export class StateManager {
 
     /**
      * Initializes the state for the given socket. Either by restoring it, or creating a new one.
+     * This method should always create or restore a state for the given socket, unless the IP is blocked.
      *
      * @param socket - The server WebSocket instance.
      */
@@ -95,6 +96,7 @@ export class StateManager {
         }
 
         if (!this.restoreState(socket, socket.data.userId, socket.data.roomCode)) {
+            console.log("restore state failed, creating new state")
             this.createState(socket);
         }
     }
@@ -111,8 +113,10 @@ export class StateManager {
             return false;
         }
 
+        console.log(`Found user ${user.getUsername()} in room ${roomCode}`);
         // reassign the socket
         if (user.getSocket().readyState === WebSocket.OPEN) {
+            this.stateMap.delete(user.getSocket());
             user.getSocket().close(4007, 'User reconnected');
         }
         user.setSocket(newSocket);
@@ -123,6 +127,7 @@ export class StateManager {
             user
         };
 
+        this.stateMap.set(newSocket, state);
         StateManager.keepAlive(state);
 
         return state;
@@ -204,6 +209,28 @@ export class StateManager {
 
     public isRoomCodeAvaliable(roomCode: string): boolean {
         return !this.rooms.has(roomCode);
+    }
+
+    public getAvaliableRoomCode(): string {
+        let pattern: string = '';
+
+        switch (Rand.int(1, 3)) {
+            case 1:
+                pattern = 'nnn';
+                break;
+            case 2:
+                pattern = 'can';
+                break;
+            default:
+                pattern = 'acn';
+                break;
+        }
+
+        let roomCode = Rand.getName(3, '-', false, pattern);
+        while (!this.isRoomCodeAvaliable(roomCode)) {
+            this.getAvaliableRoomCode();
+        }
+        return roomCode;
     }
 
     public authUser(roomCode: string, state: State, password: string): boolean {
