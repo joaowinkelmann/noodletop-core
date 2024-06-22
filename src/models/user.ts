@@ -7,7 +7,7 @@ import { Deck } from './deck';
 export class User {
     socket: ServerWebSocket<WebSocketData>;
     username: string;
-    id: string = Rand.id(56);
+    id: string = Rand.id(48);
     role: Role;
     status: UserStatus;
     cosmetics: UserCosmetics;

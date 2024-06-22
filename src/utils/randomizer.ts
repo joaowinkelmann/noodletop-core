@@ -88,23 +88,22 @@ export class Rand {
     /**
      * Generates a random alphanumeric ID of a given length.
      *
-     * @param length The length of the ID string. Default is 8. (Collision probability is 1 in 62^length within the same millisecond, assuming includeTimestamp is true.)
-     * @param includeTimestamp Adds a base62 encoded string of milliseconds since epoch at the start of the ID. Default is true.
+     * @param length The length of the ID string. Default is 8. (Collision probability is 1 in 62^length within the same nanosecond, assuming includeTimestamp is true.)
+     * @param includeTimestamp Adds a base62 encoded string of unix miliseconds + nanoseconds since epoch at the start of the ID. Default is true. Adds 16 characters to the ID.
+     *     The miliseconds are unix epoch time, and the nanoseconds are relative to the current Node.js process.
      * @returns The generated ID string.
      */
     static id(length: number = 8, includeTimestamp: boolean = true): string {
         let id = '';
         if (includeTimestamp) {
             const timestamp = Date.now();
-            // const timestampMicro = process.hrtime()[1];
-            const timestampMicro = process.hrtime.bigint();
-            const paddedTimestamp = this.toBase62(timestamp, 10) + this.toBase62(timestampMicro, 7);
-            // console.log(`Timestamp: ${timestamp}\nTimestampMicro: ${timestampMicro}`)
-            // console.log(`Base62 timestamp: ${this.toBase62(timestamp, 10)}\nBase62 timestampMicro: ${this.toBase62(timestampMicro, 7)}\nBase62 padded: ${paddedTimestamp}`)
-            // id += this.toBase62(timestamp, 10); // gets the timestamp, and pads it to 10 chars
+            const timestampNano = parseInt(String(process.hrtime()[1]).slice(-9)); // nanoseconds in the current second
+            const paddedTimestamp = this.toBase62(timestamp, 10) + this.toBase62(timestampNano, 6);
+            // console.log(`Timestamp: ${timestamp}\nNano: ${timestampNano}`)
+            // console.log(`Base62 timestamp: ${this.toBase62(timestamp, 10)}\nBase62 timestampNano: ${this.toBase62(timestampNano, 6)}\nBase62 padded: ${paddedTimestamp}`)
             id += paddedTimestamp;
         }
-        while (id.length < length + (includeTimestamp ? 17 : 0)) { // account for 17 chars if timestamp is included
+        while (id.length < length + (includeTimestamp ? 16 : 0)) { // account for 16 chars if timestamp is included
             id += this.toBase62(this.int(0, 61), 1);
         }
         return id;
@@ -114,18 +113,17 @@ export class Rand {
      * Converts an ID string into a Date object.
      * Assumes that the timestamp takes up 10 characters in the given string.
      * @param id - The ID string to convert.
-     * @param getMicro - A boolean indicating whether to include the microtime in the output. Default is false.
+     * @param getNano - A boolean indicating whether to include the nanoseconds in the output. Default is false.
      * @returns 'Sat Apr 20 2024 10:14:41 GMT-0300 (Brasilia Standard Time)' - A Date object representing the timestamp encoded in the ID.
      */
-    static dateFromId(id: string, getMicro: boolean = false): Date | string {
+    static dateFromId(id: string, getNano: boolean = false): Date | string {
         const timestampBase62 = id.slice(0, 10); // we're now using 10 chars to store the timestamp
         const timestamp = this.fromBase62(timestampBase62);
-        if (getMicro) {
-            // get the 7 characters after the timestamp, which is the microtime
-            const microtimeBase62 = id.slice(10, 17);
-            const microtime = this.fromBase62(microtimeBase62);
-            // return new Date(timestamp).toISOString() + microtime.toString();
-            return new Date(timestamp).toISOString() + ' Microtime:' + microtime.toString();
+        if (getNano) {
+            // get the 6 characters after the timestamp (encoded nanoseconds)
+            const nanotimeBase62 = id.slice(10, 16);
+            const nanotime = this.fromBase62(nanotimeBase62);
+            return new Date(timestamp).toISOString() + ' Nanotime:' + nanotime.toString();
         }
         return new Date(timestamp);
     }
@@ -160,9 +158,17 @@ export class Rand {
         return `#${rgb.map((c) => c.toString(16).padStart(2, '0')).join('')}`;
     }
 
-    static toBase62(value: number | bigint | string, minLength: number = 0): string {
+    /**
+     * Converts a number to a base62 string.
+     * 
+     * @param value - The number or bigint to convert.
+     * @param minLength - The minimum length of the resulting base62 string. Defaults to 0.
+     *     Uses the constant BASE62_PAD to pad the string.
+     * @returns The base62 string representation of the input value.
+     */
+    static toBase62(value: number | bigint, minLength: number = 0): string {
         let num: bigint;
-        let result = '';
+        let result: string = '';
 
         // convert to integer
         num = BigInt(value);
