@@ -2,8 +2,8 @@ import { webcrypto } from 'crypto';
 import * as fs from 'fs';
 import * as path from 'path';
 
-export const BASE62 = '0123456789abcdefghijklm_opqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-export const BASE62_PAD = 'n';
+const BASE62 = '0123456789abcdefghijklm_opqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+const BASE62_PAD = 'n';
 
 const assetsDir = path.join(__dirname, '../assets/');
 const adjectives = fs.readFileSync(path.join(assetsDir, 'english-adjectives.txt'), 'utf8').split('\n');
@@ -89,7 +89,7 @@ export class Rand {
      * Generates a random alphanumeric ID of a given length.
      *
      * @param length The length of the ID string. Default is 8. (Collision probability is 1 in 62^length within the same nanosecond, assuming includeTimestamp is true.)
-     * @param includeTimestamp Adds a base62 encoded string of unix miliseconds + nanoseconds since epoch at the start of the ID. Default is true. Adds 16 characters to the ID.
+     * @param includeTimestamp Adds a base62 encoded string of unix miliseconds + (micro + nanoseconds) since epoch at the start of the ID. Default is true. Adds 14 characters to the ID.
      *     The miliseconds are unix epoch time, and the nanoseconds are relative to the current Node.js process.
      * @returns The generated ID string.
      */
@@ -97,13 +97,13 @@ export class Rand {
         let id = '';
         if (includeTimestamp) {
             const timestamp = Date.now();
-            const timestampNano = parseInt(String(process.hrtime()[1]).slice(-9)); // nanoseconds in the current second
-            const paddedTimestamp = this.toBase62(timestamp, 10) + this.toBase62(timestampNano, 6);
+            const timestampNano = parseInt(String(process.hrtime()[1]).slice(-6)); // micro and nanoseconds in the same millisecond
+            const paddedTimestamp = this.toBase62(timestamp, 10) + this.toBase62(timestampNano, 4);
             // console.log(`Timestamp: ${timestamp}\nNano: ${timestampNano}`)
-            // console.log(`Base62 timestamp: ${this.toBase62(timestamp, 10)}\nBase62 timestampNano: ${this.toBase62(timestampNano, 6)}\nBase62 padded: ${paddedTimestamp}`)
+            // console.log(`Base62 timestamp: ${this.toBase62(timestamp, 10)}\nBase62 timestampNano: ${this.toBase62(timestampNano, 4)}\nBase62 padded: ${paddedTimestamp}`)
             id += paddedTimestamp;
         }
-        while (id.length < length + (includeTimestamp ? 16 : 0)) { // account for 16 chars if timestamp is included
+        while (id.length < length + (includeTimestamp ? 14 : 0)) { // account for 14 chars if timestamp is included
             id += this.toBase62(this.int(0, 61), 1);
         }
         return id;
@@ -120,8 +120,8 @@ export class Rand {
         const timestampBase62 = id.slice(0, 10); // we're now using 10 chars to store the timestamp
         const timestamp = this.fromBase62(timestampBase62);
         if (getNano) {
-            // get the 6 characters after the timestamp (encoded nanoseconds)
-            const nanotimeBase62 = id.slice(10, 16);
+            // get the 4 characters after the timestamp (encoded micro + nanoseconds)
+            const nanotimeBase62 = id.slice(10, 14);
             const nanotime = this.fromBase62(nanotimeBase62);
             return new Date(timestamp).toISOString() + ' Nanotime:' + nanotime.toString();
         }
