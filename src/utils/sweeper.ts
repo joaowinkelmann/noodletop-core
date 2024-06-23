@@ -6,8 +6,12 @@ import { shCss } from './common';
 // Class containing tasks to remove inactive instances
 export class RoomSweeper {
     private static instance: RoomSweeper;
+    private static auto_save: boolean = false;
 
-    private constructor() { }
+    private constructor() {
+        // console.log(String(process.env.SWEEP_DO_AUTO_SAVE).toLowerCase());
+        // RoomSweeper.auto_save = String(process.env.SWEEP_DO_AUTO_SAVE).toLowerCase() === 'true';
+     }
 
     public static getInstance(): RoomSweeper {
         if (!this.instance) {
@@ -31,9 +35,15 @@ export class RoomSweeper {
         // try to get from env, if it's not 0, otherwise use the default values
         const thresholdMins: number = parseInt(process.env.SWEEP_THRESHOLD_MINS || "40", 10);
         const retaskMins: number = parseInt(process.env.SWEEP_INTERVAL_MINS || "30", 10);
+        const autoSave: boolean = String(process.env.SWEEP_DO_AUTO_SAVE).toLowerCase() === 'true';
+
+        // global.log(`Starting sweeping process...`)
+        // global.log(`Threshold: ${thresholdMins} minutes`);
+        // global.log(`Interval: ${retaskMins} minutes`);
+        // global.log(`Auto-save: ${autoSave}`);
 
         this.checkUserActivity(thresholdMins, retaskMins);
-        this.sweepInactiveRooms(thresholdMins, retaskMins);
+        this.sweepInactiveRooms(thresholdMins, retaskMins, autoSave);
         this.isInitialized = true;
     }
 
@@ -71,7 +81,7 @@ export class RoomSweeper {
     }
 
     // task que verifica se os usuarios ja estão fora da sala por um tempo consideravel e so tem exited. nesse caso, salvamos o que restou da sala e passamos o fumo
-    private static sweepInactiveRooms(thresholdMins: number = 40, retaskMins: number = 30): void {
+    private static sweepInactiveRooms(thresholdMins: number = 40, retaskMins: number = 30, autoSave: boolean = false): void {
         global.log(`${shCss.magenta}→ Active Task → Sweeping inactive rooms every ${retaskMins} minutes. Threshold: ${thresholdMins} minutes.${shCss.end}`);
         setInterval(() => {
             const rooms: Map<string, Room> = StateManager.getInstance().getRooms();
@@ -89,6 +99,9 @@ export class RoomSweeper {
                             global.log(`${shCss.red}Failed to archive room ${room.getCode()}.${shCss.end}`);
                         }
                     }
+                } else if (autoSave) {
+                    global.log(`Auto-saving room ${room.getCode()}...`);
+                    await room.save();
                 }
             });
         },
