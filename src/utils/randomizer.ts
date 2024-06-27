@@ -201,18 +201,28 @@ export class Rand {
      * @param chunks The number of chunks to include in the name. Default is 3.
      * @param separator The separator to use between chunks. Default is '-'.
      * @param camelcase Indicates whether to use camel case for the name. Default is false.
-     * @param pattern The pattern to generate the name. Default is 'acn'.
+     * @param pattern The pattern to generate the name. If not provided, a random pattern will be used.
      *                'a' -> adjective || 'c' -> color || 'n' -> noun.
      * 
      * @returns The generated random name.
      * 
      * @throws Error if an invalid pattern character is provided.
      */
-    static getName(chunks: number = 3, separator: string = '-', camelcase: boolean = false, pattern: string = 'acn'): string {
+    static getName(chunks: number = 3, separator: string = '-', camelcase: boolean = false, pattern?: string): string {
         let name = '';
         let wordsArray: string[] = [];
+        
+        // Generate a random pattern if no pattern was provided
+        if (pattern === undefined) {
+            pattern = '';
+            const possibleChars = ['a', 'c', 'n'];
+            while (pattern.length < chunks) {
+                const randomIndex = this.int(0, possibleChars.length - 1);
+                pattern += possibleChars[randomIndex];
+            }
+        }
+        
         // Generate words based on pattern
-
         for (const char of pattern) {
             switch (char) {
                 case 'a':

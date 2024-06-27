@@ -151,8 +151,9 @@ export class Room {
 
     getAvailableUsername(): string {
         let username = '';
-        let pattern = Rand.bool() ? 'cn' : 'nn';
-        username = Rand.getName(2, '', true, pattern);
+        // let pattern = Rand.bool() ? 'cn' : 'nn';
+        // username = Rand.getName(2, '', true, pattern);
+        username = Rand.getName(2, '', true);
         while (!this.isUsernameAvaliable(username)) {
             this.getAvailableUsername();
         }

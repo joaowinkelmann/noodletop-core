@@ -210,21 +210,22 @@ export class StateManager {
     }
 
     public getAvaliableRoomCode(): string {
-        let pattern: string = '';
+        // let pattern: string = '';
 
-        switch (Rand.int(1, 3)) {
-            case 1:
-                pattern = 'nnn';
-                break;
-            case 2:
-                pattern = 'can';
-                break;
-            default:
-                pattern = 'acn';
-                break;
-        }
+        // switch (Rand.int(1, 3)) {
+        //     case 1:
+        //         pattern = 'nnn';
+        //         break;
+        //     case 2:
+        //         pattern = 'can';
+        //         break;
+        //     default:
+        //         pattern = 'acn';
+        //         break;
+        // }
 
-        let roomCode = Rand.getName(3, '-', false, pattern);
+        // const roomCode = Rand.getName(3, '-', false, pattern);
+        const roomCode = Rand.getName(3, '-', false);
         while (!this.isRoomCodeAvaliable(roomCode)) {
             this.getAvaliableRoomCode();
         }
