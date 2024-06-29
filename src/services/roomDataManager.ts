@@ -1,5 +1,6 @@
 import { Db } from '../database';
 import { Room } from '../models/room';
+import { State } from '../models/state';
 import { Rand } from '../utils/randomizer';
 import { StateManager } from '../utils/stateManager';
 
@@ -66,5 +67,7 @@ export class RoomDataManager {
         return room;
     }
 
-    // Other methods for backing up and importing data...
+    public getAllPublicRooms() {
+        StateManager.getInstance().getPublicRooms();
+    }
 }

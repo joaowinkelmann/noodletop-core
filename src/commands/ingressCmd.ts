@@ -3,7 +3,6 @@ import { StateManager } from '../utils/stateManager';
 import { Room } from '../models/room';
 import { User } from '../models/user';
 import message from './messageCmd';
-import { Rand } from '../utils/randomizer';
 
 export const listeners = [
     '/ingress'
@@ -95,7 +94,7 @@ export default function ingress(state: State, input: string) {
             let username = input.trim();
             const room: Room = StateManager.getInstance().getRoom(state.roomCode) as Room;
             if (!room) {
-                state.user.getSocket().close(4003, 'Invalid state');
+                state.user.getSocket().close(4002, 'Invalid state');
                 return;
             }
             // if the user hasn't informed a username, generate a random one
@@ -131,7 +130,7 @@ export default function ingress(state: State, input: string) {
             message(state, input);
             break;
         default:
-            state.user.getSocket().close(4003, 'Invalid state');
+            state.user.getSocket().close(4002, 'Invalid state');
             return;
     }
 

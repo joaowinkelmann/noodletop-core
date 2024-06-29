@@ -79,6 +79,10 @@ export class Room {
         return this.countUsers() === 0;
     }
 
+    isPublic(): boolean {
+        return this.settings.isPublic;
+    }
+
     getSessionId(): string {
         return this.sessionId;
     }
@@ -176,7 +180,9 @@ export class Room {
      * @param code - The WebSocket close code to send to the user's socket. Defaults to 1000.
      * @param reason - The reason for disconnecting the user.
      * Standard codes and reasons:
-     *  4003 - "Invalid state" : User was removed from the room due to a forbidden action
+     *  4002 - "Invalid state" : User was removed from the room due to a forbidden action
+     *  4003 - "Blocked IP"  : User was removed from the room due to being blocked
+     *  4004 - "Unable to verify IP address" : User was removed from the room due to an invalid IP address
      *  4100 - "/leave"    : User briefly disconnected from the room using /leave
      *  4700 - "Inactivity": User was removed from the room due to inactivity
      *  4900 - "/quit"     : User quit the room using /quit
