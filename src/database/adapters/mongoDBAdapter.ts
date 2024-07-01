@@ -80,8 +80,14 @@ export class MongoDBAdapter implements DatabaseAdapterInterface {
         return this.client.db(this.database).collection(collection).updateOne(query, { $set: update }, { upsert: true }).then((result) => {
             // return result.modifiedCount > 0;
             // se adicionou ou modificou algo, retorna true
-            return result.modifiedCount > 0 || result.upsertedCount > 0;
+            // se simplesmente encontrou o objeto, mas não teve que alterar nada, retorna true também, pois na prática, concluímos a operação
+            // global.log(`result object: ${JSON.stringify(result)}`);
+            // global.log("result.upsertedCount: " + result.upsertedCount);
+            // global.log("result.modifiedCount: " + result.modifiedCount);
+
+            return result.modifiedCount > 0 || result.upsertedCount > 0 || result.matchedCount > 0;
         }).catch((err) => {
+            global.log("deu ruim familia");
             console.error(err);
             return false;
         });

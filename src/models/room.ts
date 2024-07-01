@@ -5,7 +5,6 @@ import { Rand } from '../utils/randomizer';
 import { RoomSettings } from './dto/roomDTO';
 import { Connection, Role } from './dto/userDTO';
 import { Table } from './table';
-
 import { RoomDataManager } from '../services/roomDataManager';
 
 /**
@@ -218,6 +217,10 @@ export class Room {
         return this.users;
     }
 
+    getUser(userId: string): User | undefined {
+        return Array.from(this.users).find((user) => user.getId() === userId);
+    }
+
     getActiveUsers(): Set<User> {
         // return new Set(Array.from(this.users).filter((user) => user.getConnectionStatus()));
         // return new Set(Array.from(this.users).filter((user) => user.getConnectionStatus() === Connection.Active));
@@ -349,6 +352,8 @@ export class Room {
     async save(close: boolean = false): Promise<boolean>{
         // @todo - save to storage
         const ret = await RoomDataManager.saveRoom(this);
+
+        global.log(`ret: ${ret}`);
 
         if (close) {
             this.status = 'closed';

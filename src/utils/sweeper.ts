@@ -94,7 +94,8 @@ export class RoomSweeper {
                         const saved: boolean = await room.save();
                         if (saved) {
                             global.log(`Sucessfully archived room ${room.getCode()}. Now closing...`);
-                            rooms.delete(room.getCode());
+                            // rooms.delete(room.getCode());
+                            StateManager.getInstance().deleteRoom(room.getCode());
                         } else {
                             global.log(`${shCss.red}Failed to archive room ${room.getCode()}.${shCss.end}`);
                         }

@@ -1,6 +1,5 @@
 import { Db } from '../database';
 import { Room } from '../models/room';
-import { State } from '../models/state';
 import { Rand } from '../utils/randomizer';
 import { StateManager } from '../utils/stateManager';
 
@@ -12,11 +11,11 @@ export class RoomDataManager {
         const roomDataToSave = this.convertRoomToData(room);
         const db = new Db();
         const connected = await db.connect();
+        // global.log(`connected: ${connected}`);
 
         if (!connected) {
             return false;
         }
-
         // Save the room data...
         return await db.upsOne('rooms', { id: room.getSessionId() }, roomDataToSave);
     }

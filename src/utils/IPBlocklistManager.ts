@@ -23,10 +23,6 @@ export class IPBlocklistManager {
         }
     }
 
-    /**
-     * 
-     * @param state 
-     */
     public static addStrike(state: State): void {
         const ip = state.user.getSocket().data.ip;
         const ipInfo = this.ipBlocklist.get(ip);

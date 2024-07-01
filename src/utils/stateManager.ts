@@ -32,11 +32,19 @@ export class StateManager {
         socket.send('?ack');
     }
 
-    // public getState(socket: ServerWebSocket<WebSocketData>): State | undefined {
-    public getState(socket: ServerWebSocket<WebSocketData>): State | undefined {
-        const state: State | undefined = this.stateMap.get(socket) ?? undefined;
+    /**
+     * Retrieves the state associated with the given socket.
+     * If the state has a valid room code, it also updates the heartbeat of the corresponding room.
+     * This method should be called before processing any incoming messages.
+     * It will not allow sockets with invalid states (roomCode AND/OR userId not found) to proceed.
+     * @param socket - The user's socket.
+     * @returns The state associated with the socket, or undefined if not found.
+     */
+    public getState(socket: ServerWebSocket<WebSocketData>): State | null {
+        const state: State | null = this.stateMap.get(socket) ?? null;
         if (state && state.roomCode) {
-            const room: Room = this.getRoom(state.roomCode) as Room;
+            const room: Room | null = this.getRoom(state.roomCode);
+            if (!room) return null;
             room.heartbeat(state.user);
         }
         return state;
@@ -134,6 +142,17 @@ export class StateManager {
         RoomSweeper.startSweeping();
 
         return room;
+    }
+
+    public deleteRoom(roomCode: string): boolean {
+        global.log(`Deleting room ${roomCode}`);
+        if (this.rooms.delete(roomCode)) {
+            // global.log(`Room ${roomCode} deleted`);
+            return true;
+        } else {
+            // global.log(`Failed to delete room ${roomCode}`);
+            return false;
+        }
     }
 
     public getRooms(): Map<string, Room>{
