@@ -63,11 +63,11 @@ export class MongoDBAdapter implements DatabaseAdapterInterface {
     }
 
     // Create
-    insOne(collection: string, document: Record<string, any>): Promise<any> {
+    insOne(collection: string, newData: Record<string, any>): Promise<any> {
         // throw new Error('Method not implemented.');
         console.log('Inserting document into MongoDB...');
         // return this.client.db().collection(collection).insertOne(document);
-        return this.client.db(this.database).collection(collection).insertOne(document).then((result) => {
+        return this.client.db(this.database).collection(collection).insertOne(newData).then((result) => {
             console.log('Document inserted');
             return result;
         }).catch((err) => {
@@ -76,8 +76,8 @@ export class MongoDBAdapter implements DatabaseAdapterInterface {
     }
 
     // Upsert
-    upsOne(collection: string, query: Record<string, any>, update: Record<string, any>): Promise<boolean> {
-        return this.client.db(this.database).collection(collection).updateOne(query, { $set: update }, { upsert: true }).then((result) => {
+    upsOne(collection: string, query: Record<string, any>, newData: Record<string, any>): Promise<boolean> {
+        return this.client.db(this.database).collection(collection).updateOne(query, { $set: newData }, { upsert: true }).then((result) => {
             // return result.modifiedCount > 0;
             // se adicionou ou modificou algo, retorna true
             // se simplesmente encontrou o objeto, mas não teve que alterar nada, retorna true também, pois na prática, concluímos a operação
@@ -92,8 +92,8 @@ export class MongoDBAdapter implements DatabaseAdapterInterface {
             return false;
         });
     }
-    upsMany(collection: string, query: Record<string, any>, update: Record<string, any>[]): Promise<boolean> {
-        return this.client.db(this.database).collection(collection).updateMany(query, { $set: update }, { upsert: true }).then((result) => {
+    upsMany(collection: string, query: Record<string, any>, newData: Record<string, any>[]): Promise<boolean> {
+        return this.client.db(this.database).collection(collection).updateMany(query, { $set: newData }, { upsert: true }).then((result) => {
             return result.modifiedCount > 0 || result.upsertedCount > 0;
         }).catch((err) => {
             console.error(err);
@@ -123,8 +123,8 @@ export class MongoDBAdapter implements DatabaseAdapterInterface {
 
     // Update
     // example db.modOne('test', { name: 'test3' }, { $set: { name: 'test4' } });
-    modOne(collection: string, query: Record<string, any>, update: Record<string, any>): Promise<any> {
-        return this.client.db(this.database).collection(collection).updateOne(query, update).then
+    modOne(collection: string, query: Record<string, any>, newData: Record<string, any>): Promise<any> {
+        return this.client.db(this.database).collection(collection).updateOne(query, newData).then
         ((result) => {
             return result;
         }).catch((err) => {
@@ -132,8 +132,8 @@ export class MongoDBAdapter implements DatabaseAdapterInterface {
         });
     }
 
-    modMany(collection: string, query: Record<string, any>, update: Record<string, any>): Promise<any> {
-        return this.client.db(this.database).collection(collection).updateMany(query, update).then
+    modMany(collection: string, query: Record<string, any>, newData: Record<string, any>): Promise<any> {
+        return this.client.db(this.database).collection(collection).updateMany(query, newData).then
         ((result) => {
             return result;
         }).catch((err) => {

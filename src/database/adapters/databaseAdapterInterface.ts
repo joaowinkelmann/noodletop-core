@@ -4,20 +4,20 @@ export interface DatabaseAdapterInterface {
     disconnect(): Promise<boolean>;
 
     // Create
-    insOne(collection: string, document: Record<string, any>): Promise<boolean>;
-    insMany?(collection: string, documents: Record<string, any>[]): Promise<boolean[]>;
+    insOne(collection: string, newData: Record<string, any>): Promise<boolean>;
+    insMany?(collection: string, newData: Record<string, any>[]): Promise<boolean>;
 
     // Read
     getOne(collection: string, query: Record<string, any>): Promise<Record<string, any> | null>;
     getMany(collection: string, query: Record<string, any>): Promise<Record<string, any>[]>;
 
     // Update
-    modOne(collection: string, query: Record<string, any>, update: Record<string, any>): Promise<boolean>;
-    modMany?(collection: string, query: Record<string, any>, update: Record<string, any>[]): Promise<boolean[]>;
+    modOne(collection: string, query: Record<string, any>, newData: Record<string, any>): Promise<boolean>;
+    modMany?(collection: string, query: Record<string, any>, newData: Record<string, any>[]): Promise<boolean>;
 
     // Upsert
-    upsOne(collection: string, query: Record<string, any>, update: Record<string, any>): Promise<boolean>;
-    upsMany(collection: string, query: Record<string, any>, update: Record<string, any>[]): Promise<boolean[]>;
+    upsOne(collection: string, query: Record<string, any>, newData: Record<string, any>): Promise<boolean>;
+    upsMany(collection: string, query: Record<string, any>, newData: Record<string, any>[]): Promise<boolean>;
 
     // Delete
     remOne(collection: string, query: Record<string, any>): Promise<boolean>;

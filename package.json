@@ -25,7 +25,8 @@
   "dependencies": {
     "bun": "^1.1.17",
     "groq-sdk": "^0.4.0",
-    "mongodb": "^6.8.0"
+    "mongodb": "^6.8.0",
+    "postgres": "^3.4.4"
   },
   "devDependencies": {
     "@types/bun": "^1.1.6",
