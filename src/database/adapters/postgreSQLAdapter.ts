@@ -7,13 +7,14 @@ export class PostgreSQLAdapter implements DatabaseAdapterInterface {
     private client: postgres.Sql = postgres();
     private database: string;
 
-    constructor(uri: string, database: string) {
+    constructor(uri: string, database: string, username: string, password: string) {
         this.client = postgres(
             {
                 host: uri,
+                // port: 5432,
                 database: database,
-                username: 'postgres',
-                password: 'password'
+                username: username || 'postgres',
+                password: password || ''
             }
         );
         this.database = database;

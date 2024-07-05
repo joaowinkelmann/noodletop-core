@@ -49,7 +49,7 @@ export class Rand {
         }
 
         const matches = diceNotation.match(/(\d*)d(\d+)([-+]\d+)*/);
-        if (!matches) {
+        if (!matches || matches[0] == '0' || matches[2] == '0') {
             return '{"err": "Invalid dice notation"}'
         }
 
