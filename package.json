@@ -13,6 +13,7 @@
     "start": "bun run --bun ./src/main.ts",
     "lint": "eslint -c eslint.config.mjs",
     "build": "bun build --compile --minify --sourcemap ./src/main.ts --outfile ./dist/core",
+    "build-js": "bun build ./src/main.ts --target=bun --outfile=./dist/out.js --minify-syntax --minify-identifiers",
     "build-arm": "bun build --compile --target=bun-linux-arm64 --minify --sourcemap ./src/main.ts --outfile ./dist/core",
     "start-comp": "./dist/core",
     "prepare": "husky"
