@@ -1,7 +1,5 @@
 import postgres from 'postgres';
 import { DatabaseAdapterInterface } from './databaseAdapterInterface';
-import { $ } from 'bun';
-import { shCss } from '../../utils/common';
 
 export class PostgreSQLAdapter implements DatabaseAdapterInterface {
     private client: postgres.Sql = postgres();
@@ -96,10 +94,42 @@ export class PostgreSQLAdapter implements DatabaseAdapterInterface {
     }
 
     async upsOne(collection: string, query: Record<string, any>, newData: Record<string, any>): Promise<boolean> {
+        global.log("upsOne")
         return this.client.begin(async (sql) => {
             try {
-                const result = await sql`INSERT INTO ${collection} (name) VALUES (${newData.name}) ON CONFLICT (name) DO UPDATE SET name = ${newData.name}`;
-                console.log(JSON.stringify(result));
+                // const result = await sql`
+                //     INSERT INTO ${tableName} (${columnName}) 
+                //     VALUES (${sql.json(newData)}) 
+                //     ON CONFLICT (${conflictTarget}) 
+                //     DO UPDATE SET ${columnName} = ${sql.json(newData)}
+                // `;
+
+                // Instead, use dynamic table and column names based on newData, collection
+                const tableName = collection;
+                console.log(query);
+                console.log(Object.keys(query)[0]);
+                // console.log(query);
+                // console.log(query);
+                // console.log(query);
+                // console.log(query);
+                // const queryTarget = query[Object.keys(query)[0].valueOf];
+                // get the value from {key: value} in query
+                const conflictTarget = Object.keys(query)[0];
+                global.log(conflictTarget);
+
+                // iterate the keys in newData to get the column names
+                for (const key in newData) {
+                    const columnName = key;
+                    const conflictTarget = key;
+                    const result = await sql`
+                        INSERT INTO ${tableName} (${columnName}) 
+                        VALUES (${newData[columnName]}) 
+                        WHERE 
+                        ON CONFLICT (${conflictTarget}) 
+                        DO UPDATE SET ${columnName} = ${newData[columnName]}
+                    `;
+                    console.log(JSON.stringify(result));
+                }
                 return true;
             } catch (error) {
                 console.log(JSON.stringify(error));
@@ -114,10 +144,10 @@ export class PostgreSQLAdapter implements DatabaseAdapterInterface {
                 for (const data of newData) {
                     await sql`INSERT INTO ${collection} (name) VALUES (${data.name}) ON CONFLICT (name) DO UPDATE SET name = ${data.name}`;
                 }
-                console.log('All operations completed successfully');
+                global.log('All operations completed successfully');
                 return true;
             } catch (error) {
-                console.log(JSON.stringify(error));
+                global.log(JSON.stringify(error));
                 return false;
             }
         });

@@ -11,7 +11,7 @@ export class RoomDataManager {
         const roomDataToSave = this.convertRoomToData(room);
         const db = new Db();
         const connected = await db.connect();
-        // global.log(`connected: ${connected}`);
+        global.log(`connected: ${connected}`);
 
         if (!connected) {
             return false;
