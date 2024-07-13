@@ -1,13 +1,17 @@
 import { Room } from '../models/room';
 import { StateManager } from '../utils/stateManager';
 import { State } from '../models/state';
-import { isAdmin } from '../utils/common';
 
 export const listeners = [
     '/room'
 ];
 
-export const helpString = '/room - Perform operations within the room. Usage: /room [set|close|info|list|kick] [username]';
+export const helpString = '/room - Perform operations within the room. Usage: /room [set|close|info|list|kick] [username]\n' +
+    '\t\t/room set [key] [value] - Set a room data key to a value\n' +
+    '\t\t/room info - Get room information\n' +
+    '\t\t/room save - Save the room\n' +
+    '\t\t/room setpassword [password] - Set a password for the room';
+
 
 export default async function room(state: State, input: string) {
     const [command , op, ...args] = input.split(' ');
@@ -23,26 +27,6 @@ export default async function room(state: State, input: string) {
             break;
         case 'info':
             response = room.getRoomInfo();
-            break;
-        case 'create':
-        case 'add':
-            response = room.createTeam(argArr[0]);
-            break;
-        case 'join':
-            response = room.joinTeam(argArr[0], state.user);
-            break;
-        case 'leave':
-            response = String(room.leaveTeam(state.user));
-            break;
-        case 'delete':
-            if (!isAdmin(state.user)) return;
-            response = String(room.deleteTeam(argArr[0], state.user));
-            break;
-        case 'list':
-            response = room.listTeams();
-            break;
-        case 'get':
-            response = room.getTeam(argArr[0]);
             break;
         case 'save':
             response = String(await room.save());

@@ -4,25 +4,24 @@ export interface DatabaseAdapterInterface {
     disconnect(): Promise<boolean>;
 
     // Create
-    insOne(collection: string, document: Record<string, any>): Promise<boolean>;
-    insMany?(collection: string, documents: Record<string, any>[]): Promise<boolean>;
+    insOne(collection: string, newData: Record<string, any>): Promise<boolean>;
+    insMany?(collection: string, newData: Record<string, any>[]): Promise<boolean>;
 
     // Read
-    //                                         Promise<object | null>;
-    getOne(collection: string, query: Record<string, any>): Promise<any>;
-    getMany(collection: string, query: Record<string, any>): Promise<any>;
+    getOne(collection: string, query: Record<string, any>): Promise<Record<string, any> | null>;
+    getMany(collection: string, query: Record<string, any>): Promise<Record<string, any>[]>;
 
     // Update
-    modOne(collection: string, query: Record<string, any>, update: Record<string, any>): Promise<any>;
-    modMany?(collection: string, query: Record<string, any>, update: Record<string, any>[]): Promise<any>;
+    modOne(collection: string, query: Record<string, any>, newData: Record<string, any>): Promise<boolean>;
+    modMany?(collection: string, query: Record<string, any>, newData: Record<string, any>[]): Promise<boolean>;
 
     // Upsert
-    upsOne(collection: string, query: Record<string, any>, update: Record<string, any>): Promise<boolean>;
-    upsMany(collection: string, query: Record<string, any>, update: Record<string, any>[]): Promise<boolean>;
+    upsOne(collection: string, query: Record<string, any>, newData: Record<string, any>): Promise<boolean>;
+    upsMany(collection: string, query: Record<string, any>, newData: Record<string, any>[]): Promise<boolean>;
 
     // Delete
-    remOne(collection: string, query: Record<string, any>): Promise<any>;
-    remMany(collection: string, query: Record<string, any>[]): Promise<any>;
+    remOne(collection: string, query: Record<string, any>): Promise<boolean>;
+    remMany(collection: string, query: Record<string, any>[]): Promise<boolean>;
 
     // Misc
     setup?(): Promise<boolean>;

@@ -5,10 +5,10 @@ import * as path from 'path';
 const BASE62 = '0123456789abcdefghijklm_opqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
 const BASE62_PAD = 'n';
 
-const assetsDir = path.join(__dirname, '../assets/');
-const adjectives = fs.readFileSync(path.join(assetsDir, 'english-adjectives.txt'), 'utf8').split('\n');
-const colors = fs.readFileSync(path.join(assetsDir, 'english-colors.txt'), 'utf8').split('\n');
-const nouns = fs.readFileSync(path.join(assetsDir, 'english-nouns.txt'), 'utf8').split('\n');
+const textAssetsDir = path.join(__dirname, '../assets/text/');
+const adjectives = fs.readFileSync(path.join(textAssetsDir, 'english-adjectives.txt'), 'utf8').split('\n');
+const colors = fs.readFileSync(path.join(textAssetsDir, 'english-colors.txt'), 'utf8').split('\n');
+const nouns = fs.readFileSync(path.join(textAssetsDir, 'english-nouns.txt'), 'utf8').split('\n');
 
 export class Rand {
     /**
@@ -49,7 +49,7 @@ export class Rand {
         }
 
         const matches = diceNotation.match(/(\d*)d(\d+)([-+]\d+)*/);
-        if (!matches) {
+        if (!matches || matches[0] == '0' || matches[2] == '0') {
             return '{"err": "Invalid dice notation"}'
         }
 

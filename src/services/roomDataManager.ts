@@ -11,11 +11,11 @@ export class RoomDataManager {
         const roomDataToSave = this.convertRoomToData(room);
         const db = new Db();
         const connected = await db.connect();
+        global.log(`connected: ${connected}`);
 
         if (!connected) {
             return false;
         }
-
         // Save the room data...
         return await db.upsOne('rooms', { id: room.getSessionId() }, roomDataToSave);
     }
@@ -66,5 +66,7 @@ export class RoomDataManager {
         return room;
     }
 
-    // Other methods for backing up and importing data...
+    public getAllPublicRooms() {
+        StateManager.getInstance().getPublicRooms();
+    }
 }

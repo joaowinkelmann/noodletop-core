@@ -5,7 +5,6 @@ import { Rand } from '../utils/randomizer';
 import { RoomSettings } from './dto/roomDTO';
 import { Connection, Role } from './dto/userDTO';
 import { Table } from './table';
-
 import { RoomDataManager } from '../services/roomDataManager';
 
 /**
@@ -77,6 +76,10 @@ export class Room {
 
     isEmpty(): boolean {
         return this.countUsers() === 0;
+    }
+
+    isPublic(): boolean {
+        return this.settings.isPublic;
     }
 
     getSessionId(): string {
@@ -176,7 +179,9 @@ export class Room {
      * @param code - The WebSocket close code to send to the user's socket. Defaults to 1000.
      * @param reason - The reason for disconnecting the user.
      * Standard codes and reasons:
-     *  4003 - "Invalid state" : User was removed from the room due to a forbidden action
+     *  4002 - "Invalid state" : User was removed from the room due to a forbidden action
+     *  4003 - "Blocked IP"  : User was removed from the room due to being blocked
+     *  4004 - "Unable to verify IP address" : User was removed from the room due to an invalid IP address
      *  4100 - "/leave"    : User briefly disconnected from the room using /leave
      *  4700 - "Inactivity": User was removed from the room due to inactivity
      *  4900 - "/quit"     : User quit the room using /quit
@@ -210,6 +215,10 @@ export class Room {
 
     getUsers(): Set<User> {
         return this.users;
+    }
+
+    getUser(userId: string): User | undefined {
+        return Array.from(this.users).find((user) => user.getId() === userId);
     }
 
     getActiveUsers(): Set<User> {
@@ -343,6 +352,8 @@ export class Room {
     async save(close: boolean = false): Promise<boolean>{
         // @todo - save to storage
         const ret = await RoomDataManager.saveRoom(this);
+
+        global.log(`ret: ${ret}`);
 
         if (close) {
             this.status = 'closed';
