@@ -39,7 +39,7 @@ Bun.serve<WebSocketData>({
         },
         message(ws, message) {
             const state = StateManager.getInstance().getState(ws);
-            if (!state) return;
+            if (!state) return ws.close(4002, "Invalid state");
             const command = message.toString().split(' ')[0];
             let handler = commands[command];
 
