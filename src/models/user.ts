@@ -7,14 +7,16 @@ import { Deck } from './deck';
 export class User {
     socket: ServerWebSocket<WebSocketData>;
     username: string;
-    id: string = Rand.id(50);
+    id: string = Rand.id(58);
+    // pid: string = Rand.id(8, false);
+    pid: string;
     role: Role;
     status: UserStatus;
     cosmetics: UserCosmetics;
     // private deck: Deck = new Deck();
     deck: Deck = new Deck();
 
-    constructor(socket: ServerWebSocket<WebSocketData>) {
+    constructor(socket: ServerWebSocket<WebSocketData>, pid: string) {
         this.socket = socket;
         this.status = {
             connection: Connection.Active,
@@ -26,6 +28,7 @@ export class User {
             team: null
         };
         this.role = Role.Player;
+        this.pid = pid;
     }
 
     // Role related methods
@@ -45,6 +48,7 @@ export class User {
     getInfo(): string {
         return JSON.stringify({
             id: this.id,
+            pid: this.pid,
             username: this.username,
             status: this.status,
             cosmetics: this.cosmetics,

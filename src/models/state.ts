@@ -2,6 +2,7 @@
 import { ServerWebSocket } from 'bun';
 import { WebSocketData } from '../utils/common';
 import { User } from './user';
+import { Rand } from '../utils/randomizer';
 
 // export type State = {
 //     // 1st State: ACK  -> User must perform a handshake by sending back the received userId, confirming its integrity
@@ -22,7 +23,7 @@ export class State {
     constructor(socket: ServerWebSocket<WebSocketData>) {
         this.status = 'ACK';
         this.roomCode = '';
-        this.user = new User(socket);
+        this.user = new User(socket, Rand.id(2));
     }
 
     static createState(socket: ServerWebSocket<WebSocketData>): State {

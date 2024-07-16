@@ -90,7 +90,6 @@ export class Room {
         return this.code;
     }
 
-
     getRoomTable(): Record<string, any> {
         return this.table.getTable();
     }
