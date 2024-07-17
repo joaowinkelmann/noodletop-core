@@ -54,7 +54,7 @@ export default function debug(state: State, input: string) {
         case "away":
             // forcibly disconnect a user, setting their status to away
             const room = StateManager.getInstance().getRoom(state.roomCode) as Room;
-            const user = room.getUser(state.user.getId());
+            const user = room.getUser(state.user.getToken());
             if (!room || !user) return "Invalid room or user.";
             room.disconnectUser(user, false, 4700, 'Inactivity (DEBUG)');
             user.setConnectionStatus(Connection.Away);

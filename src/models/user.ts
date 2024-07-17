@@ -7,7 +7,7 @@ import { Deck } from './deck';
 export class User {
     socket: ServerWebSocket<WebSocketData>;
     username: string;
-    id: string = Rand.id(58);
+    tkn: string = Rand.id(58);
     // pid: string = Rand.id(8, false);
     pid: string;
     role: Role;
@@ -98,8 +98,8 @@ export class User {
         return `Username changed from ${currentUsername} to ${newUsername}`;
     }
 
-    getId(): string {
-        return this.id;
+    getToken(): string {
+        return this.tkn;
     }
 
     getColor(): string {

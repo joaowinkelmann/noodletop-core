@@ -26,11 +26,11 @@ export default function ingress(state: State, input: string) {
                 return; // ignore the request
             }
 
-            if (id !== state.user.getId()) {
+            if (id !== state.user.getToken()) {
                 // @todo - Handle as error in the future.
                 // @todo - check for profanity, perhaps
                 state.user.getSocket().send('{err: "Invalid ACK, try again"}');
-                state.user.getSocket().send(`u ${state.user.getId()}`);
+                state.user.getSocket().send(`u ${state.user.getToken()}`);
                 return; // ignore the request
             } else {
                 state.status = 'ROOM'; // user is now being asked to enter a room code

@@ -28,7 +28,7 @@ export class StateManager {
         const state = State.createState(socket);
         this.stateMap.set(socket, state);
         StateManager.keepAlive(state);
-        socket.send(`u ${state.user.getId()}`);
+        socket.send(`u ${state.user.getToken()}`);
         socket.send('?ack');
     }
 

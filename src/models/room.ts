@@ -202,7 +202,7 @@ export class Room {
         if (user) {
             user.quitRoom();
 
-            this.objects.yieldOwnership(user.getId(), null);
+            this.objects.yieldOwnership(user.getToken(), null);
 
             // this.removeUser(user);
         }
@@ -217,7 +217,7 @@ export class Room {
     }
 
     getUser(userId: string): User | undefined {
-        return Array.from(this.users).find((user) => user.getId() === userId);
+        return Array.from(this.users).find((user) => user.getToken() === userId);
     }
 
     getActiveUsers(): Set<User> {
@@ -239,8 +239,8 @@ export class Room {
     }
 
     // Method to get a single user by its ID, used for recconecting a user back to a room
-    getUserById(id: string): User | undefined {
-        return Array.from(this.users).find((user) => user.getId() === id);
+    getUserByToken(id: string): User | undefined {
+        return Array.from(this.users).find((user) => user.getToken() === id);
     }
 
     // CRUD operations for teams
@@ -253,7 +253,7 @@ export class Room {
     }
 
     joinTeam(teamId: string, user: User): string {
-        this.teams.join(teamId, user.getId());
+        this.teams.join(teamId, user.getToken());
         user.setTeam(teamId);
 
         const team = this.teams.get(teamId);
@@ -275,7 +275,7 @@ export class Room {
         if (!teamId) {
             return false;
         }
-        this.teams.leave(teamId, user.getId());
+        this.teams.leave(teamId, user.getToken());
         user.setTeam(null);
         return true;
     }

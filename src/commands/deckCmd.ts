@@ -26,7 +26,7 @@ export default function deck(state: State, input: string) {
             if (args.length > 1 && isJSON(args[1])) {
                 props = JSON.parse(args[1]);
             }
-            deck.addToDeck(state.user.getId(), args[0], props);
+            deck.addToDeck(state.user.getToken(), args[0], props);
             response = 'Added to deck';
             break;
         case 'get':
